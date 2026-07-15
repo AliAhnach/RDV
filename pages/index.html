@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini Plateforme RDV - Dashboard</title>
+
+  <!-- Route Guard -->
+  <script src="../assets/js/cognito.js"></script>
+  <script>requireAuth();</script>
+
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link rel="stylesheet" href="../assets/css/dashboard.css"/>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <a class="sidebar-logo" href="./index.html">
+      <div class="logo-badge"><span>RDV</span></div>
+      <div class="logo-text">
+        <span class="logo-text__main">RDV</span>
+        <span class="logo-text__sub">Plateforme</span>
+      </div>
+    </a>
+
+    <nav>
+      <a href="./index.html" class="active">🏠 Dashboard</a>
+      <a href="./rendez-vous.html">📅 Rendez-vous</a>
+      <a href="./clients.html">👥 Clients</a>
+      <a href="./messages.html">💬 Messages</a>
+      <a href="./parametres.html">⚙️ Paramètres</a>
+      <a href="#" onclick="cognitoSignOut(); return false;">🚪 Déconnexion</a>
+    </nav>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- Topbar -->
+    <div class="dash-header">
+      <div class="search-wrap">
+        <svg width="14" height="14" fill="none" stroke="#7a7a9a" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" placeholder="Rechercher médicaments, pharmacies…"/>
+        <span class="kbd">⌘ K</span>
+      </div>
+
+      <div class="dash-header-right">
+        <button class="hdr-icon-btn" id="btn-notifications" title="Notifications">
+          🔔<span class="hdr-badge"></span>
+        </button>
+        <button class="hdr-icon-btn" title="Messages">
+          💬<span class="hdr-badge"></span>
+        </button>
+        <div class="profile-pill" id="btn-profile">
+          <div class="pill-avatar" id="pill-initials">?</div>
+          <div>
+            <div class="pill-name"  id="pill-name">—</div>
+            <div class="pill-handle" id="pill-handle">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content grid -->
+    <div class="dash-content">
+
+      <!-- ── Left panel ── -->
+      <div class="left-panel">
+
+        <div class="section-label">Needs refill soon</div>
+
+        <div class="med-card">
+          <div class="med-icon ic-purple">💊</div>
+          <div class="med-info">
+            <div class="med-name">Metformin</div>
+            <div class="med-meta">
+              <span>500 mg · 30 tabs</span>
+              <span class="mtag mtag-warn">3 days left</span>
+            </div>
+          </div>
+          <div class="med-price">€3.20</div>
+        </div>
+
+        <div class="med-card">
+          <div class="med-icon ic-yellow">🌟</div>
+          <div class="med-info">
+            <div class="med-name">Vitamin D3</div>
+            <div class="med-meta">
+              <span>1000 IU · 60 caps</span>
+              <span class="mtag mtag-warn">5 days left</span>
+            </div>
+          </div>
+          <div class="med-price">€4.50</div>
+        </div>
+
+        <div class="med-card">
+          <div class="med-icon ic-blue">💉</div>
+          <div class="med-info">
+            <div class="med-name">Lisinopril</div>
+            <div class="med-meta">
+              <span>10 mg · 28 tabs</span>
+              <span class="mtag mtag-purple">7 days left</span>
+            </div>
+          </div>
+          <div class="med-price">€2.10</div>
+        </div>
+
+        <div class="section-label">Others by prescription</div>
+
+        <div class="med-card">
+          <div class="med-icon ic-green">🧬</div>
+          <div class="med-info">
+            <div class="med-name">Atorvastatin</div>
+            <div class="med-meta">
+              <span>20 mg · 30 tabs</span>
+              <span class="mtag mtag-purple">Rx required</span>
+            </div>
+          </div>
+          <div class="med-price">€0.90</div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary">
+          <div class="sum-row"><span>Metformin 500 mg</span><span>€3.20</span></div>
+          <div class="sum-row"><span>Vitamin D3 1000 IU</span><span>€4.50</span></div>
+          <div class="sum-row"><span>Lisinopril 10 mg</span><span>€2.10</span></div>
+          <div class="sum-row"><span>Atorvastatin 20 mg</span><span>€0.90</span></div>
+          <div class="sum-row total"><span>Total</span><span>€10.70</span></div>
+          <button class="order-btn" onclick="placeOrder(this)">
+            Place Order
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M7 17 17 7M7 7h10v10"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ── Right panel (welcome) ── -->
+      <div class="right-panel">
+
+        <!-- Welcome -->
+        <div class="welcome-block">
+          <div class="welcome-greeting">
+            Bonjour <span class="grad-name" id="welcome-name">!</span> 👋
+          </div>
+          <div class="welcome-sub">Ravi de vous revoir sur votre espace santé.</div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon si-purple">📅</div>
+            <div class="stat-value">4</div>
+            <div class="stat-label">Rendez-vous</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon si-blue">👥</div>
+            <div class="stat-value">12</div>
+            <div class="stat-label">Clients</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon si-green">💬</div>
+            <div class="stat-value">3</div>
+            <div class="stat-label">Messages</div>
+          </div>
+        </div>
+
+        <!-- Platform description card -->
+        <div class="platform-desc-card">
+          <div class="pdc-top">
+            <div class="pdc-icon">🏥</div>
+            <span class="pdc-badge">Nouveau</span>
+          </div>
+          <div class="pdc-title">Mini Plateforme RDV</div>
+          <div class="pdc-desc">
+            Gérez vos rendez-vous, suivez vos clients et communiquez en temps réel
+            depuis une interface simple, rapide et sécurisée. Tout ce dont vous avez
+            besoin est ici, en un seul endroit.
+          </div>
+          <div class="pdc-features">
+            <span class="pdc-feat">📅 Rendez-vous</span>
+            <span class="pdc-feat">👥 Clients</span>
+            <span class="pdc-feat">💬 Messages</span>
+            <span class="pdc-feat">⚙️ Paramètres</span>
+            <span class="pdc-feat">🔒 Sécurisé</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/dashboard.js"></script>
+</body>
+</html>

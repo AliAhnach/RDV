@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Plateforme RDV - Rendez-vous</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div class="container">
+
+    <aside class="sidebar">
+        <a class="sidebar-logo" href="./index.html">
+            <div class="logo-badge"><span>RDV</span></div>
+            <div class="logo-text">
+                <span class="logo-text__main">RDV</span>
+                <span class="logo-text__sub">Plateforme</span>
+            </div>
+        </a>
+  
+
+        <nav>
+            <a href="./index.html">🏠 Dashboard</a>
+            <a href="./rendez-vous.html" class="active">📅 Rendez-vous</a>
+            <a href="./clients.html">👥 Clients</a>
+            <a href="./messages.html">💬 Messages</a>
+            <a href="./parametres.html">⚙️ Paramètres</a>
+            <a href="#" onclick="cognitoSignOut(); return false;">🚪 Déconnexion</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <input id="search" type="text" placeholder="Rechercher un rendez-vous...">
+            <div class="icons">
+                <button id="btn-notifications" class="icon-btn" type="button" title="Notifications" aria-label="Notifications">🔔</button>
+                <button id="btn-profile" class="icon-btn" type="button" title="Profil" aria-label="Profil">👤</button>
+            </div>
+        </header>
+
+
+        <section class="appointments">
+            <h3>Tous les rendez-vous</h3>
+            <div id="rdv-list" class="rdv-list" aria-live="polite"></div>
+            <div id="rdv-empty" class="empty" hidden>Aucun rendez-vous trouvé.</div>
+        </section>
+    </main>
+</div>
+
+<!-- Modal RDV -->
+<div id="rdv-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="rdv-modal-title" hidden>
+    <div class="modal">
+        <button class="modal-close" id="rdv-modal-close" aria-label="Fermer">✖</button>
+        <h3 id="rdv-modal-title">Détails du rendez-vous</h3>
+        <div class="modal-body">
+            <p><strong>Client :</strong> <span id="modal-client">—</span></p>
+            <p><strong>Heure :</strong> <span id="modal-time">—</span></p>
+            <p><strong>Type :</strong> <span id="modal-type">—</span></p>
+            <p><strong>Statut :</strong> <span id="modal-status" class="pill">—</span></p>
+            <p class="modal-desc"><strong>Description :</strong> <span id="modal-desc">—</span></p>
+        </div>
+        <div class="modal-actions">
+            <button id="modal-action" class="primary">Confirmer</button>
+            <button id="modal-secondary" class="ghost">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<script src="../assets/js/app.js"></script>
+</body>
+</html>
+

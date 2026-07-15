@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RDV - Connexion</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Avb2QiuDEEvB4h8uHh2zYcGfHcZt1qg3r2h2V5uBzv0y9wQ6fQhKj2bWb8Qn9uQ3wQH2h2p0yB6nKcS7m7Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link rel="stylesheet" href="../assets/css/auth.css" />
+
+  <script src="../assets/js/cognito.js"></script>
+</head>
+<body>
+  <main class="auth-page" id="auth-page" aria-label="Authentication">
+    <section class="auth-card" aria-label="Authentication card">
+      <!-- Right overlay (always present on desktop) -->
+      <div class="auth-overlay" aria-hidden="false">
+        <div class="overlay-inner" aria-live="polite">
+          <div class="overlay-panel overlay-panel--signin" aria-hidden="true">
+            <h1 class="overlay-title">Bon retour !</h1>
+            <p class="overlay-desc">Connectez-vous pour continuer à gérer vos rendez-vous sur RDV.</p>
+            <button class="overlay-cta" type="button" data-overlay-cta="signin">
+              <span>Go to Sign In</span>
+              <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div class="overlay-panel overlay-panel--signup" aria-hidden="false">
+            <h1 class="overlay-title">Rejoignez RDV</h1>
+            <p class="overlay-desc">Créez votre compte en quelques secondes. Gérez vos rendez-vous, clients et messages en un seul endroit.</p>
+            <button class="overlay-cta" type="button" data-overlay-cta="signup">
+              <span>Create Account</span>
+              <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Left forms area -->
+      <div class="auth-forms" aria-label="Authentication forms">
+        <header class="auth-header" aria-label="Brand">
+          <div class="brand" aria-label="RDV logo">
+            <span class="brand-mark" aria-hidden="true">R</span>
+            <span class="brand-name">RDV</span>
+          </div>
+        </header>
+
+        <!-- Sign In Form -->
+        <div class="auth-forms-body">
+        <form class="auth-form auth-form--signin" id="form-signin" novalidate autocomplete="on">
+          <h2 class="form-title">Connexion à RDV</h2>
+          <p class="form-subtitle">Use your email and password to access your dashboard.</p>
+
+          <div class="social" aria-label="Social login">
+            <button type="button" class="social-btn social-btn--facebook" aria-label="Continue with Facebook">
+              <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
+              <span>Facebook</span>
+            </button>
+            <button type="button" class="social-btn social-btn--google" aria-label="Continue with Google">
+              <i class="fa-brands fa-google" aria-hidden="true"></i>
+              <span>Google</span>
+            </button>
+            <button type="button" class="social-btn social-btn--linkedin" aria-label="Continue with LinkedIn">
+              <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+              <span>LinkedIn</span>
+            </button>
+          </div>
+
+          <div class="separator" role="separator" aria-label="Email separator">
+            <span class="separator-line" aria-hidden="true"></span>
+            <span class="separator-text">or use your email</span>
+            <span class="separator-line" aria-hidden="true"></span>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="signin-email">Email</label>
+            <div class="input-with-icon">
+              <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+              <input id="signin-email" name="email" type="email" inputmode="email" placeholder="you@example.com" required />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="signin-password">Password</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              <input id="signin-password" name="password" type="password" placeholder="••••••••" required />
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <a class="forgot" href="#" aria-label="Forgot password">Forgot password?</a>
+          </div>
+
+          <p id="auth-message" class="auth-message" aria-live="polite"></p>
+
+          <button class="primary-btn primary-btn--green" type="submit">
+            <span>Sign In</span>
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+
+
+          <p class="switch-text">
+            New here?
+            <button type="button" class="link-btn" data-switch="signup" aria-label="Switch to Sign Up">Create an account</button>
+          </p>
+        </form>
+
+        <!-- Sign Up Form -->
+        <form class="auth-form auth-form--signup" id="form-signup" novalidate autocomplete="on">
+          <h2 class="form-title">Create Account</h2>
+          <p class="form-subtitle">Rejoignez RDV pour gérer vos clients, rendez-vous et messages facilement.</p>
+
+          <div class="social" aria-label="Social login">
+            <button type="button" class="social-btn social-btn--facebook" aria-label="Continue with Facebook">
+              <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
+              <span>Facebook</span>
+            </button>
+            <button type="button" class="social-btn social-btn--google" aria-label="Continue with Google">
+              <i class="fa-brands fa-google" aria-hidden="true"></i>
+              <span>Google</span>
+            </button>
+            <button type="button" class="social-btn social-btn--linkedin" aria-label="Continue with LinkedIn">
+              <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+              <span>LinkedIn</span>
+            </button>
+          </div>
+
+          <div class="separator" role="separator" aria-label="Email separator">
+            <span class="separator-line" aria-hidden="true"></span>
+            <span class="separator-text">or use your email</span>
+            <span class="separator-line" aria-hidden="true"></span>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="signup-name">Full Name</label>
+            <div class="input-with-icon">
+              <i class="fa-regular fa-user" aria-hidden="true"></i>
+              <input id="signup-name" name="name" type="text" placeholder="Your full name" required />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="signup-email">Email</label>
+            <div class="input-with-icon">
+              <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+              <input id="signup-email" name="email" type="email" inputmode="email" placeholder="you@example.com" required />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="signup-password">Password</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              <input id="signup-password" name="password" type="password" placeholder="Create a password" required minlength="4" />
+            </div>
+          </div>
+
+          <p id="auth-message2" class="auth-message" aria-live="polite"></p>
+
+          <button class="primary-btn primary-btn--green" type="submit">
+            <span>Sign Up</span>
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+
+
+          <p class="switch-text">
+            Already have an account?
+            <button type="button" class="link-btn" data-switch="signin" aria-label="Switch to Sign In">Sign in</button>
+          </p>
+        </form>
+        </div><!-- /.auth-forms-body -->
+
+        <!-- Toggle buttons (kept hidden visually; overlay handles the main narrative) -->
+        <div class="sr-only" aria-hidden="false">
+          <button type="button" data-switch="signin">Sign In</button>
+          <button type="button" data-switch="signup">Sign Up</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>
+

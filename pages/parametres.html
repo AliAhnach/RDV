@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Plateforme RDV - Paramètres</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/parametres.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+</head>
+<body>
+
+<div class="container">
+
+    <aside class="sidebar">
+        <a class="sidebar-logo" href="./index.html">
+            <div class="logo-badge"><span>RDV</span></div>
+            <div class="logo-text">
+                <span class="logo-text__main">RDV</span>
+                <span class="logo-text__sub">Plateforme</span>
+            </div>
+        </a>
+  
+
+        <nav>
+            <a href="./index.html">🏠 Dashboard</a>
+            <a href="./rendez-vous.html">📅 Rendez-vous</a>
+            <a href="./clients.html">👥 Clients</a>
+            <a href="./messages.html">💬 Messages</a>
+            <a href="./parametres.html" class="active">⚙️ Paramètres</a>
+            <a href="#" onclick="cognitoSignOut(); return false;">🚪 Déconnexion</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <input id="search" type="text" placeholder="Rechercher...">
+            <div class="icons">
+                <button id="btn-notifications" class="icon-btn" type="button" title="Notifications">🔔</button>
+                <button id="btn-profile"       class="icon-btn" type="button" title="Profil">👤</button>
+            </div>
+        </header>
+
+        <div class="settings-page">
+
+            <!-- ── Profile hero ── -->
+            <div class="profile-hero">
+                <div class="profile-hero__avatar" id="hero-avatar">?</div>
+                <div class="profile-hero__info">
+                    <div class="profile-hero__name"  id="hero-name">—</div>
+                    <div class="profile-hero__email" id="hero-email">—</div>
+                    <div class="profile-hero__badge">
+                        <i class="fa-solid fa-circle-check"></i> Compte actif
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Settings grid ── -->
+            <div class="settings-grid">
+
+                <!-- Informations personnelles -->
+                <div class="settings-section settings-section--full">
+                    <div class="section-header">
+                        <div class="section-header__icon"><i class="fa-solid fa-user"></i></div>
+                        <div>
+                            <div class="section-header__title">Informations personnelles</div>
+                            <div class="section-header__sub">Modifiez votre nom, email et mot de passe</div>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <form id="settings-form" autocomplete="on">
+                            <div class="field-group">
+                                <div class="field-row">
+                                    <div class="field">
+                                        <label for="settings-name">Nom complet</label>
+                                        <div class="field-input-wrap">
+                                            <i class="fa-solid fa-user"></i>
+                                            <input id="settings-name" name="name" type="text" required placeholder="Votre nom"/>
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <label for="settings-email">Adresse email</label>
+                                        <div class="field-input-wrap">
+                                            <i class="fa-solid fa-envelope"></i>
+                                            <input id="settings-email" name="email" type="email" required placeholder="vous@exemple.com"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-row">
+                                    <div class="field">
+                                        <label for="settings-password">Nouveau mot de passe</label>
+                                        <div class="field-input-wrap">
+                                            <i class="fa-solid fa-lock"></i>
+                                            <input id="settings-password" name="password" type="password" placeholder="Laisser vide pour ne pas changer" minlength="4"/>
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <label for="settings-phone">Téléphone</label>
+                                        <div class="field-input-wrap">
+                                            <i class="fa-solid fa-phone"></i>
+                                            <input id="settings-phone" name="phone" type="tel" placeholder="+213 XX XX XX XX"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="save-bar">
+                                    <button class="btn-save" type="submit">
+                                        <i class="fa-solid fa-floppy-disk"></i> Enregistrer
+                                    </button>
+                                    <span id="settings-message" role="status" aria-live="polite"></span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="settings-section">
+                    <div class="section-header">
+                        <div class="section-header__icon"><i class="fa-solid fa-bell"></i></div>
+                        <div>
+                            <div class="section-header__title">Notifications</div>
+                            <div class="section-header__sub">Gérez vos alertes</div>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <div class="toggle-info__icon"><i class="fa-solid fa-calendar-check"></i></div>
+                                <div>
+                                    <div class="toggle-info__label">Rappels de rendez-vous</div>
+                                    <div class="toggle-info__desc">Recevoir une alerte avant chaque RDV</div>
+                                </div>
+                            </div>
+                            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                        </div>
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <div class="toggle-info__icon"><i class="fa-solid fa-envelope"></i></div>
+                                <div>
+                                    <div class="toggle-info__label">Notifications email</div>
+                                    <div class="toggle-info__desc">Recevoir les résumés par email</div>
+                                </div>
+                            </div>
+                            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                        </div>
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <div class="toggle-info__icon"><i class="fa-solid fa-comment"></i></div>
+                                <div>
+                                    <div class="toggle-info__label">Nouveaux messages</div>
+                                    <div class="toggle-info__desc">Alerte à chaque nouveau message</div>
+                                </div>
+                            </div>
+                            <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Préférences -->
+                <div class="settings-section">
+                    <div class="section-header">
+                        <div class="section-header__icon"><i class="fa-solid fa-sliders"></i></div>
+                        <div>
+                            <div class="section-header__title">Préférences</div>
+                            <div class="section-header__sub">Langue et affichage</div>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="field-group">
+                            <div class="field">
+                                <label>Langue</label>
+                                <div class="field-input-wrap">
+                                    <i class="fa-solid fa-globe"></i>
+                                    <select>
+                                        <option selected>Français</option>
+                                        <option>العربية</option>
+                                        <option>English</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Fuseau horaire</label>
+                                <div class="field-input-wrap">
+                                    <i class="fa-solid fa-clock"></i>
+                                    <select>
+                                        <option selected>Africa/Algiers (UTC+1)</option>
+                                        <option>Europe/Paris (UTC+2)</option>
+                                        <option>UTC</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="toggle-row" style="padding-top:6px;">
+                                <div class="toggle-info">
+                                    <div class="toggle-info__icon"><i class="fa-solid fa-moon"></i></div>
+                                    <div>
+                                        <div class="toggle-info__label">Mode sombre</div>
+                                        <div class="toggle-info__desc">Thème foncé pour l'interface</div>
+                                    </div>
+                                </div>
+                                <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sécurité -->
+                <div class="settings-section settings-section--full">
+                    <div class="section-header">
+                        <div class="section-header__icon"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div>
+                            <div class="section-header__title">Sécurité</div>
+                            <div class="section-header__sub">Gérez l'accès à votre compte</div>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="danger-row">
+                            <div>
+                                <div class="danger-label">Se déconnecter</div>
+                                <div class="danger-desc">Terminer la session en cours</div>
+                            </div>
+                            <button class="btn-danger" onclick="cognitoSignOut()">
+                                <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+                            </button>
+                        </div>
+                        <div class="danger-row">
+                            <div>
+                                <div class="danger-label">Supprimer le compte</div>
+                                <div class="danger-desc">Supprime définitivement toutes vos données</div>
+                            </div>
+                            <button class="btn-danger" onclick="deleteAccount()">
+                                <i class="fa-solid fa-trash"></i> Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="../assets/js/app.js"></script>
+</body>
+</html>

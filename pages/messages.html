@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Plateforme RDV - Messages</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <aside class="sidebar">
+        <a class="sidebar-logo" href="./index.html">
+            <div class="logo-badge"><span>RDV</span></div>
+            <div class="logo-text">
+                <span class="logo-text__main">RDV</span>
+                <span class="logo-text__sub">Plateforme</span>
+            </div>
+        </a>
+  
+
+        <nav>
+            <a href="./index.html">🏠 Dashboard</a>
+            <a href="./rendez-vous.html">📅 Rendez-vous</a>
+            <a href="./clients.html">👥 Clients</a>
+            <a href="./messages.html" class="active">💬 Messages</a>
+            <a href="./parametres.html">⚙️ Paramètres</a>
+            <a href="#" onclick="cognitoSignOut(); return false;">🚪 Déconnexion</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <input id="search" type="text" placeholder="Rechercher dans les messages...">
+            <div class="icons">
+                <button id="btn-notifications" class="icon-btn" type="button" title="Notifications" aria-label="Notifications">🔔</button>
+                <button id="btn-profile" class="icon-btn" type="button" title="Informations de compte" aria-label="Informations de compte">👤</button>
+            </div>
+        </header>
+
+
+        <section class="appointments">
+            <h3>Messages</h3>
+            <div class="empty" style="display:block;">
+                Page Messages (contenu à connecter).
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="../assets/js/app.js"></script>
+</body>
+</html>
+
