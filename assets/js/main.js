@@ -126,7 +126,7 @@ function getPageId() {
   const path = window.location.pathname || "";
   const file = path.split("/").pop() || "index.html";
   if (file === "index.html") return "dashboard";
-  if (file.includes("rendez-vous")) return "rendez-vous";
+  if (file.includes("appointments")) return "rendez-vous";
   if (file.includes("clients")) return "clients";
   if (file.includes("messages")) return "messages";
   if (file.includes("parametres")) return "parametres";
@@ -143,7 +143,7 @@ function highlightActiveNav() {
 
     const href = a.getAttribute("href") || "";
     const isDashboard = href.includes("index.html");
-    const isRdv = href.includes("rendez-vous.html");
+    const isRdv = href.includes("appointments.html");
     const isClients = href.includes("clients.html");
     const isMessages = href.includes("messages.html");
     const isParam = href.includes("parametres.html");
@@ -397,7 +397,7 @@ function deleteAccount() {
   if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) return;
   localStorage.removeItem('rdv_user');
   localStorage.removeItem('rdv_session');
-  window.location.href = './auth.html';
+  window.location.href = './login.html';
 }
 
 function boot() {

@@ -32,6 +32,14 @@ function isSessionValid() {
   return s && s.expiresAt > Date.now();
 }
 
+// ── Guest access ─────────────────────────────────────────────
+
+function continuerEnInvite() {
+  const session = { name: 'Invité', email: '', isGuest: true, expiresAt: Date.now() + 2 * 60 * 60 * 1000 };
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  window.location.href = './index.html';
+}
+
 // ── Sign Up ───────────────────────────────────────────────────
 
 function cognitoSignUp(name, email, password) {
@@ -65,14 +73,14 @@ function cognitoSignIn(email, password) {
 
 function cognitoSignOut() {
   clearSession();
-  window.location.href = './auth.html';
+  window.location.href = './login.html';
 }
 
 // ── Route Guard ───────────────────────────────────────────────
 
 function requireAuth() {
   if (!isSessionValid()) {
-    window.location.replace('./auth.html');
+    window.location.replace('./login.html');
   }
 }
 

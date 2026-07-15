@@ -375,6 +375,47 @@ body{
 
 .link-btn:hover{ text-decoration: underline; }
 
+/* Guest button */
+.guest-divider{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+.guest-divider::before,
+.guest-divider::after{
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(15,23,42,0.10);
+}
+.guest-divider span{
+  font-size: 12px;
+  color: var(--muted);
+}
+.guest-btn{
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px 16px;
+  border-radius: 999px;
+  border: 1.5px dashed rgba(13,61,125,0.25);
+  background: transparent;
+  color: #1f5fbf;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 160ms, border-color 160ms, transform 160ms;
+}
+.guest-btn:hover{
+  background: rgba(31,95,191,0.06);
+  border-color: rgba(13,61,125,0.45);
+  transform: translateY(-1px);
+}
+
 /* Accessibility - focus ring */
 :focus-visible{
   outline: 0;
