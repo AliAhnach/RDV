@@ -1,0 +1,116 @@
+#auth-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #08051e 0%, #05143c 55%, #0d3d7d 100%);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+#auth-splash.auth-splash-in { opacity: 1; }
+
+.auth-splash-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: 0 24px;
+}
+
+.auth-splash-logo {
+  width: 90px;
+  height: 90px;
+  border-radius: 22px;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.3) rotate(-20deg);
+}
+#auth-splash.auth-splash-in .auth-splash-logo {
+  animation: splashLogoIn 0.50s cubic-bezier(0.34,1.56,0.64,1) 0.05s both,
+             splashPulse  1.4s ease-in-out 0.55s infinite;
+}
+.auth-splash-logo svg { width: 100%; height: 100%; display: block; }
+
+.auth-splash-name {
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(90deg, #fff 0%, #4a9eff 50%, #a8d4ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0;
+}
+#auth-splash.auth-splash-in .auth-splash-name {
+  animation: splashTextIn 0.40s cubic-bezier(0.22,1,0.36,1) 0.30s both;
+}
+
+.auth-splash-sub {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  font-family: Arial, sans-serif;
+  color: rgba(255,255,255,0.40);
+  opacity: 0;
+}
+#auth-splash.auth-splash-in .auth-splash-sub {
+  animation: splashTextIn 0.35s ease 0.44s both;
+}
+
+.auth-splash-msg {
+  margin-top: 22px;
+  font-size: 22px;
+  font-weight: 700;
+  font-family: Arial, sans-serif;
+  color: #fff;
+  opacity: 0;
+  max-width: 340px;
+  line-height: 1.4;
+}
+#auth-splash.auth-splash-in .auth-splash-msg {
+  animation: splashTextIn 0.50s cubic-bezier(0.22,1,0.36,1) 0.70s both;
+}
+
+.auth-splash-bar {
+  width: 140px;
+  height: 2px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 20px;
+  opacity: 0;
+}
+#auth-splash.auth-splash-in .auth-splash-bar {
+  animation: splashTextIn 0.3s ease 0.80s both;
+}
+.auth-splash-bar-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #4a9eff, #a78bfa);
+  border-radius: 999px;
+}
+#auth-splash.auth-splash-in .auth-splash-bar-fill {
+  animation: splashBarFill 1.60s cubic-bezier(0.4,0,0.2,1) 0.82s both;
+}
+
+@keyframes splashLogoIn {
+  from { opacity: 0; transform: scale(0.3) rotate(-20deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes splashPulse {
+  0%,100% { box-shadow: 0 0 0 0   rgba(74,158,255,0.5); }
+  50%      { box-shadow: 0 0 0 16px rgba(74,158,255,0);  }
+}
+@keyframes splashTextIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes splashBarFill {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
