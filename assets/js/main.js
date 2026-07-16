@@ -28,6 +28,7 @@ function initAuthPage() {
       const name  = String(data.get('name')     || '').trim();
       const email = String(data.get('email')    || '').trim().toLowerCase();
       const pass  = String(data.get('password') || '');
+      const role  = String(data.get('role')     || 'user');
 
       if (!name || !email || pass.length < 4) {
         if (msg2) msg2.textContent = 'Remplissez tous les champs (mot de passe min. 4 caractères).';
@@ -39,10 +40,9 @@ function initAuthPage() {
       if (msg2) msg2.textContent = '';
 
       try {
-        await cognitoSignUp(name, email, pass);
-        // Auto sign-in right after sign-up
+        await cognitoSignUp(name, email, pass, role);
         await cognitoSignIn(email, pass);
-        window.location.href = './index.html';
+        redirectToDashboard();
       } catch (err) {
         if (msg2) msg2.textContent = err;
         setSubmitting(btn, false);
@@ -68,7 +68,7 @@ function initAuthPage() {
 
       try {
         await cognitoSignIn(email, pass);
-        window.location.href = './index.html';
+        redirectToDashboard();
       } catch (err) {
         if (msg1) msg1.textContent = err;
         setSubmitting(btn, false);
@@ -433,9 +433,12 @@ function injectFooter() {
 
 function boot() {
   initAuthPage();
-  // Si on est sur la page auth, on évite de lancer le reste
   if (document.getElementById('form-signin') || document.getElementById('form-signup')) return;
 
+  // Hide clients link for non-admin users
+  if (getUserRole() !== 'admin') {
+    document.querySelectorAll('.sidebar nav a[href*="clients"]').forEach(a => a.remove());
+  }
 
   highlightActiveNav();
   initAuthStateUI();

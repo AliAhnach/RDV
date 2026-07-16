@@ -170,6 +170,32 @@
             </div>
           </div>
 
+          <div class="field">
+            <label class="field-label">Type de compte</label>
+            <div class="role-picker">
+              <label class="role-option">
+                <input type="radio" name="role" value="user" checked />
+                <span class="role-card">
+                  <span class="role-icon">👤</span>
+                  <span class="role-info">
+                    <span class="role-title">Utilisateur</span>
+                    <span class="role-desc">Accès à vos rendez-vous</span>
+                  </span>
+                </span>
+              </label>
+              <label class="role-option">
+                <input type="radio" name="role" value="admin" />
+                <span class="role-card">
+                  <span class="role-icon">🛡️</span>
+                  <span class="role-info">
+                    <span class="role-title">Administrateur</span>
+                    <span class="role-desc">Gestion complète</span>
+                  </span>
+                </span>
+              </label>
+            </div>
+          </div>
+
           <p id="auth-message2" class="auth-message" aria-live="polite"></p>
 
           <button class="primary-btn primary-btn--green" type="submit">

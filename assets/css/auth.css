@@ -458,6 +458,38 @@ body{
   .auth-page.is-signin .auth-form--signin{ display: grid; opacity: 1; transform: none; }
 }
 
+/* Role picker */
+.role-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.role-option input[type="radio"] { display: none; }
+.role-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border-radius: 12px;
+  border: 2px solid rgba(13,61,125,0.15);
+  background: var(--field-bg);
+  cursor: pointer;
+  transition: border-color 160ms, background 160ms, box-shadow 160ms;
+}
+.role-card:hover {
+  border-color: rgba(31,95,191,0.4);
+  background: #fff;
+}
+.role-option input:checked + .role-card {
+  border-color: #1f5fbf;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(31,95,191,0.12);
+}
+.role-icon { font-size: 22px; flex-shrink: 0; }
+.role-info { display: flex; flex-direction: column; gap: 1px; }
+.role-title { font-size: 13px; font-weight: 700; color: #0d3d7d; }
+.role-desc  { font-size: 11px; color: var(--muted); }
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce){
   .overlay-panel,

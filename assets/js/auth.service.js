@@ -19,7 +19,7 @@ function getSession() {
 }
 
 function createSession(user) {
-  const session = { email: user.email, name: user.name, expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 };
+  const session = { email: user.email, name: user.name, role: user.role || 'user', expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 };
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
 }
 
@@ -42,15 +42,16 @@ function continuerEnInvite() {
 
 // ── Sign Up ───────────────────────────────────────────────────
 
-function cognitoSignUp(name, email, password) {
+function cognitoSignUp(name, email, password, role) {
   return new Promise((resolve, reject) => {
     const normalizedEmail = email.trim().toLowerCase();
     const existing = getStoredUser();
     if (existing && existing.email === normalizedEmail) {
       return reject('Un compte avec cet email existe déjà.');
     }
-    localStorage.setItem(AUTH_KEY, JSON.stringify({ name: name.trim(), email: normalizedEmail, password }));
-    resolve({ name, email: normalizedEmail });
+    const r = (role === 'admin') ? 'admin' : 'user';
+    localStorage.setItem(AUTH_KEY, JSON.stringify({ name: name.trim(), email: normalizedEmail, password, role: r }));
+    resolve({ name, email: normalizedEmail, role: r });
   });
 }
 
@@ -84,12 +85,32 @@ function requireAuth() {
   }
 }
 
+function requireAdmin() {
+  if (!isSessionValid()) {
+    window.location.replace('./login.html');
+    return;
+  }
+  if (getUserRole() !== 'admin') {
+    window.location.replace('./user-dashboard.html');
+  }
+}
+
 // ── Get current user info ─────────────────────────────────────
 
 function getCurrentUserInfo() {
   return new Promise((resolve) => {
     if (!isSessionValid()) return resolve(null);
     const s = getSession();
-    resolve(s ? { name: s.name, email: s.email } : null);
+    resolve(s ? { name: s.name, email: s.email, role: s.role || 'user' } : null);
   });
+}
+
+function getUserRole() {
+  const s = getSession();
+  return (s && s.role) ? s.role : 'user';
+}
+
+function redirectToDashboard() {
+  const role = getUserRole();
+  window.location.href = role === 'admin' ? './index.html' : './user-dashboard.html';
 }

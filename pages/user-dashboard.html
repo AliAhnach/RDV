@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini Plateforme RDV - Mon Espace</title>
+
+  <script src="../assets/js/auth.service.js"></script>
+  <script>
+    requireAuth();
+    // Redirect admin away from user dashboard
+    if (typeof getUserRole === 'function' && getUserRole() === 'admin') {
+      window.location.replace('./index.html');
+    }
+  </script>
+
+  <link rel="stylesheet" href="../assets/css/global.css"/>
+  <link rel="stylesheet" href="../assets/css/dashboard.css"/>
+  <link rel="stylesheet" href="../assets/css/splash.css"/>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <a class="sidebar-logo" href="./user-dashboard.html">
+      <div class="logo-badge"><span>RDV</span></div>
+      <div class="logo-text">
+        <span class="logo-text__main">RDV</span>
+        <span class="logo-text__sub">Plateforme</span>
+      </div>
+    </a>
+
+    <nav>
+      <a href="./user-dashboard.html" class="active">🏠 Mon Espace</a>
+      <a href="./appointments.html">📅 Mes Rendez-vous</a>
+      <a href="./messages.html">💬 Messages</a>
+      <a href="./parametres.html">⚙️ Paramètres</a>
+      <a href="#" onclick="cognitoSignOut(); return false;">🚪 Déconnexion</a>
+    </nav>
+
+    <!-- Role badge -->
+    <div style="margin-top:auto; padding-top:20px;">
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.07);border-radius:10px;border:1px solid rgba(255,255,255,0.1);">
+        <span style="font-size:18px;">👤</span>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#fff;letter-spacing:.5px;">UTILISATEUR</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.45);">Accès standard</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- Topbar -->
+    <div class="dash-header">
+      <div class="search-wrap">
+        <svg width="14" height="14" fill="none" stroke="#7a7a9a" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" placeholder="Rechercher un rendez-vous…"/>
+      </div>
+
+      <div class="dash-header-right">
+        <button class="hdr-icon-btn" id="btn-notifications" title="Notifications">
+          🔔<span class="hdr-badge"></span>
+        </button>
+        <button class="hdr-icon-btn" title="Messages">
+          💬<span class="hdr-badge"></span>
+        </button>
+        <div class="profile-pill" id="btn-profile">
+          <div class="pill-avatar" id="pill-initials">?</div>
+          <div>
+            <div class="pill-name"  id="pill-name">—</div>
+            <div class="pill-handle" id="pill-handle">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="dash-content" style="grid-template-columns: 1fr;">
+      <div class="right-panel" style="padding: 32px 36px; gap: 24px;">
+
+        <!-- Welcome -->
+        <div class="welcome-block">
+          <div class="welcome-greeting">
+            Bonjour <span class="grad-name" id="welcome-name">!</span> 👋
+          </div>
+          <div class="welcome-sub">Bienvenue dans votre espace personnel.</div>
+        </div>
+
+        <!-- Role info banner -->
+        <div style="
+          display:flex; align-items:center; gap:14px;
+          background: linear-gradient(135deg, rgba(31,95,191,0.10), rgba(124,92,191,0.08));
+          border: 1px solid rgba(31,95,191,0.20);
+          border-radius: 16px; padding: 16px 20px;
+          animation: fadeUp 0.55s ease 0.05s both;
+        ">
+          <div style="font-size:32px;">👤</div>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:#0d3d7d;">Compte Utilisateur</div>
+            <div style="font-size:13px;color:#7a7a9a;margin-top:2px;">Vous avez accès à vos rendez-vous, messages et paramètres personnels.</div>
+          </div>
+          <div style="margin-left:auto;">
+            <span style="
+              display:inline-flex; align-items:center; gap:5px;
+              background: rgba(31,95,191,0.10); border:1px solid rgba(31,95,191,0.20);
+              border-radius:999px; padding:5px 13px;
+              font-size:11px; font-weight:700; color:#1f5fbf;
+            ">✦ Standard</span>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row" style="animation: fadeUp 0.55s ease 0.10s both;">
+          <div class="stat-card">
+            <div class="stat-icon si-purple">📅</div>
+            <div class="stat-value">4</div>
+            <div class="stat-label">Mes RDV</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon si-blue">✅</div>
+            <div class="stat-value">2</div>
+            <div class="stat-label">Confirmés</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon si-green">💬</div>
+            <div class="stat-value">3</div>
+            <div class="stat-label">Messages</div>
+          </div>
+        </div>
+
+        <!-- Prochains RDV -->
+        <div class="platform-desc-card" style="animation: fadeUp 0.55s ease 0.20s both;">
+          <div class="pdc-top">
+            <div class="pdc-icon">📅</div>
+            <span class="pdc-badge">Aujourd'hui</span>
+          </div>
+          <div class="pdc-title">Mes prochains rendez-vous</div>
+
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(124,92,191,0.06);border:1px solid rgba(124,92,191,0.14);border-radius:12px;">
+              <div style="width:42px;height:42px;border-radius:10px;background:#ede8f9;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🩺</div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:700;color:#1a1a2e;">Consultation médicale</div>
+                <div style="font-size:11px;color:#7a7a9a;margin-top:2px;">Aujourd'hui · 10:00</div>
+              </div>
+              <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;background:#dcfce7;color:#16a34a;">Confirmé</span>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.14);border-radius:12px;">
+              <div style="width:42px;height:42px;border-radius:10px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">💊</div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:700;color:#1a1a2e;">Suivi traitement</div>
+                <div style="font-size:11px;color:#7a7a9a;margin-top:2px;">Demain · 14:30</div>
+              </div>
+              <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;background:#fef3cd;color:#b45309;">En attente</span>
+            </div>
+
+          </div>
+
+          <div class="pdc-features" style="margin-top:16px;">
+            <span class="pdc-feat">📅 Rendez-vous</span>
+            <span class="pdc-feat">💬 Messages</span>
+            <span class="pdc-feat">⚙️ Paramètres</span>
+            <span class="pdc-feat">🔒 Sécurisé</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/main.js"></script>
+<script src="../assets/js/transition.js"></script>
+<script>
+  // Fill profile pill
+  const s = JSON.parse(localStorage.getItem('rdv_session') || 'null');
+  if (s) {
+    const initials = (s.name || '?').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    document.getElementById('pill-initials').textContent = initials;
+    document.getElementById('pill-name').textContent     = s.name  || '—';
+    document.getElementById('pill-handle').textContent   = s.email || '—';
+    const firstName = (s.name || '').trim().split(' ')[0];
+    document.getElementById('welcome-name').textContent  = firstName + ' !';
+  }
+</script>
+</body>
+</html>
