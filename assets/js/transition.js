@@ -1,3 +1,6 @@
+/* Exposed globally so auth.service.js can trigger the animation */
+window.navigateTo = null;
+
 (() => {
   const PAGE_NAMES = {
     'index.html':          'Dashboard Admin',
@@ -123,6 +126,12 @@
       window.location.href = href;
     }, 2400);
   }
+
+  /* ── Expose globally for programmatic navigation ── */
+  window.navigateTo = (href) => {
+    const file = href.split('/').pop();
+    navigate(href, PAGE_NAMES[file] || '');
+  };
 
   /* ── Intercept nav clicks ── */
   document.addEventListener('click', e => {

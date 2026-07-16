@@ -32,12 +32,20 @@ function isSessionValid() {
   return s && s.expiresAt > Date.now();
 }
 
+function _go(href) {
+  if (typeof window.navigateTo === 'function') {
+    window.navigateTo(href);
+  } else {
+    window.location.href = href;
+  }
+}
+
 // ── Guest access ─────────────────────────────────────────────
 
 function continuerEnInvite() {
   const session = { name: 'Invité', email: '', isGuest: true, expiresAt: Date.now() + 2 * 60 * 60 * 1000 };
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-  window.location.href = './index.html';
+  _go('./index.html');
 }
 
 // ── Sign Up ───────────────────────────────────────────────────
@@ -74,7 +82,7 @@ function cognitoSignIn(email, password) {
 
 function cognitoSignOut() {
   clearSession();
-  window.location.href = './login.html';
+  _go('./login.html');
 }
 
 // ── Route Guard ───────────────────────────────────────────────
@@ -112,5 +120,5 @@ function getUserRole() {
 
 function redirectToDashboard() {
   const role = getUserRole();
-  window.location.href = role === 'admin' ? './index.html' : './user-dashboard.html';
+  _go(role === 'admin' ? './index.html' : './user-dashboard.html');
 }

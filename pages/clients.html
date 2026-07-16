@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini Plateforme RDV - Clients</title>
     <link rel="stylesheet" href="../assets/css/global.css">
     <link rel="stylesheet" href="../assets/css/splash.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
     <script src="../assets/js/auth.service.js"></script>
 </head>
 <body>
 
+<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
 <div class="container">
 
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <a class="sidebar-logo" href="./index.html">
             <div class="logo-badge"><span>RDV</span></div>
             <div class="logo-text">
@@ -21,7 +25,6 @@
                 <span class="logo-text__sub">Plateforme</span>
             </div>
         </a>
-  
 
         <nav>
             <a href="./index.html">🏠 Dashboard</a>
@@ -41,16 +44,14 @@
             </div>
         </header>
 
-
         <section class="appointments">
             <h3>Liste des clients</h3>
             <div class="empty" style="display:block;">Page Clients (contenu à connecter).</div>
         </section>
-
     </main>
 </div>
 
-<script src="../assets/js/main.js"></script>
 <script src="../assets/js/transition.js"></script>
+<script src="../assets/js/main.js"></script>
 </body>
 </html>

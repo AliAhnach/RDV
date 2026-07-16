@@ -24,7 +24,7 @@ body::after {
 }
 
 .container { position: relative; z-index: 1; }
-.sidebar   { z-index: 2; }
+.sidebar   { z-index: 200; }
 
 /* ── Main area ── */
 .main {

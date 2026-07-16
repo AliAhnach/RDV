@@ -400,20 +400,32 @@ function deleteAccount() {
   window.location.href = './login.html';
 }
 
-function adjustMainMargin() {
-  const sidebar = document.querySelector('.sidebar');
-  const main    = document.querySelector('.main');
-  const footer  = document.querySelector('.dash-footer');
-  if (!sidebar || !main) return;
-  const w = sidebar.offsetWidth + 'px';
-  const isRTL = document.documentElement.dir === 'rtl';
-  if (isRTL) {
-    main.style.marginRight = w; main.style.marginLeft = '';
-    if (footer) { footer.style.marginRight = w; footer.style.marginLeft = ''; }
-  } else {
-    main.style.marginLeft = w; main.style.marginRight = '';
-    if (footer) { footer.style.marginLeft = ''; }
+function initHamburger() {
+  const btn      = document.getElementById('hamburger');
+  const sidebar  = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (!btn || !sidebar) return;
+
+  function openSidebar() {
+    sidebar.classList.add('open');
+    if (backdrop) backdrop.classList.add('open');
+    btn.classList.add('is-open');
   }
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('open');
+    btn.classList.remove('is-open');
+  }
+
+  btn.addEventListener('click', () =>
+    sidebar.classList.contains('open') ? closeSidebar() : openSidebar()
+  );
+  if (backdrop) backdrop.addEventListener('click', closeSidebar);
+
+  // Close on nav link click (mobile)
+  sidebar.querySelectorAll('nav a').forEach(a =>
+    a.addEventListener('click', () => { if (window.innerWidth <= 768) closeSidebar(); })
+  );
 }
 
 function injectFooter() {
@@ -451,8 +463,7 @@ function boot() {
   initTopIcons();
   initParametresPage();
   injectFooter();
-  adjustMainMargin();
-  window.addEventListener('resize', adjustMainMargin);
+  initHamburger();
 }
 
 boot();
