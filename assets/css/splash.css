@@ -1,116 +1,145 @@
-#auth-splash {
+/* ── Page Transition Splash ── */
+#page-splash {
   position: fixed;
   inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #08051e 0%, #05143c 55%, #0d3d7d 100%);
-  opacity: 0;
-  transition: opacity 0.22s ease;
-}
-#auth-splash.auth-splash-in { opacity: 1; }
-
-.auth-splash-inner {
+  z-index: 99999;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  text-align: center;
-  padding: 0 24px;
-}
-
-.auth-splash-logo {
-  width: 90px;
-  height: 90px;
-  border-radius: 22px;
+  justify-content: center;
+  background: #020b18;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  font-family: 'Courier New', Courier, monospace;
   overflow: hidden;
-  opacity: 0;
-  transform: scale(0.3) rotate(-20deg);
 }
-#auth-splash.auth-splash-in .auth-splash-logo {
-  animation: splashLogoIn 0.50s cubic-bezier(0.34,1.56,0.64,1) 0.05s both,
-             splashPulse  1.4s ease-in-out 0.55s infinite;
-}
-.auth-splash-logo svg { width: 100%; height: 100%; display: block; }
+#page-splash.splash-visible { opacity: 1; }
 
-.auth-splash-name {
-  font-size: 44px;
-  font-weight: 900;
-  letter-spacing: 6px;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(90deg, #fff 0%, #4a9eff 50%, #a8d4ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  opacity: 0;
-}
-#auth-splash.auth-splash-in .auth-splash-name {
-  animation: splashTextIn 0.40s cubic-bezier(0.22,1,0.36,1) 0.30s both;
+/* Matrix rain canvas behind everything */
+#splash-canvas {
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
 }
 
-.auth-splash-sub {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  font-family: Arial, sans-serif;
-  color: rgba(255,255,255,0.40);
-  opacity: 0;
-}
-#auth-splash.auth-splash-in .auth-splash-sub {
-  animation: splashTextIn 0.35s ease 0.44s both;
+/* Center content */
+.splash-center {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
 }
 
-.auth-splash-msg {
-  margin-top: 22px;
+/* Logo badge */
+.splash-logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #4a9eff, #1f5fbf, #0d3d7d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 22px;
-  font-weight: 700;
-  font-family: Arial, sans-serif;
+  font-weight: 900;
   color: #fff;
+  letter-spacing: 1px;
+  box-shadow: 0 0 0 0 rgba(74,158,255,0.6);
   opacity: 0;
-  max-width: 340px;
-  line-height: 1.4;
+  transform: scale(0.6);
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
 }
-#auth-splash.auth-splash-in .auth-splash-msg {
-  animation: splashTextIn 0.50s cubic-bezier(0.22,1,0.36,1) 0.70s both;
+#page-splash.splash-visible .splash-logo {
+  opacity: 1;
+  transform: scale(1);
+  animation: splashGlow 1.8s ease-in-out 0.4s infinite;
+}
+@keyframes splashGlow {
+  0%,100% { box-shadow: 0 0 0 0 rgba(74,158,255,0.5); }
+  50%      { box-shadow: 0 0 0 18px rgba(74,158,255,0); }
 }
 
-.auth-splash-bar {
-  width: 140px;
-  height: 2px;
-  background: rgba(255,255,255,0.12);
+/* The decode text line (RDV) */
+.splash-decode {
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: 10px;
+  color: #4a9eff;
+  text-shadow: 0 0 20px rgba(74,158,255,0.6), 0 0 40px rgba(74,158,255,0.3);
+  min-width: 180px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+#page-splash.splash-visible .splash-decode { opacity: 1; }
+
+/* Sub label "Plateforme" */
+.splash-sub {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: rgba(74,158,255,0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease 0.1s;
+}
+#page-splash.splash-visible .splash-sub { opacity: 1; }
+
+/* Divider */
+.splash-divider {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(to bottom, transparent, rgba(74,158,255,0.4), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+#page-splash.splash-visible .splash-divider { opacity: 1; }
+
+/* Destination page name */
+.splash-page-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+#page-splash.splash-visible .splash-page-name { opacity: 1; }
+
+/* Progress bar */
+.splash-bar {
+  width: 160px;
+  height: 1px;
+  background: rgba(74,158,255,0.15);
   border-radius: 999px;
   overflow: hidden;
-  margin-top: 20px;
+  margin-top: 8px;
   opacity: 0;
+  transition: opacity 0.3s ease;
 }
-#auth-splash.auth-splash-in .auth-splash-bar {
-  animation: splashTextIn 0.3s ease 0.80s both;
-}
-.auth-splash-bar-fill {
+#page-splash.splash-visible .splash-bar { opacity: 1; }
+.splash-bar-fill {
   height: 100%;
-  width: 0;
+  width: 0%;
   background: linear-gradient(90deg, #4a9eff, #a78bfa);
   border-radius: 999px;
-}
-#auth-splash.auth-splash-in .auth-splash-bar-fill {
-  animation: splashBarFill 1.60s cubic-bezier(0.4,0,0.2,1) 0.82s both;
+  transition: width linear;
 }
 
-@keyframes splashLogoIn {
-  from { opacity: 0; transform: scale(0.3) rotate(-20deg); }
-  to   { opacity: 1; transform: scale(1) rotate(0deg); }
-}
-@keyframes splashPulse {
-  0%,100% { box-shadow: 0 0 0 0   rgba(74,158,255,0.5); }
-  50%      { box-shadow: 0 0 0 16px rgba(74,158,255,0);  }
-}
-@keyframes splashTextIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes splashBarFill {
-  from { width: 0%; }
-  to   { width: 100%; }
+/* Scanline overlay */
+#page-splash::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.06) 2px,
+    rgba(0,0,0,0.06) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
 }
