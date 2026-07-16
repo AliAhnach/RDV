@@ -1,5 +1,5 @@
 /* ── Page layout ── */
-.settings-page { display: flex; flex-direction: column; gap: 24px; }
+.settings-page { display: flex; flex-direction: column; gap: 24px; padding: 25px 25px 25px 0; flex: 1; }
 
 /* ── Profile hero card ── */
 .profile-hero {
