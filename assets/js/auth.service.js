@@ -57,7 +57,7 @@ function cognitoSignUp(name, email, password, role) {
     if (existing && existing.email === normalizedEmail) {
       return reject('Un compte avec cet email existe déjà.');
     }
-    const r = (role === 'admin') ? 'admin' : 'user';
+    const r = 'user';
     localStorage.setItem(AUTH_KEY, JSON.stringify({ name: name.trim(), email: normalizedEmail, password, role: r }));
     resolve({ name, email: normalizedEmail, role: r });
   });
@@ -68,11 +68,17 @@ function cognitoSignUp(name, email, password, role) {
 function cognitoSignIn(email, password) {
   return new Promise((resolve, reject) => {
     const normalizedEmail = email.trim().toLowerCase();
+    if (normalizedEmail === 'admin@gmail.com' && password === '0000') {
+      const adminUser = { name: 'Admin', email: normalizedEmail, role: 'admin' };
+      createSession(adminUser);
+      return resolve(adminUser);
+    }
     const user = getStoredUser();
     if (!user) return reject('Aucun compte trouvé. Veuillez créer un compte.');
     if (user.email !== normalizedEmail || user.password !== password) {
       return reject('Email ou mot de passe incorrect.');
     }
+    user.role = 'user';
     createSession(user);
     resolve(user);
   });

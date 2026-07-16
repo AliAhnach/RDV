@@ -400,6 +400,19 @@ function deleteAccount() {
   window.location.href = './login.html';
 }
 
+function initPillFromSession() {
+  const pillInitials = document.getElementById('pill-initials');
+  const pillName     = document.getElementById('pill-name');
+  const pillHandle   = document.getElementById('pill-handle');
+  if (!pillInitials) return;
+  const s = getSession();
+  if (!s) return;
+  const initials = (s.name || '?').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  pillInitials.textContent = initials;
+  if (pillName)   pillName.textContent   = s.name  || '—';
+  if (pillHandle) pillHandle.textContent = s.email || '—';
+}
+
 function initHamburger() {
   const btn      = document.getElementById('hamburger');
   const sidebar  = document.getElementById('sidebar');
@@ -462,6 +475,7 @@ function boot() {
   initRdvPage();
   initTopIcons();
   initParametresPage();
+  initPillFromSession();
   injectFooter();
   initHamburger();
 }

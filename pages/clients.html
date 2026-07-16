@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini Plateforme RDV - Clients</title>
     <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link rel="stylesheet" href="../assets/css/splash.css">
     <link rel="stylesheet" href="../assets/css/responsive.css">
     <script src="../assets/js/auth.service.js"></script>
@@ -37,10 +38,22 @@
     </aside>
 
     <main class="main">
-        <header class="topbar">
-            <input id="search" type="text" placeholder="Rechercher un client...">
-            <div class="icons">
-                <button id="btn-profile" class="icon-btn" type="button" title="Informations de compte" aria-label="Informations de compte">👤</button>
+        <header class="dash-header">
+            <div class="search-wrap">
+                <svg width="14" height="14" fill="none" stroke="#7a7a9a" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+                <input id="search" type="text" placeholder="Rechercher un client…"/>
+                <span class="kbd">⌘ K</span>
+            </div>
+            <div class="dash-header-right">
+                <div class="profile-pill" id="btn-profile">
+                    <div class="pill-avatar" id="pill-initials">?</div>
+                    <div>
+                        <div class="pill-name"  id="pill-name">—</div>
+                        <div class="pill-handle" id="pill-handle">—</div>
+                    </div>
+                </div>
             </div>
         </header>
 
