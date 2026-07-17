@@ -11,8 +11,9 @@
   }
 
   // ── Profile pill ──
-  const initials = s.isGuest ? '👤' : (s.name || '?').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-  document.getElementById('pill-initials').textContent = initials;
+  const initials = s.isGuest ? '👤' : (s.name || '').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '👤';
+  const pillInitials = document.getElementById('pill-initials');
+  if (pillInitials) pillInitials.textContent = initials;
   document.getElementById('pill-name').textContent     = s.isGuest ? 'Invité' : (s.name || '—');
   document.getElementById('pill-handle').textContent   = s.isGuest ? 'Mode consultation' : (s.email || '—');
   const firstName = s.isGuest ? 'Invité' : (s.name || '').trim().split(' ')[0];

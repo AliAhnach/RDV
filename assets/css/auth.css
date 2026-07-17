@@ -225,15 +225,16 @@ body{
 }
 
 .social-btn{
-  flex: 1;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 12px;
+  gap: 10px;
+  padding: 11px 14px;
   border-radius: 999px;
   border: 1px solid rgba(15,23,42,0.12);
   background: #fff;
+  color: #1f1f1f;
   cursor: pointer;
   font-size: 13px;
   font-family: inherit;
@@ -241,7 +242,12 @@ body{
   box-shadow: 0 8px 20px rgba(0,0,0,0.05);
 }
 
-.social-btn i{ font-size: 15px; }
+.social-btn i{ font-size: 16px; }
+
+.social-btn--google {
+  color: #db4437;
+  border-color: rgba(219, 68, 55, 0.24);
+}
 
 .social-btn:hover{
   transform: translateY(-1px);

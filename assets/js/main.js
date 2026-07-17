@@ -275,7 +275,26 @@ function initModal() {
   }
 }
 
+function applyTheme(isDark) {
+  document.body.classList.toggle('dark-mode', isDark);
+  localStorage.setItem('rdv-theme', isDark ? 'dark' : 'light');
+  const btn = document.getElementById('theme-toggle');
+  if (btn) {
+    btn.innerHTML = isDark ? '☀️<span class="hdr-badge"></span>' : '🌙<span class="hdr-badge"></span>';
+  }
+}
+
 function initTopIcons() {
+  const themeBtn = document.getElementById('theme-toggle');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const isDark = !document.body.classList.contains('dark-mode');
+      applyTheme(isDark);
+    });
+  }
+
   const nav = (id, href) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -284,19 +303,41 @@ function initTopIcons() {
       else window.location.href = href;
     });
   };
-  nav('btn-notifications',  './messages.html');
-  nav('btn-messages',       './messages.html');
-  nav('btn-profile',        './parametres.html');
+  nav('btn-account',        './parametres.html');
   nav('stat-card-rdv',      './appointments.html');
   nav('stat-card-clients',  './clients.html');
   nav('stat-card-messages', './messages.html');
 }
 
+function initGlobalTheme() {
+  const saved = localStorage.getItem('rdv-theme') || 'light';
+  const isDark = saved === 'dark';
+  applyTheme(isDark);
+}
+
 function initProfileName() {
   const el = document.getElementById('profile-name');
-  if (!el) return;
+  const welcomeEl = document.getElementById('welcome-name');
+  const dashboardWelcomeEl = document.getElementById('dashboard-welcome-username');
+  const accountBtn = document.getElementById('btn-account');
+
   getCurrentUserInfo().then(user => {
-    el.textContent = (user && user.name) ? user.name : 'Invité';
+    const name = (user && user.name) ? user.name : 'Invité';
+    const firstName = String(name || '').trim().split(/\s+/)[0] || 'Invité';
+
+    if (el) el.textContent = name;
+    if (welcomeEl) welcomeEl.textContent = firstName;
+    if (dashboardWelcomeEl) dashboardWelcomeEl.textContent = firstName;
+
+    if (accountBtn) {
+      let label = accountBtn.querySelector('.account-label');
+      if (!label) {
+        label = document.createElement('span');
+        label.className = 'account-label';
+        accountBtn.appendChild(label);
+      }
+      label.textContent = firstName;
+    }
   });
 }
 
@@ -304,7 +345,9 @@ function initDashboardWelcome() {
   const el = document.getElementById('dashboard-welcome-username');
   if (!el) return;
   getCurrentUserInfo().then(user => {
-    el.textContent = (user && user.name) ? user.name : 'Invité';
+    const name = (user && user.name) ? user.name : 'Invité';
+    const firstName = String(name || '').trim().split(/\s+/)[0] || 'Invité';
+    el.textContent = firstName;
   });
 }
 
@@ -408,7 +451,7 @@ function initPillFromSession() {
   if (!pillInitials) return;
   const s = getSession();
   if (!s) return;
-  const initials = (s.name || '?').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  const initials = (s.name || '').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '👤';
   pillInitials.textContent = initials;
   if (pillName)   pillName.textContent   = s.name  || '—';
   if (pillHandle) pillHandle.textContent = s.email || '—';
@@ -514,12 +557,14 @@ function boot() {
   highlightActiveNav();
   initAuthStateUI();
   initProfileName();
+  initPillFromSession();
   initDashboardWelcome();
   initSettingsPage();
   initModal();
 
   initRdvPage();
   initTopIcons();
+  initGlobalTheme();
   initParametresPage();
   injectFooter();
   initHamburger();

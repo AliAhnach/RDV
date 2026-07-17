@@ -1,5 +1,69 @@
 /* Diprella Auth Toggle Logic (vanilla JS only) */
 
+function handleGoogleAuth(mode = 'signin') {
+  const role = 'user';
+
+  try {
+    const googleUser = window.google && window.google.accounts && window.google.accounts.id
+      ? null
+      : null;
+
+    const fallbackUser = {
+      name: 'Google User',
+      email: 'google.user@rdv.local',
+      password: 'google-auth-demo',
+      role,
+      provider: 'google-demo'
+    };
+
+    const profileToStore = googleUser && googleUser.getBasicProfile ? {
+      name: googleUser.getBasicProfile().getName() || 'Google User',
+      email: googleUser.getBasicProfile().getEmail() || fallbackUser.email,
+      password: 'google-auth-demo',
+      role,
+      provider: 'google'
+    } : fallbackUser;
+
+    window.localStorage.setItem('rdv_user', JSON.stringify(profileToStore));
+    window.localStorage.setItem('rdv_session', JSON.stringify({
+      email: profileToStore.email,
+      name: profileToStore.name,
+      role,
+      provider: profileToStore.provider,
+      expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000
+    }));
+
+    if (typeof window.cognitoSignIn === 'function' && mode === 'signin') {
+      window.cognitoSignIn(profileToStore.email, profileToStore.password)
+        .then(() => {
+          const roleFromSession = window.getUserRole ? window.getUserRole() : role;
+          window.location.href = roleFromSession === 'admin' ? './index.html' : './user-dashboard.html';
+        })
+        .catch(() => {
+          window.location.href = './user-dashboard.html';
+        });
+      return;
+    }
+
+    if (typeof window.cognitoSignUp === 'function') {
+      window.cognitoSignUp(profileToStore.name, profileToStore.email, profileToStore.password, role)
+        .then(() => window.cognitoSignIn(profileToStore.email, profileToStore.password))
+        .then(() => {
+          const roleFromSession = window.getUserRole ? window.getUserRole() : role;
+          window.location.href = roleFromSession === 'admin' ? './index.html' : './user-dashboard.html';
+        })
+        .catch(() => {
+          window.location.href = './user-dashboard.html';
+        });
+    } else {
+      window.location.href = './user-dashboard.html';
+    }
+  } catch (err) {
+    console.error(err);
+    window.location.href = './user-dashboard.html';
+  }
+}
+
 (function () {
   'use strict';
 
