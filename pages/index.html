@@ -51,7 +51,7 @@
         <svg width="14" height="14" fill="none" stroke="#7a7a9a" stroke-width="2" viewBox="0 0 24 24">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
-        <input type="text" placeholder="Rechercher médicaments, pharmacies…"/>
+        <input type="text" placeholder="Rechercher…"/>
         <span class="kbd">⌘ K</span>
       </div>
 
@@ -59,8 +59,8 @@
         <button class="hdr-icon-btn" id="btn-notifications" title="Notifications">
           🔔<span class="hdr-badge"></span>
         </button>
-        <button class="hdr-icon-btn" title="Messages">
-          💬<span class="hdr-badge"></span>
+        <button class="hdr-icon-btn" id="btn-messages" title="Messages">
+          💬<span class="hdr-badge" style="display:none;"></span>
         </button>
         <div class="profile-pill" id="btn-profile">
           <div class="pill-avatar" id="pill-initials">?</div>
@@ -75,41 +75,53 @@
     <!-- Content grid -->
     <div class="dash-content">
 
-      <!-- ── Right panel (welcome) ── -->
+      <!-- ── Right panel ── -->
       <div class="right-panel">
 
         <!-- Welcome -->
         <div class="welcome-block">
           <div class="welcome-greeting">
-            Bonjour <span class="grad-name" id="welcome-name">!</span> 👋
+            Bonjour <span class="grad-name" id="welcome-name">!</span> 
           </div>
           <div class="welcome-sub">Ravi de vous revoir sur votre espace santé.</div>
         </div>
 
         <!-- Stats row -->
         <div class="stats-row">
-          <div class="stat-card">
+          <div class="stat-card" id="stat-card-rdv" style="cursor:pointer;">
             <div class="stat-icon si-purple">📅</div>
-            <div class="stat-value">4</div>
+            <div class="stat-value" id="stat-rdv">—</div>
             <div class="stat-label">Rendez-vous</div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" id="stat-card-clients" style="cursor:pointer;">
             <div class="stat-icon si-blue">👥</div>
-            <div class="stat-value">12</div>
+            <div class="stat-value" id="stat-clients">—</div>
             <div class="stat-label">Clients</div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" id="stat-card-messages" style="cursor:pointer;">
             <div class="stat-icon si-green">💬</div>
-            <div class="stat-value">3</div>
+            <div class="stat-value" id="stat-messages">—</div>
             <div class="stat-label">Messages</div>
           </div>
+        </div>
+
+        <!-- Upcoming RDVs card -->
+        <div class="platform-desc-card">
+          <div class="pdc-top">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="pdc-icon" style="font-size:20px;">📅</div>
+              <div class="pdc-title" style="margin-bottom:0;">Prochains rendez-vous</div>
+            </div>
+            <a href="./appointments.html" class="pdc-badge" style="text-decoration:none;">Voir tout →</a>
+          </div>
+          <div id="upcoming-rdvs" style="margin-top:4px;"></div>
         </div>
 
         <!-- Platform description card -->
         <div class="platform-desc-card">
           <div class="pdc-top">
             <div class="pdc-icon">RDV</div>
-            <span class="pdc-badge">Nouveau</span>
+            <span class="pdc-badge">Plateforme</span>
           </div>
           <div class="pdc-title">Mini Plateforme RDV</div>
           <div class="pdc-desc">

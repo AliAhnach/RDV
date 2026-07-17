@@ -144,6 +144,19 @@ window.navigateTo = null;
     const file = href.split('/').pop();
     const pageName = PAGE_NAMES[file] || '';
     e.preventDefault();
+
+    // Sur mobile, fermer la sidebar puis lancer la transition comme sur desktop
+    if (window.innerWidth <= 768) {
+      const sidebar  = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      const hamburger = document.getElementById('hamburger');
+      if (sidebar)   sidebar.classList.remove('open');
+      if (backdrop)  backdrop.classList.remove('open');
+      if (hamburger) hamburger.classList.remove('is-open');
+      document.body.classList.remove('sidebar-open');
+      document.body.style.overflow = '';
+    }
+
     navigate(href, pageName);
   });
 

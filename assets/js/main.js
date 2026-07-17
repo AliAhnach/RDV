@@ -276,19 +276,20 @@ function initModal() {
 }
 
 function initTopIcons() {
-  const notifications = document.getElementById('btn-notifications');
-  if (notifications) {
-    notifications.addEventListener('click', () => {
-      window.location.href = './messages.html';
+  const nav = (id, href) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('click', () => {
+      if (typeof window.navigateTo === 'function') window.navigateTo(href);
+      else window.location.href = href;
     });
-  }
-
-  const profile = document.getElementById('btn-profile');
-  if (profile) {
-    profile.addEventListener('click', () => {
-      window.location.href = './parametres.html';
-    });
-  }
+  };
+  nav('btn-notifications',  './messages.html');
+  nav('btn-messages',       './messages.html');
+  nav('btn-profile',        './parametres.html');
+  nav('stat-card-rdv',      './appointments.html');
+  nav('stat-card-clients',  './clients.html');
+  nav('stat-card-messages', './messages.html');
 }
 
 function initProfileName() {
@@ -417,28 +418,73 @@ function initHamburger() {
   const btn      = document.getElementById('hamburger');
   const sidebar  = document.getElementById('sidebar');
   const backdrop = document.getElementById('sidebar-backdrop');
+  const body     = document.body;
   if (!btn || !sidebar) return;
 
-  function openSidebar() {
-    sidebar.classList.add('open');
-    if (backdrop) backdrop.classList.add('open');
-    btn.classList.add('is-open');
-  }
-  function closeSidebar() {
-    sidebar.classList.remove('open');
-    if (backdrop) backdrop.classList.remove('open');
-    btn.classList.remove('is-open');
+  const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+
+  function ensureMobileCloseButton() {
+    if (!isMobile()) return;
+    let closeBtn = sidebar.querySelector('.sidebar-close');
+    if (!closeBtn) {
+      closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'sidebar-close';
+      closeBtn.setAttribute('aria-label', 'Fermer le menu');
+      closeBtn.innerHTML = '✕';
+      sidebar.insertBefore(closeBtn, sidebar.firstChild);
+    }
+    return closeBtn;
   }
 
-  btn.addEventListener('click', () =>
-    sidebar.classList.contains('open') ? closeSidebar() : openSidebar()
-  );
-  if (backdrop) backdrop.addEventListener('click', closeSidebar);
+  function setSidebarState(isOpen) {
+    const mobile = isMobile();
+    sidebar.classList.toggle('open', mobile && isOpen);
+    if (backdrop) backdrop.classList.toggle('open', mobile && isOpen);
+    btn.classList.toggle('is-open', mobile && isOpen);
+    body.classList.toggle('sidebar-open', mobile && isOpen);
+    body.style.overflow = mobile && isOpen ? 'hidden' : '';
+    btn.setAttribute('aria-expanded', String(mobile && isOpen));
+    btn.setAttribute('aria-controls', 'sidebar');
+    if (!mobile) {
+      sidebar.classList.remove('open');
+      if (backdrop) backdrop.classList.remove('open');
+      btn.classList.remove('is-open');
+      body.classList.remove('sidebar-open');
+      body.style.overflow = '';
+    }
+  }
 
-  // Close on nav link click (mobile)
-  sidebar.querySelectorAll('nav a').forEach(a =>
-    a.addEventListener('click', () => { if (window.innerWidth <= 768) closeSidebar(); })
-  );
+  function openSidebar() { setSidebarState(true); }
+  function closeSidebar() { setSidebarState(false); }
+
+  const closeBtn = ensureMobileCloseButton();
+  if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+
+  btn.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const isOpen = sidebar.classList.contains('open');
+    if (isOpen) closeSidebar(); else openSidebar();
+  });
+
+  if (backdrop) {
+    backdrop.addEventListener('click', closeSidebar);
+    backdrop.addEventListener('touchstart', closeSidebar);
+  }
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && sidebar.classList.contains('open')) closeSidebar();
+  });
+
+  window.addEventListener('resize', () => {
+    if (!isMobile()) {
+      closeSidebar();
+      ensureMobileCloseButton();
+    } else {
+      ensureMobileCloseButton();
+    }
+  });
 }
 
 function injectFooter() {
@@ -475,7 +521,6 @@ function boot() {
   initRdvPage();
   initTopIcons();
   initParametresPage();
-  initPillFromSession();
   injectFooter();
   initHamburger();
 }

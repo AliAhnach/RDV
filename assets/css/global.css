@@ -25,10 +25,10 @@ body{
     left:0;
     height:100vh;
     overflow-y:auto;
-    z-index:200;
+    z-index:300;
     display:flex;
     flex-direction:column;
-    transition: left 260ms ease;
+    transition: transform 260ms ease;
 }
 
 /* Logo RDV */
