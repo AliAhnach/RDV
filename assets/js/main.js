@@ -303,7 +303,6 @@ function initTopIcons() {
       else window.location.href = href;
     });
   };
-  nav('btn-notifications',  './messages.html');
   nav('btn-account',        './parametres.html');
   nav('stat-card-rdv',      './appointments.html');
   nav('stat-card-clients',  './clients.html');

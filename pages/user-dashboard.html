@@ -59,9 +59,6 @@
       </div>
 
       <div class="dash-header-right">
-        <button class="hdr-icon-btn" id="btn-notifications" title="Notifications">
-          🔔<span class="notif-count" id="notif-count" style="display:none;"></span>
-        </button>
         <button class="hdr-icon-btn" id="theme-toggle" title="Changer le thème" type="button" aria-label="Changer le thème">
           🌙<span class="hdr-badge"></span>
         </button>
@@ -212,11 +209,7 @@
     if (elMsg)  elMsg.textContent  = unread;
 
     // ── Badge notifications ──
-    const notifCount = document.getElementById('notif-count');
-    if (notifCount && unread > 0) {
-      notifCount.textContent = unread > 99 ? '99+' : unread;
-      notifCount.style.display = 'flex';
-    }
+    // (bouton supprimé)
 
     // ── Navigation boutons ──
     const nav = (id, href) => {
@@ -227,7 +220,6 @@
         else window.location.href = href;
       });
     };
-    nav('btn-notifications',   './messages.html');
     nav('btn-account',         './parametres.html');
     nav('stat-card-rdv',       './appointments.html');
     nav('stat-card-confirmed', './appointments.html');
