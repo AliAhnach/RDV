@@ -240,6 +240,13 @@
 
   /* ── Request modal (USER) ── */
   function openRequestModal() {
+    const session = JSON.parse(localStorage.getItem('rdv_session') || 'null');
+    if (session && session.isGuest) {
+      alert('⚠️ Fonctionnalité réservée aux membres\n\nVous consultez en mode invité. Créez un compte gratuit pour demander un rendez-vous.');
+      if (typeof window.navigateTo === 'function') window.navigateTo('./login.html');
+      else window.location.href = './login.html';
+      return;
+    }
     document.getElementById('form-request').reset();
     document.getElementById('req-message').textContent = '';
     document.getElementById('modal-request').hidden = false;
