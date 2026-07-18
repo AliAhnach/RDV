@@ -55,29 +55,43 @@ const API_BASE = 'http://127.0.0.1:5000';
 // ── Sign Up ───────────────────────────────────────────────────
 
 async function cognitoSignUp(name, email, password) {
-  const res = await fetch(`${API_BASE}/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ fullname: name.trim(), email: email.trim().toLowerCase(), password })
-  });
-  const data = await res.json();
-  if (!res.ok) throw data.message || 'Erreur lors de la création du compte.';
-  return data;
+  const normalizedEmail = email.trim().toLowerCase();
+  const existing = getStoredUser();
+  if (existing && existing.email === normalizedEmail) throw 'Un compte avec cet email existe déjà.';
+  const user = { name: name.trim(), email: normalizedEmail, password, role: 'user' };
+  localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+  return user;
 }
+
+// ── Comptes locaux (mode démo front-end) ─────────────────────
+
+const LOCAL_ACCOUNTS = [
+  { email: 'admin@gmail.com', password: '0000', name: 'Administrateur', role: 'admin' },
+  { email: 'user@rdv.local',  password: 'user123',  name: 'Utilisateur',    role: 'user'  }
+];
 
 // ── Sign In ───────────────────────────────────────────────────
 
 async function cognitoSignIn(email, password) {
-  const res = await fetch(`${API_BASE}/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email.trim().toLowerCase(), password })
-  });
-  const data = await res.json();
-  if (!res.ok) throw data.message || 'Email ou mot de passe incorrect.';
-  const user = { name: data.name || data.fullname || email, email: email.trim().toLowerCase(), role: data.role || 'user' };
-  createSession(user);
-  return user;
+  const normalizedEmail = email.trim().toLowerCase();
+
+  // Vérifier d'abord les comptes locaux
+  const local = LOCAL_ACCOUNTS.find(a => a.email === normalizedEmail && a.password === password);
+  if (local) {
+    const user = { name: local.name, email: local.email, role: local.role };
+    createSession(user);
+    return user;
+  }
+
+  // Vérifier le compte enregistré en localStorage
+  const stored = getStoredUser();
+  if (stored && stored.email === normalizedEmail && stored.password === password) {
+    const user = { name: stored.name, email: stored.email, role: stored.role || 'user' };
+    createSession(user);
+    return user;
+  }
+
+  throw 'Email ou mot de passe incorrect.';
 }
 
 // ── Sign Out ──────────────────────────────────────────────────
