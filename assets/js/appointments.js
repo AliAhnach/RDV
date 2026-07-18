@@ -207,6 +207,22 @@
     if (!rdv) return;
     rdv.status = status;
     saveRdvs(list);
+
+    // ── Notification pour le user ──
+    const userNotifs = JSON.parse(localStorage.getItem('rdv_user_notifications') || '[]');
+    userNotifs.unshift({
+      id: Date.now(),
+      rdvId: rdv.id,
+      client: rdv.client,
+      rdvType: rdv.type,
+      date: rdv.date,
+      time: rdv.time,
+      status,
+      read: false,
+      createdAt: new Date().toISOString(),
+    });
+    localStorage.setItem('rdv_user_notifications', JSON.stringify(userNotifs));
+
     renderAdminRdvs(currentFilter);
     renderAdminStats();
   }
@@ -242,14 +258,16 @@
   function openRequestModal() {
     const session = JSON.parse(localStorage.getItem('rdv_session') || 'null');
     if (session && session.isGuest) {
-      alert('⚠️ Fonctionnalité réservée aux membres\n\nVous consultez en mode invité. Créez un compte gratuit pour demander un rendez-vous.');
-      if (typeof window.navigateTo === 'function') window.navigateTo('./login.html');
-      else window.location.href = './login.html';
+      document.getElementById('modal-guest').hidden = false;
       return;
     }
     document.getElementById('form-request').reset();
     document.getElementById('req-message').textContent = '';
     document.getElementById('modal-request').hidden = false;
+  }
+
+  function closeGuestModal() {
+    document.getElementById('modal-guest').hidden = true;
   }
 
   function closeRequestModal() {
@@ -309,6 +327,16 @@
       document.getElementById('btn-open-request').addEventListener('click', openRequestModal);
       const btn2 = document.getElementById('btn-open-request2');
       if (btn2) btn2.addEventListener('click', openRequestModal);
+
+      // Guest modal events
+      document.getElementById('guest-modal-cancel').addEventListener('click', closeGuestModal);
+      document.getElementById('guest-modal-signup').addEventListener('click', () => {
+        if (typeof window.navigateTo === 'function') window.navigateTo('./login.html');
+        else window.location.href = './login.html';
+      });
+      document.getElementById('modal-guest').addEventListener('click', e => {
+        if (e.target === document.getElementById('modal-guest')) closeGuestModal();
+      });
       document.getElementById('modal-request-close').addEventListener('click', closeRequestModal);
       document.getElementById('modal-request-cancel').addEventListener('click', closeRequestModal);
       document.getElementById('modal-request').addEventListener('click', e => {
@@ -346,6 +374,22 @@
         };
         list.push(newRdv);
         saveRdvs(list);
+
+        // ── Notification pour l'admin ──
+        const notifs = JSON.parse(localStorage.getItem('rdv_notifications') || '[]');
+        notifs.unshift({
+          id: newRdv.id,
+          type: 'new_rdv',
+          client: newRdv.client,
+          rdvType: newRdv.type,
+          date: newRdv.date,
+          time: newRdv.time,
+          desc: newRdv.desc,
+          read: false,
+          createdAt: new Date().toISOString(),
+        });
+        localStorage.setItem('rdv_notifications', JSON.stringify(notifs));
+
         closeRequestModal();
         renderUserRdvs(currentFilter);
       });

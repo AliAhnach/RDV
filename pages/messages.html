@@ -55,9 +55,24 @@
         </header>
 
 
-        <section class="appointments">
-            <h3>Messages</h3>
-            <div class="empty" style="display:block;">Page Messages (contenu à connecter).</div>
+        <section style="padding: 28px 32px; display:flex; flex-direction:column; gap:20px;">
+
+          <!-- Header -->
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h2 style="font-size:22px;font-weight:900;color:#0d3d7d;margin:0 0 4px;">💬 Notifications</h2>
+              <p style="font-size:13px;color:#7a7a9a;margin:0;">Demandes de rendez-vous reçues.</p>
+            </div>
+            <button id="btn-mark-all-read" style="padding:8px 18px;border-radius:999px;border:1px solid rgba(13,61,125,0.18);background:#fff;color:#1f5fbf;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✅ Tout marquer lu</button>
+          </div>
+
+          <!-- Liste -->
+          <div id="notif-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+          <div id="notif-empty" hidden style="text-align:center;padding:48px 24px;color:#7a7a9a;font-size:14px;font-weight:600;background:#fff;border-radius:16px;border:1px dashed rgba(13,61,125,0.18);">
+            <div style="font-size:40px;margin-bottom:10px;">📭</div>
+            Aucune notification pour le moment.
+          </div>
+
         </section>
 
     </main>
@@ -65,5 +80,86 @@
 
 <script src="../assets/js/transition.js"></script>
 <script src="../assets/js/main.js"></script>
+<script>
+(() => {
+  const NOTIF_KEY = 'rdv_notifications';
+  const role = (typeof getUserRole === 'function') ? getUserRole() : 'user';
+
+  function loadNotifs() {
+    try { return JSON.parse(localStorage.getItem(NOTIF_KEY) || '[]'); }
+    catch { return []; }
+  }
+
+  function saveNotifs(list) {
+    localStorage.setItem(NOTIF_KEY, JSON.stringify(list));
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '—';
+    const [y, m, d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  function timeAgo(isoStr) {
+    const diff = Math.floor((Date.now() - new Date(isoStr)) / 1000);
+    if (diff < 60)  return 'il y a quelques secondes';
+    if (diff < 3600) return `il y a ${Math.floor(diff/60)} min`;
+    if (diff < 86400) return `il y a ${Math.floor(diff/3600)}h`;
+    return `il y a ${Math.floor(diff/86400)}j`;
+  }
+
+  function render() {
+    const list = loadNotifs();
+    const listEl  = document.getElementById('notif-list');
+    const emptyEl = document.getElementById('notif-empty');
+    if (!listEl) return;
+
+    // Non-admin voit seulement ses propres notifs
+    const session = JSON.parse(localStorage.getItem('rdv_session') || 'null');
+    const filtered = role === 'admin' ? list : list.filter(n => n.client === (session && session.name));
+
+    listEl.innerHTML = '';
+    if (filtered.length === 0) { emptyEl.hidden = false; return; }
+    emptyEl.hidden = true;
+
+    filtered.forEach(n => {
+      const isUnread = !n.read;
+      const card = document.createElement('div');
+      card.style.cssText = `display:flex;align-items:flex-start;gap:14px;padding:16px 20px;background:${isUnread ? 'rgba(124,92,191,0.06)' : '#fff'};border:1px solid ${isUnread ? 'rgba(124,92,191,0.25)' : 'rgba(13,61,125,0.10)'};border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.04);transition:transform 180ms;cursor:default;`;
+      card.innerHTML = `
+        <div style="width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#ede8f9,#dbeafe);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📅</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:14px;font-weight:900;color:#0d3d7d;">${n.client}</span>
+            ${isUnread ? '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:linear-gradient(135deg,#7c5cbf,#60a5fa);color:#fff;">Nouveau</span>' : ''}
+          </div>
+          <div style="font-size:13px;color:#566574;margin-top:3px;">Demande de <strong>${n.rdvType}</strong> — 📅 ${formatDate(n.date)}  🕐 ${n.time}</div>
+          ${n.desc ? `<div style="font-size:12px;color:#7a7a9a;margin-top:4px;">📝 ${n.desc}</div>` : ''}
+          <div style="font-size:11px;color:#a0aec0;margin-top:6px;">${timeAgo(n.createdAt)}</div>
+        </div>
+        ${role === 'admin' && isUnread ? `<button data-id="${n.id}" class="btn-mark-read" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(124,92,191,0.25);background:#fff;color:#7c5cbf;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">Marquer lu</button>` : ''}
+      `;
+      listEl.appendChild(card);
+    });
+
+    listEl.querySelectorAll('.btn-mark-read').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const all = loadNotifs();
+        const n = all.find(x => x.id === +btn.dataset.id);
+        if (n) { n.read = true; saveNotifs(all); render(); }
+      });
+    });
+  }
+
+  document.getElementById('btn-mark-all-read').addEventListener('click', () => {
+    const all = loadNotifs();
+    all.forEach(n => { n.read = true; });
+    saveNotifs(all);
+    render();
+  });
+
+  render();
+})();
+</script>
 </body>
 </html>

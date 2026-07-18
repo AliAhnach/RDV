@@ -73,8 +73,16 @@
   }
 
   // ── Notification badge ──
-  const badge = document.querySelector('#btn-notifications .hdr-badge');
-  if (badge) badge.style.display = pending > 0 ? '' : 'none';
+  const unread = (JSON.parse(localStorage.getItem('rdv_notifications') || '[]')).filter(n => !n.read).length;
+  const notifCount = document.getElementById('notif-count');
+  if (notifCount) {
+    if (unread > 0) {
+      notifCount.textContent = unread > 99 ? '99+' : unread;
+      notifCount.style.display = 'flex';
+    } else {
+      notifCount.style.display = 'none';
+    }
+  }
 
   // ── Upcoming RDVs ──
   const upcomingEl = document.getElementById('upcoming-rdvs');

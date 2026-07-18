@@ -59,10 +59,12 @@
       </div>
 
       <div class="dash-header-right">
+        <button class="hdr-icon-btn" id="btn-notifications" title="Notifications">
+          🔔<span class="notif-count" id="notif-count" style="display:none;"></span>
+        </button>
         <button class="hdr-icon-btn" id="theme-toggle" title="Changer le thème" type="button" aria-label="Changer le thème">
           🌙<span class="hdr-badge"></span>
         </button>
-  
         <button class="hdr-icon-btn" id="btn-account" title="Compte" type="button" aria-label="Compte">
           👤<span class="account-label">Compte</span><span class="hdr-badge" style="display:none;"></span>
         </button>
@@ -110,20 +112,20 @@
 
         <!-- Stats -->
         <div class="stats-row" style="animation: fadeUp 0.55s ease 0.10s both;">
-          <div class="stat-card">
+          <div class="stat-card" id="stat-card-rdv" style="cursor:pointer;">
             <div class="stat-icon si-purple">📅</div>
-            <div class="stat-value">4</div>
+            <div class="stat-value" id="stat-rdv">—</div>
             <div class="stat-label">Mes RDV</div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" id="stat-card-confirmed" style="cursor:pointer;">
             <div class="stat-icon si-blue">✅</div>
-            <div class="stat-value">2</div>
+            <div class="stat-value" id="stat-confirmed">—</div>
             <div class="stat-label">Confirmés</div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" id="stat-card-messages" style="cursor:pointer;">
             <div class="stat-icon si-green">💬</div>
-            <div class="stat-value">3</div>
-            <div class="stat-label">Messages</div>
+            <div class="stat-value" id="stat-messages">—</div>
+            <div class="stat-label">Notifications</div>
           </div>
         </div>
 
@@ -174,21 +176,16 @@
 <script src="../assets/js/main.js"></script>
 <script>
   (() => {
+    // ── Session & pill ──
     const s = JSON.parse(localStorage.getItem('rdv_session') || 'null');
     if (s) {
       const stored = JSON.parse(localStorage.getItem('rdv_user') || 'null');
       if (stored && !s.isGuest) { s.name = stored.name || s.name; s.email = stored.email || s.email; }
-      const initials = (s.name || '?').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-      const pillInitials = document.getElementById('pill-initials');
-      if (pillInitials) pillInitials.textContent = initials;
-      const pillName = document.getElementById('pill-name');
-      if (pillName) pillName.textContent = s.name || '—';
-      const pillHandle = document.getElementById('pill-handle');
-      if (pillHandle) pillHandle.textContent = s.email || '—';
       const welcomeName = document.getElementById('welcome-name');
       if (welcomeName) welcomeName.textContent = (s.name || '').trim().split(' ')[0] + ' !';
     }
 
+    // ── Date & heure ──
     const heroDate = document.getElementById('hero-date');
     const heroTime = document.getElementById('hero-time');
     if (heroDate || heroTime) {
@@ -200,6 +197,41 @@
       tick();
       setInterval(tick, 1000);
     }
+
+    // ── Stats dynamiques ──
+    const rdvs = JSON.parse(localStorage.getItem('rdv_appointments') || '[]');
+    const userName = s ? s.name : '';
+    const myRdvs = rdvs.filter(r => !userName || r.client === userName);
+    const confirmed = myRdvs.filter(r => r.status === 'Confirmé').length;
+    const unread = (JSON.parse(localStorage.getItem('rdv_user_notifications') || '[]')).filter(n => !n.read).length;
+    const elRdv = document.getElementById('stat-rdv');
+    const elConf = document.getElementById('stat-confirmed');
+    const elMsg  = document.getElementById('stat-messages');
+    if (elRdv)  elRdv.textContent  = myRdvs.length;
+    if (elConf) elConf.textContent = confirmed;
+    if (elMsg)  elMsg.textContent  = unread;
+
+    // ── Badge notifications ──
+    const notifCount = document.getElementById('notif-count');
+    if (notifCount && unread > 0) {
+      notifCount.textContent = unread > 99 ? '99+' : unread;
+      notifCount.style.display = 'flex';
+    }
+
+    // ── Navigation boutons ──
+    const nav = (id, href) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('click', () => {
+        if (typeof window.navigateTo === 'function') window.navigateTo(href);
+        else window.location.href = href;
+      });
+    };
+    nav('btn-notifications',   './messages.html');
+    nav('btn-account',         './parametres.html');
+    nav('stat-card-rdv',       './appointments.html');
+    nav('stat-card-confirmed', './appointments.html');
+    nav('stat-card-messages',  './messages.html');
   })();
 </script>
 </body>
