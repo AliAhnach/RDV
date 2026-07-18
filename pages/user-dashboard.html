@@ -173,47 +173,34 @@
 <script src="../assets/js/transition.js"></script>
 <script src="../assets/js/main.js"></script>
 <script>
-  // Fill profile pill
-  const s = JSON.parse(localStorage.getItem('rdv_session') || 'null');
-  if (s) {
-    const initials = (s.name || '?').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-    document.getElementById('pill-initials').textContent = initials;
-    document.getElementById('pill-name').textContent     = s.name  || '—';
-    document.getElementById('pill-handle').textContent   = s.email || '—';
-    const firstName = (s.name || '').trim().split(' ')[0];
-    document.getElementById('welcome-name').textContent  = firstName + ' !';
-  }
+  (() => {
+    const s = JSON.parse(localStorage.getItem('rdv_session') || 'null');
+    if (s) {
+      const stored = JSON.parse(localStorage.getItem('rdv_user') || 'null');
+      if (stored && !s.isGuest) { s.name = stored.name || s.name; s.email = stored.email || s.email; }
+      const initials = (s.name || '?').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+      const pillInitials = document.getElementById('pill-initials');
+      if (pillInitials) pillInitials.textContent = initials;
+      const pillName = document.getElementById('pill-name');
+      if (pillName) pillName.textContent = s.name || '—';
+      const pillHandle = document.getElementById('pill-handle');
+      if (pillHandle) pillHandle.textContent = s.email || '—';
+      const welcomeName = document.getElementById('welcome-name');
+      if (welcomeName) welcomeName.textContent = (s.name || '').trim().split(' ')[0] + ' !';
+    }
 
-  const today = new Date();
-  const heroDate = document.getElementById('hero-date');
-  const heroTime = document.getElementById('hero-time');
-  if (heroDate) {
-    heroDate.textContent = today.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-  }
-  if (heroTime) {
-    heroTime.textContent = today.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-  }
-
-  function mettreAJourHorloge() {
-    const maintenant = new Date();
-
-    // Options pour formater la date en français
-    const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-    const dateFormatee = maintenant.toLocaleDateString('fr-FR', optionsDate);
-
-    // Options pour l'heure (format 24h avec secondes)
-    const heureFormatee = maintenant.toLocaleTimeString('fr-FR', { hour12: false });
-
-    // Injection dans le HTML
-    document.getElementById('hero-date').textContent = dateFormatee;
-    document.getElementById('hero-time').textContent = heureFormatee;
-}
-
-// Lancer la fonction immédiatement au chargement de la page
-mettreAJourHorloge();
-
-// Mettre à jour l'affichage toutes les secondes
-setInterval(mettreAJourHorloge, 1000);_
+    const heroDate = document.getElementById('hero-date');
+    const heroTime = document.getElementById('hero-time');
+    if (heroDate || heroTime) {
+      const tick = () => {
+        const now = new Date();
+        if (heroDate) heroDate.textContent = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        if (heroTime) heroTime.textContent = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      };
+      tick();
+      setInterval(tick, 1000);
+    }
+  })();
 </script>
 </body>
 </html>
