@@ -48,40 +48,36 @@ function continuerEnInvite() {
   _go('./index.html');
 }
 
+// ── Config ────────────────────────────────────────────────────
+
+const API_BASE = 'http://127.0.0.1:5000';
+
 // ── Sign Up ───────────────────────────────────────────────────
 
-function cognitoSignUp(name, email, password, role) {
-  return new Promise((resolve, reject) => {
-    const normalizedEmail = email.trim().toLowerCase();
-    const existing = getStoredUser();
-    if (existing && existing.email === normalizedEmail) {
-      return reject('Un compte avec cet email existe déjà.');
-    }
-    const r = 'user';
-    localStorage.setItem(AUTH_KEY, JSON.stringify({ name: name.trim(), email: normalizedEmail, password, role: r }));
-    resolve({ name, email: normalizedEmail, role: r });
+async function cognitoSignUp(name, email, password) {
+  const res = await fetch(`${API_BASE}/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fullname: name.trim(), email: email.trim().toLowerCase(), password })
   });
+  const data = await res.json();
+  if (!res.ok) throw data.message || 'Erreur lors de la création du compte.';
+  return data;
 }
 
 // ── Sign In ───────────────────────────────────────────────────
 
-function cognitoSignIn(email, password) {
-  return new Promise((resolve, reject) => {
-    const normalizedEmail = email.trim().toLowerCase();
-    if (normalizedEmail === 'admin@gmail.com' && password === '0000') {
-      const adminUser = { name: 'Admin', email: normalizedEmail, role: 'admin' };
-      createSession(adminUser);
-      return resolve(adminUser);
-    }
-    const user = getStoredUser();
-    if (!user) return reject('Aucun compte trouvé. Veuillez créer un compte.');
-    if (user.email !== normalizedEmail || user.password !== password) {
-      return reject('Email ou mot de passe incorrect.');
-    }
-    user.role = 'user';
-    createSession(user);
-    resolve(user);
+async function cognitoSignIn(email, password) {
+  const res = await fetch(`${API_BASE}/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email.trim().toLowerCase(), password })
   });
+  const data = await res.json();
+  if (!res.ok) throw data.message || 'Email ou mot de passe incorrect.';
+  const user = { name: data.name || data.fullname || email, email: email.trim().toLowerCase(), role: data.role || 'user' };
+  createSession(user);
+  return user;
 }
 
 // ── Sign Out ──────────────────────────────────────────────────
