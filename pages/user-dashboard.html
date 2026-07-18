@@ -44,17 +44,6 @@
       <a href="./parametres.html">⚙️ Paramètres</a>
       <a href="#" onclick="cognitoSignOut(); return false;">🚪 Déconnexion</a>
     </nav>
-
-    <!-- Role badge -->
-    <div style="margin-top:auto; padding-top:20px;">
-      <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.07);border-radius:10px;border:1px solid rgba(255,255,255,0.1);">
-        <span style="font-size:18px;">👤</span>
-        <div>
-          <div style="font-size:11px;font-weight:700;color:#fff;letter-spacing:.5px;">UTILISATEUR</div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.45);">Accès standard</div>
-        </div>
-      </div>
-    </div>
   </aside>
 
   <!-- ── Main ── -->
@@ -73,9 +62,7 @@
         <button class="hdr-icon-btn" id="theme-toggle" title="Changer le thème" type="button" aria-label="Changer le thème">
           🌙<span class="hdr-badge"></span>
         </button>
-        <button class="hdr-icon-btn" title="Messages">
-          💬<span class="hdr-badge"></span>
-        </button>
+  
         <button class="hdr-icon-btn" id="btn-account" title="Compte" type="button" aria-label="Compte">
           👤<span class="account-label">Compte</span><span class="hdr-badge" style="display:none;"></span>
         </button>
@@ -102,8 +89,8 @@
           <div class="hero-summary">
             <div class="hero-mini-card">
               <div class="hero-mini-label">Aujourd’hui</div>
-              <div class="hero-mini-date" id="hero-date">—</div>
-              <div class="hero-mini-time" id="hero-time">—</div>
+              <div class="hero-mini-date" id="hero-date"></div>
+              <div class="hero-mini-time" id="hero-time"></div>
             </div>
             <div class="hero-chip">✅ 2 confirmés</div>
             <div class="hero-chip">📅 4 RDV</div>
@@ -111,7 +98,7 @@
           </div>
         </div>
 
-        <!-- Role info banner -->
+        <!-- Role info banner
         <div class="role-banner">
           <div class="role-banner-icon">👤</div>
           <div class="role-banner-content">
@@ -119,7 +106,7 @@
             <div class="role-banner-text">Vous avez accès à vos rendez-vous, messages et paramètres personnels.</div>
           </div>
           <div class="role-banner-badge">✦ Standard</div>
-        </div>
+        </div> -->
 
         <!-- Stats -->
         <div class="stats-row" style="animation: fadeUp 0.55s ease 0.10s both;">
@@ -206,6 +193,27 @@
   if (heroTime) {
     heroTime.textContent = today.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   }
+
+  function mettreAJourHorloge() {
+    const maintenant = new Date();
+
+    // Options pour formater la date en français
+    const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+    const dateFormatee = maintenant.toLocaleDateString('fr-FR', optionsDate);
+
+    // Options pour l'heure (format 24h avec secondes)
+    const heureFormatee = maintenant.toLocaleTimeString('fr-FR', { hour12: false });
+
+    // Injection dans le HTML
+    document.getElementById('hero-date').textContent = dateFormatee;
+    document.getElementById('hero-time').textContent = heureFormatee;
+}
+
+// Lancer la fonction immédiatement au chargement de la page
+mettreAJourHorloge();
+
+// Mettre à jour l'affichage toutes les secondes
+setInterval(mettreAJourHorloge, 1000);_
 </script>
 </body>
 </html>

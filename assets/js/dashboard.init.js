@@ -10,6 +10,19 @@
     localStorage.setItem('rdv_session', JSON.stringify(s));
   }
 
+  // ── Date & heure en temps réel ──
+  const heroDate = document.getElementById('hero-date');
+  const heroTime = document.getElementById('hero-time');
+  if (heroDate || heroTime) {
+    const tick = () => {
+      const now = new Date();
+      if (heroDate) heroDate.textContent = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      if (heroTime) heroTime.textContent = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    };
+    tick();
+    setInterval(tick, 1000);
+  }
+
   // ── Profile pill ──
   const initials = s.isGuest ? '👤' : (s.name || '').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '👤';
   const pillInitials = document.getElementById('pill-initials');

@@ -14,6 +14,40 @@
   <link rel="stylesheet" href="../assets/css/dashboard.css"/>
   <link rel="stylesheet" href="../assets/css/splash.css"/>
   <link rel="stylesheet" href="../assets/css/responsive.css"/>
+  <style>
+    .today-date {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 12px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.86);
+      color: #4b4f6b;
+      font-size: 0.95rem;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(125, 129, 162, 0.16);
+      backdrop-filter: blur(8px);
+      white-space: nowrap;
+    }
+    .today-date .today-day {
+      color: #7c3aed;
+      text-transform: capitalize;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .today-date .today-date-text {
+      color: #4b4f6b;
+    }
+    @media (max-width: 768px) {
+      .today-date {
+        margin-right: 0;
+        margin-bottom: 8px;
+        width: fit-content;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -47,6 +81,8 @@
 
     <!-- Topbar -->
     <div class="dash-header">
+      <div class="today-date" id="today-date" aria-live="polite"></div>
+
       <div class="search-wrap">
         <svg width="14" height="14" fill="none" stroke="#7a7a9a" stroke-width="2" viewBox="0 0 24 24">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -73,10 +109,21 @@
 
         <!-- Welcome -->
         <div class="welcome-block">
-          <div class="welcome-greeting">
-            Bonjour <span class="grad-name" id="welcome-name">!</span> 
+          <div class="dashboard-hero">
+            <div>
+              <div class="welcome-greeting">
+                Bonjour <span class="grad-name" id="welcome-name">!</span>
+              </div>
+              <div class="welcome-sub">Ravi de vous revoir sur votre espace santé.</div>
+            </div>
+            <div class="hero-summary">
+              <div class="hero-mini-card">
+                <div class="hero-mini-label">📅 Aujourd'hui</div>
+                <div class="hero-mini-date" id="hero-date">—</div>
+                <div class="hero-mini-time" id="hero-time">—</div>
+              </div>
+            </div>
           </div>
-          <div class="welcome-sub">Ravi de vous revoir sur votre espace santé.</div>
         </div>
 
         <!-- Stats row -->
@@ -139,5 +186,21 @@
 <script src="../assets/js/transition.js"></script>
 <script src="../assets/js/main.js"></script>
 <script src="../assets/js/dashboard.init.js"></script>
+<script>
+  (function () {
+    const el = document.getElementById('today-date');
+    if (!el) return;
+
+    const now = new Date();
+    const dayName = new Intl.DateTimeFormat('fr-FR', { weekday: 'long' }).format(now);
+    const dateText = new Intl.DateTimeFormat('fr-FR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    }).format(now);
+
+    el.innerHTML = `<span class="today-day">${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</span><span class="today-date-text"> • ${dateText}</span>`;
+  })();
+</script>
 </body>
 </html>
