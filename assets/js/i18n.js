@@ -23,7 +23,7 @@ const TRANSLATIONS = {
     'panel.prescription': 'Others by prescription',
     'order.btn':          'Place Order',
     // Footer
-    'footer.copy':        '© 2025 RDV Plateforme. Tous droits réservés.',
+    'footer.copy':        '© 2026 RDV Plateforme. Tous droits réservés.'
     'footer.dev':         'Développeur',
     // Guest banner
     'guest.banner':       '👁️ Vous consultez en mode invité — certaines fonctionnalités sont limitées.',
@@ -72,7 +72,7 @@ const TRANSLATIONS = {
     'panel.refill':       'Needs refill soon',
     'panel.prescription': 'Others by prescription',
     'order.btn':          'Place Order',
-    'footer.copy':        '© 2025 RDV Platform. All rights reserved.',
+    'footer.copy':        '© 2026 RDV Platform. All rights reserved.'
     'footer.dev':         'Developer',
     'guest.banner':       '👁️ You are browsing as a guest — some features are limited.',
     'guest.cta':          'Create an account',
@@ -117,7 +117,7 @@ const TRANSLATIONS = {
     'panel.refill':       'تحتاج إعادة تعبئة قريباً',
     'panel.prescription': 'أخرى بوصفة طبية',
     'order.btn':          'تأكيد الطلب',
-    'footer.copy':        '© 2025 منصة RDV. جميع الحقوق محفوظة.',
+    'footer.copy':        '© 2026 منصة RDV. جميع الحقوق محفوظة.',
     'footer.dev':         'المطور',
     'guest.banner':       '👁️ أنت تتصفح كضيف — بعض الميزات محدودة.',
     'guest.cta':          'إنشاء حساب',
