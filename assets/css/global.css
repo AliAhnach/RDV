@@ -667,6 +667,12 @@ body{
     transform: translateY(-1px);
 }
 
+/* ── Sidebar close button (mobile only) ── */
+.sidebar-close { display: none; }
+@media (max-width: 768px) {
+  .sidebar-close { display: flex; }
+}
+
 /* RTL support (Arabic) */
 [dir="rtl"] .sidebar { left:auto; right:0; }
 [dir="rtl"] .main { margin-left:0; margin-right:220px; }
