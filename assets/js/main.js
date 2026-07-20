@@ -1,81 +1,5 @@
-// ===== Auth (AWS Cognito) =====
-
-function setSubmitting(btn, loading) {
-  btn.disabled = loading;
-  btn.querySelector('span').textContent = loading ? 'Chargement...' : btn.dataset.label;
-}
-
-function initAuthPage() {
-  const isAuthPage = !!document.getElementById('form-signin') || !!document.getElementById('form-signup');
-  if (!isAuthPage) return;
-
-  const formLogin  = document.getElementById('form-signin');
-  const formSignup = document.getElementById('form-signup');
-  const msg1 = document.getElementById('auth-message');
-  const msg2 = document.getElementById('auth-message2');
-
-  // Store original button labels for reset after loading
-  [formLogin, formSignup].forEach(f => {
-    if (!f) return;
-    const btn = f.querySelector('button[type="submit"]');
-    if (btn) btn.dataset.label = btn.querySelector('span').textContent;
-  });
-
-  if (formSignup) {
-    formSignup.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data  = new FormData(formSignup);
-      const name  = String(data.get('name')     || '').trim();
-      const email = String(data.get('email')    || '').trim().toLowerCase();
-      const pass  = String(data.get('password') || '');
-      const role  = String(data.get('role')     || 'user');
-
-      if (!name || !email || pass.length < 4) {
-        if (msg2) msg2.textContent = 'Remplissez tous les champs (mot de passe min. 4 caractères).';
-        return;
-      }
-
-      const btn = formSignup.querySelector('button[type="submit"]');
-      setSubmitting(btn, true);
-      if (msg2) msg2.textContent = '';
-
-      try {
-        await cognitoSignUp(name, email, pass, role);
-        await cognitoSignIn(email, pass);
-        redirectToDashboard();
-      } catch (err) {
-        if (msg2) msg2.textContent = err;
-        setSubmitting(btn, false);
-      }
-    });
-  }
-
-  if (formLogin) {
-    formLogin.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data  = new FormData(formLogin);
-      const email = String(data.get('email')    || '').trim().toLowerCase();
-      const pass  = String(data.get('password') || '');
-
-      if (!email || !pass) {
-        if (msg1) msg1.textContent = 'Veuillez remplir tous les champs.';
-        return;
-      }
-
-      const btn = formLogin.querySelector('button[type="submit"]');
-      setSubmitting(btn, true);
-      if (msg1) msg1.textContent = '';
-
-      try {
-        await cognitoSignIn(email, pass);
-        redirectToDashboard();
-      } catch (err) {
-        if (msg1) msg1.textContent = err;
-        setSubmitting(btn, false);
-      }
-    });
-  }
-}
+// ===== Auth page (géré par auth.ui.js) =====
+function initAuthPage() {}
 
 // ===== RDV =====
 
@@ -162,12 +86,11 @@ function highlightActiveNav() {
 }
 
 function initAuthStateUI() {
-  getCurrentUserInfo().then(user => {
-    const l = document.getElementById('nav-loggedout');
-    const a = document.getElementById('nav-auth-link');
-    if (l) l.style.display = user ? '' : 'none';
-    if (a) a.style.display = user ? 'none' : '';
-  });
+  const user = getCurrentUser();
+  const l = document.getElementById('nav-loggedout');
+  const a = document.getElementById('nav-auth-link');
+  if (l) l.style.display = user ? '' : 'none';
+  if (a) a.style.display = user ? 'none' : '';
 }
 
 function openModal(rdv) {
@@ -321,34 +244,31 @@ function initProfileName() {
   const dashboardWelcomeEl = document.getElementById('dashboard-welcome-username');
   const accountBtn = document.getElementById('btn-account');
 
-  getCurrentUserInfo().then(user => {
-    const name = (user && user.name) ? user.name : 'Invité';
-    const firstName = String(name || '').trim().split(/\s+/)[0] || 'Invité';
+  const user = getCurrentUser();
+  const name = (user && user.fullname) ? user.fullname : 'Invité';
+  const firstName = String(name).trim().split(/\s+/)[0] || 'Invité';
 
-    if (el) el.textContent = name;
-    if (welcomeEl) welcomeEl.textContent = firstName;
-    if (dashboardWelcomeEl) dashboardWelcomeEl.textContent = firstName;
+  if (el) el.textContent = name;
+  if (welcomeEl) welcomeEl.textContent = firstName;
+  if (dashboardWelcomeEl) dashboardWelcomeEl.textContent = firstName;
 
-    if (accountBtn) {
-      let label = accountBtn.querySelector('.account-label');
-      if (!label) {
-        label = document.createElement('span');
-        label.className = 'account-label';
-        accountBtn.appendChild(label);
-      }
-      label.textContent = firstName;
+  if (accountBtn) {
+    let label = accountBtn.querySelector('.account-label');
+    if (!label) {
+      label = document.createElement('span');
+      label.className = 'account-label';
+      accountBtn.appendChild(label);
     }
-  });
+    label.textContent = firstName;
+  }
 }
 
 function initDashboardWelcome() {
   const el = document.getElementById('dashboard-welcome-username');
   if (!el) return;
-  getCurrentUserInfo().then(user => {
-    const name = (user && user.name) ? user.name : 'Invité';
-    const firstName = String(name || '').trim().split(/\s+/)[0] || 'Invité';
-    el.textContent = firstName;
-  });
+  const user = getCurrentUser();
+  const name = (user && user.fullname) ? user.fullname : 'Invité';
+  el.textContent = String(name).trim().split(/\s+/)[0] || 'Invité';
 }
 
 function initSettingsPage() {
@@ -363,12 +283,12 @@ function initSettingsPage() {
   const passwordInput  = document.getElementById('settings-password');
 
   function fillForm() {
-    const user = getStoredUser();
+    const user = getCurrentUser();
     if (!user) return;
-    if (currentNameEl)  currentNameEl.textContent  = user.name  || '—';
-    if (currentEmailEl) currentEmailEl.textContent = user.email || '—';
-    if (nameInput)      nameInput.value  = user.name  || '';
-    if (emailInput)     emailInput.value = user.email || '';
+    if (currentNameEl)  currentNameEl.textContent  = user.fullname || '—';
+    if (currentEmailEl) currentEmailEl.textContent = user.email    || '—';
+    if (nameInput)      nameInput.value  = user.fullname || '';
+    if (emailInput)     emailInput.value = user.email    || '';
     if (passwordInput)  passwordInput.value = '';
   }
 
@@ -395,17 +315,11 @@ function initSettingsPage() {
       return;
     }
 
-    const current = getStoredUser() || {};
-    const updated = { ...current, name, email };
-    if (password) updated.password = password;
-
-    localStorage.setItem(AUTH_KEY, JSON.stringify(updated));
-
     // Mettre à jour la session active
-    const session = getSession();
+    const session = getCurrentUser();
     if (session) {
-      session.name  = name;
-      session.email = email;
+      session.fullname = name;
+      session.email    = email;
       localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     }
 
@@ -413,7 +327,6 @@ function initSettingsPage() {
     if (currentNameEl)  currentNameEl.textContent  = name;
     if (currentEmailEl) currentEmailEl.textContent = email;
     if (passwordInput)  passwordInput.value = '';
-
     const profileName = document.getElementById('profile-name');
     if (profileName) profileName.textContent = name;
 
@@ -426,22 +339,20 @@ function initSettingsPage() {
 }
 
 function initParametresPage() {
-  const user = JSON.parse(localStorage.getItem('rdv_user') || 'null');
+  const user = getCurrentUser();
   if (!user) return;
-  const initials = (user.name || '?').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  const initials = (user.fullname || '?').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
   const avatar    = document.getElementById('hero-avatar');
   const heroName  = document.getElementById('hero-name');
   const heroEmail = document.getElementById('hero-email');
   if (avatar)    avatar.textContent    = initials;
-  if (heroName)  heroName.textContent  = user.name  || '—';
-  if (heroEmail) heroEmail.textContent = user.email || '—';
+  if (heroName)  heroName.textContent  = user.fullname || '—';
+  if (heroEmail) heroEmail.textContent = user.email     || '—';
 }
 
 function deleteAccount() {
   if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) return;
-  localStorage.removeItem('rdv_user');
-  localStorage.removeItem('rdv_session');
-  window.location.href = './login.html';
+  logout();
 }
 
 function initPillFromSession() {
@@ -449,12 +360,12 @@ function initPillFromSession() {
   const pillName     = document.getElementById('pill-name');
   const pillHandle   = document.getElementById('pill-handle');
   if (!pillInitials) return;
-  const s = getSession();
+  const s = getCurrentUser();
   if (!s) return;
-  const initials = (s.name || '').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '👤';
+  const initials = (s.fullname || '').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '👤';
   pillInitials.textContent = initials;
-  if (pillName)   pillName.textContent   = s.name  || '—';
-  if (pillHandle) pillHandle.textContent = s.email || '—';
+  if (pillName)   pillName.textContent   = s.fullname || '—';
+  if (pillHandle) pillHandle.textContent = s.email    || '—';
 }
 
 function initHamburger() {
@@ -529,7 +440,8 @@ function boot() {
   if (document.getElementById('form-signin') || document.getElementById('form-signup')) return;
 
   // Hide clients link for non-admin users
-  if (getUserRole() !== 'admin') {
+  const _u = getCurrentUser();
+  if (!_u || _u.role !== 'admin') {
     document.querySelectorAll('.sidebar nav a[href*="clients"]').forEach(a => a.remove());
   }
 
