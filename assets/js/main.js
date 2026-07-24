@@ -318,9 +318,7 @@ function initSettingsPage() {
     // Mettre à jour la session active
     const session = getCurrentUser();
     if (session) {
-      session.fullname = name;
-      session.email    = email;
-      localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      saveSession({ ...session, fullname: name, name, email });
     }
 
     // Rafraîchir l'affichage
@@ -435,6 +433,174 @@ function injectFooter() {
   main.appendChild(footer);
 }
 
+function initUserDashboard() {
+  if (!window.location.pathname.includes('user-dashboard.html')) return;
+
+  const heroDate = document.getElementById('hero-date');
+  const heroTime = document.getElementById('hero-time');
+  if (heroDate || heroTime) {
+    const tick = () => {
+      const now = new Date();
+      if (heroDate) heroDate.textContent = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      if (heroTime) heroTime.textContent = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    };
+    tick();
+    window.setInterval(tick, 1000);
+  }
+
+  const session = getCurrentUser();
+  const welcomeEl = document.getElementById('welcome-name');
+
+  function renderWelcome() {
+    const fullname = String(session?.fullname || '').trim();
+    const firstName = fullname ? fullname.split(/\s+/)[0] : '';
+    if (welcomeEl) welcomeEl.textContent = firstName ? `${firstName} !` : '!';
+  }
+
+  if (!session || !session.id) {
+    renderWelcome();
+    return;
+  }
+
+  const statsRow = document.querySelector('.stats-row');
+  const upcomingTitle = Array.from(document.querySelectorAll('.pdc-title'))
+    .find(el => el.textContent.includes('prochains rendez-vous'));
+  const upcomingCard = upcomingTitle && upcomingTitle.closest('.platform-desc-card');
+  const upcomingList = upcomingCard && upcomingCard.querySelector('div[style*="flex-direction:column"]');
+
+  function readNumber(source, keys) {
+    for (const key of keys) {
+      const value = Number(source && source[key]);
+      if (Number.isFinite(value)) return value;
+    }
+    return 0;
+  }
+
+  function setCard(cardId, valueId, icon, label, value) {
+    let card = document.getElementById(cardId);
+    if (!card && statsRow) {
+      card = document.createElement('div');
+      card.className = 'stat-card';
+      card.id = cardId;
+      card.innerHTML = `<div class="stat-icon si-purple">${icon}</div><div class="stat-value" id="${valueId}">—</div><div class="stat-label"></div>`;
+      statsRow.appendChild(card);
+    }
+    if (!card) return;
+    const iconEl = card.querySelector('.stat-icon');
+    const valueEl = card.querySelector('.stat-value');
+    const labelEl = card.querySelector('.stat-label');
+    if (iconEl) iconEl.textContent = icon;
+    if (valueEl) valueEl.textContent = value;
+    if (labelEl) labelEl.textContent = label;
+  }
+
+  function normalizeAppointment(appointment) {
+    return {
+      ...appointment,
+      type: appointment.service ?? appointment.service_name ?? appointment.type ?? 'Rendez-vous',
+      date: appointment.appointment_date ?? appointment.date,
+      time: appointment.appointment_time ?? appointment.time,
+      status: appointment.status ?? 'En attente',
+    };
+  }
+
+  function appointmentItem(appointment) {
+    const rdv = normalizeAppointment(appointment);
+    const icons = { Consultation: '🩺', Suivi: '💊', Réunion: '🤝', Urgence: '🚨' };
+    const colors = {
+      Confirmé: 'background:#dcfce7;color:#16a34a;',
+      'En attente': 'background:#fef3cd;color:#b45309;',
+      Refusé: 'background:#fee2e2;color:#dc2626;',
+    };
+    const date = rdv.date ? rdv.date.split('-').reverse().join('/') : '—';
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(124,92,191,0.06);border:1px solid rgba(124,92,191,0.14);border-radius:12px;">
+      <div style="width:42px;height:42px;border-radius:10px;background:#ede8f9;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${icons[rdv.type] || '📅'}</div>
+      <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#1a1a2e;">${rdv.type}</div><div style="font-size:11px;color:#7a7a9a;margin-top:2px;">${date} · ${rdv.time || '—'}</div></div>
+      <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;${colors[rdv.status] || colors['En attente']}">${rdv.status}</span>
+    </div>`;
+  }
+
+  function getRecentCard() {
+    let card = document.getElementById('user-recent-appointments');
+    if (card || !upcomingCard) return card;
+    card = document.createElement('div');
+    card.className = 'platform-desc-card';
+    card.id = 'user-recent-appointments';
+    card.innerHTML = '<div class="pdc-top"><div class="pdc-icon">🕘</div><span class="pdc-badge">Historique</span></div><div class="pdc-title">Historique récent</div><div class="user-recent-list" style="display:flex;flex-direction:column;gap:10px;margin-top:14px;"></div>';
+    upcomingCard.insertAdjacentElement('afterend', card);
+    return card;
+  }
+
+  function setLoading() {
+    document.querySelectorAll('.stats-row .stat-value').forEach(el => { el.textContent = '…'; });
+    document.querySelectorAll('.hero-chip').forEach(el => { el.textContent = 'Chargement…'; });
+    if (upcomingList) upcomingList.innerHTML = '<div style="color:#7a7a9a;font-size:13px;text-align:center;padding:10px;">Chargement des rendez-vous…</div>';
+  }
+
+  function renderEmpty(message) {
+    if (upcomingList) upcomingList.innerHTML = `<div style="color:#7a7a9a;font-size:13px;text-align:center;padding:10px;">${message}</div>`;
+    const recentList = getRecentCard()?.querySelector('.user-recent-list');
+    if (recentList) recentList.innerHTML = `<div style="color:#7a7a9a;font-size:13px;text-align:center;padding:10px;">${message}</div>`;
+  }
+
+  async function loadDashboard() {
+    setLoading();
+    try {
+      const res = await fetch(`${API_BASE}/dashboard/user/${encodeURIComponent(session.id)}`);
+      const body = await res.text();
+      let data = {};
+      try {
+        data = body ? JSON.parse(body) : {};
+      } catch {
+        throw new Error(res.ok ? 'Réponse invalide du serveur.' : `Erreur HTTP ${res.status}`);
+      }
+      if (!res.ok || data.success === false) throw new Error(data.message || data.error || `Erreur HTTP ${res.status}`);
+
+      const stats = data.stats ?? data.dashboard ?? data.data ?? data;
+      const total = readNumber(stats, ['total_appointments', 'appointments', 'total_rdvs', 'total']);
+      const pending = readNumber(stats, ['pending_appointments', 'pending', 'waiting_appointments', 'pending_count']);
+      const confirmed = readNumber(stats, ['confirmed_appointments', 'confirmed', 'confirmed_count']);
+      const refused = readNumber(stats, ['refused_appointments', 'rejected_appointments', 'refused', 'rejected', 'refused_count']);
+      const next = data.next_appointment ?? data.nextAppointment ?? stats.next_appointment ?? stats.nextAppointment;
+      const recent = data.recent_appointments ?? data.recentAppointments ?? data.appointments
+        ?? data.data?.recent_appointments ?? data.data?.recentAppointments
+        ?? stats.recent_appointments ?? stats.recentAppointments ?? [];
+
+      setCard('stat-card-rdv', 'stat-rdv', '📅', 'Mes RDV', total);
+      setCard('stat-card-confirmed', 'stat-confirmed', '✅', 'Confirmés', confirmed);
+      setCard('stat-card-messages', 'stat-messages', '⏳', 'En attente', pending);
+      setCard('stat-card-refused', 'stat-refused', '❌', 'Refusés', refused);
+
+      const chips = document.querySelectorAll('.hero-chip');
+      if (chips[0]) chips[0].textContent = `✅ ${confirmed} confirmés`;
+      if (chips[1]) chips[1].textContent = `📅 ${total} RDV`;
+      if (chips[2]) chips[2].textContent = `⏳ ${pending} en attente`;
+
+      if (total === 0) {
+        renderEmpty('Aucun rendez-vous pour le moment.');
+        return;
+      }
+
+      if (upcomingList) upcomingList.innerHTML = next ? appointmentItem(next) : '<div style="color:#7a7a9a;font-size:13px;text-align:center;padding:10px;">Aucun prochain rendez-vous.</div>';
+      const recentList = getRecentCard()?.querySelector('.user-recent-list');
+      if (recentList) {
+        const history = Array.isArray(recent) ? recent.slice(0, 5) : [];
+        recentList.innerHTML = history.length ? history.map(appointmentItem).join('') : '<div style="color:#7a7a9a;font-size:13px;text-align:center;padding:10px;">Aucun historique disponible.</div>';
+      }
+    } catch (error) {
+      console.error('Impossible de charger le dashboard utilisateur :', error);
+      document.querySelectorAll('.stats-row .stat-value').forEach(el => { el.textContent = '—'; });
+      renderEmpty(error.message || 'Erreur réseau. Réessayez.');
+    }
+  }
+
+  // Le script local de la page est exécuté après main.js ; ce délai évite qu'il réécrase le nom et les données API.
+  window.setTimeout(() => {
+    renderWelcome();
+    loadDashboard();
+  }, 0);
+}
+
 function boot() {
   initAuthPage();
   if (document.getElementById('form-signin') || document.getElementById('form-signup')) return;
@@ -457,6 +623,7 @@ function boot() {
   initTopIcons();
   initGlobalTheme();
   initParametresPage();
+  initUserDashboard();
   injectFooter();
   initHamburger();
 }

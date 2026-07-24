@@ -5,17 +5,39 @@
    l'envoyer dans les headers fetch() des futures requêtes.
    ============================================================= */
 
-const API_BASE   = 'http://127.0.0.1:5000/api';
+const API_BASE   = 'https://aliahnach.pythonanywhere.com/api';
 const SESSION_KEY = 'rdv_session';
 
 // ── Session ───────────────────────────────────────────────────
 
+function resolveUserRole(user) {
+  if (!user) return 'user';
+  const role = String(user.role || '').trim().toLowerCase();
+  return role === 'admin' ? 'admin' : 'user';
+}
+
+function normalizeSessionUser(user) {
+  if (!user) return null;
+  const role = resolveUserRole(user);
+  return {
+    ...user,
+    role,
+    isAdmin: role === 'admin',
+    fullname: user.fullname || user.name || user.fullName || '',
+    name: user.name || user.fullname || user.fullName || ''
+  };
+}
+
 /** Sauvegarde l'utilisateur en session (7 jours). */
 function saveSession(user) {
+  const normalizedUser = normalizeSessionUser(user);
   const session = {
-    id:        user.id,
-    fullname:  user.fullname,
-    email:     user.email,
+    id:        normalizedUser?.id,
+    fullname:  normalizedUser?.fullname || '',
+    name:      normalizedUser?.name || normalizedUser?.fullname || '',
+    email:     normalizedUser?.email || '',
+    role:      normalizedUser?.role || 'user',
+    isAdmin:   normalizedUser?.isAdmin || false,
     expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000
     // token: user.token  ← décommenter pour JWT
   };
@@ -26,7 +48,15 @@ function saveSession(user) {
 function getCurrentUser() {
   try {
     const s = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
-    return (s && s.expiresAt > Date.now()) ? s : null;
+    if (s && s.expiresAt > Date.now()) {
+      const normalized = normalizeSessionUser(s);
+      if (normalized) {
+        if (!normalized.name && normalized.fullname) normalized.name = normalized.fullname;
+        return normalized;
+      }
+      return s;
+    }
+    return null;
   } catch { return null; }
 }
 
@@ -39,6 +69,22 @@ function isAuthenticated() {
 function logout() {
   localStorage.removeItem(SESSION_KEY);
   window.location.href = './login.html';
+}
+
+function cognitoSignOut() {
+  logout();
+}
+
+function getUserRole() {
+  const user = getCurrentUser();
+  return user && user.role ? user.role : 'user';
+}
+
+function requireAdmin() {
+  const user = getCurrentUser();
+  if (!user || user.role !== 'admin') {
+    window.location.replace('./login.html');
+  }
 }
 
 // ── API calls ─────────────────────────────────────────────────
@@ -83,6 +129,7 @@ function continuerEnInvite() {
   const session = {
     fullname:  'Invité',
     email:     '',
+    role:      'user',
     isGuest:   true,
     expiresAt: Date.now() + 2 * 60 * 60 * 1000
   };

@@ -48,7 +48,6 @@ Activer dans **Settings → Pages → Branch: main → / (root)**
 
 ## Auth
 
-Authentification locale via `localStorage` (mode démo) :
-- Compte stocké dans `rdv_user`
-- Session dans `rdv_session` (expire 7 jours)
+Authentification Flask avec session locale :
+- Session stockée dans `rdv_session` (expire 7 jours)
 - Mode invité disponible (expire 2 heures)

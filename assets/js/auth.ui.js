@@ -73,8 +73,10 @@
     showMessage(msg, '');
 
     try {
-      await login(email, password);
-      window.location.href = './user-dashboard.html';
+      const user = await login(email, password);
+      const role = resolveUserRole(user);
+      const isAdmin = role === 'admin';
+      window.location.href = isAdmin ? './index.html' : './user-dashboard.html';
     } catch (err) {
       showMessage(msg, err);
       setSubmitting(btn, false);
@@ -103,8 +105,10 @@
     try {
       await register(fullname, email, password);
       showMessage(msg, 'Compte créé ! Connexion en cours…', false);
-      await login(email, password);
-      window.location.href = './user-dashboard.html';
+      const user = await login(email, password);
+      const role = resolveUserRole(user);
+      const isAdmin = role === 'admin';
+      window.location.href = isAdmin ? './index.html' : './user-dashboard.html';
     } catch (err) {
       showMessage(msg, err);
       setSubmitting(btn, false);

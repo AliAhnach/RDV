@@ -1,7 +1,5 @@
 /* ── Appointments page logic ── */
 (() => {
-  const RDV_KEY = 'rdv_appointments';
-
   const TYPE_ICONS = {
     'Consultation': { icon: '🩺', cls: 'icon-consultation' },
     'Suivi':        { icon: '💊', cls: 'icon-suivi' },
@@ -9,26 +7,87 @@
     'Urgence':      { icon: '🚨', cls: 'icon-urgence' },
   };
 
+  let currentAppointments = [];
+
   /* ── Storage helpers ── */
-  function loadRdvs() {
-    try { return JSON.parse(localStorage.getItem(RDV_KEY) || '[]'); }
-    catch { return []; }
+  function loadSession() {
+    return typeof getCurrentUser === 'function' ? getCurrentUser() : null;
   }
 
-  function saveRdvs(list) {
-    localStorage.setItem(RDV_KEY, JSON.stringify(list));
+  function getCurrentRole() {
+    const session = loadSession();
+    return session && String(session.role).toLowerCase() === 'admin' ? 'admin' : 'user';
   }
 
-  function seedIfEmpty() {
-    if (loadRdvs().length > 0) return;
-    const session = JSON.parse(localStorage.getItem('rdv_session') || 'null');
-    const name = session ? session.name : 'Utilisateur';
-    saveRdvs([
-      { id: 1, client: name, date: '2025-07-10', time: '10:00', type: 'Consultation', status: 'Confirmé',  desc: 'Revue médicale et plan de suivi.' },
-      { id: 2, client: name, date: '2025-07-12', time: '11:30', type: 'Suivi',        status: 'En attente', desc: 'Vérification des résultats.' },
-      { id: 3, client: name, date: '2025-07-15', time: '14:00', type: 'Réunion',      status: 'En attente', desc: 'Discussion sur les prochaines étapes.' },
-      { id: 4, client: name, date: '2025-07-18', time: '16:15', type: 'Consultation', status: 'Refusé',    desc: 'Consultation de contrôle.' },
-    ]);
+  function normalizeAppointment(appointment) {
+    const client = appointment.user_name
+      || appointment.client
+      || appointment.client_name
+      || appointment.user_fullname
+      || appointment.fullname
+      || appointment.user?.fullname
+      || appointment.user?.name;
+
+    return {
+      ...appointment,
+      // Keep the existing renderer contract while accepting Flask's API fields.
+      type: appointment.service ?? appointment.service_name ?? appointment.type ?? '—',
+      date: appointment.appointment_date ?? appointment.date,
+      time: appointment.appointment_time ?? appointment.time,
+      desc: appointment.description ?? appointment.desc,
+      status: appointment.status ?? 'En attente',
+      user_id: appointment.user_id ?? appointment.userId,
+      client: client || `Utilisateur #${appointment.user_id ?? appointment.userId ?? 'inconnu'}`,
+    };
+  }
+
+  async function readApiResponse(res) {
+    const body = await res.text();
+    let data = {};
+
+    if (body) {
+      try {
+        data = JSON.parse(body);
+      } catch {
+        throw new Error(res.ok ? 'Réponse invalide du serveur.' : `Erreur HTTP ${res.status}`);
+      }
+    }
+
+    if (!res.ok) {
+      throw new Error(data.message || data.error || `Erreur HTTP ${res.status}`);
+    }
+    if (data.success === false) {
+      throw new Error(data.message || data.error || 'La requête a échoué.');
+    }
+    return data;
+  }
+
+  async function loadAppointments() {
+    const session = loadSession();
+
+    try {
+      if (!session || !session.id) {
+        currentAppointments = [];
+        return [];
+      }
+
+      const isAdmin = String(session.role).toLowerCase() === 'admin';
+      const endpoint = isAdmin
+        ? 'https://aliahnach.pythonanywhere.com/api/appointments'
+        : `https://aliahnach.pythonanywhere.com/api/appointments/${encodeURIComponent(session.id)}`;
+      const res = await fetch(endpoint);
+      const data = await readApiResponse(res);
+      const source = Array.isArray(data) ? data : data.appointments;
+      const appointments = Array.isArray(source)
+        ? source.map(normalizeAppointment)
+        : [];
+      currentAppointments = appointments;
+      return appointments;
+    } catch (error) {
+      console.error('Impossible de charger les rendez-vous :', error);
+      currentAppointments = [];
+      return [];
+    }
   }
 
   /* ── Render helpers ── */
@@ -54,7 +113,7 @@
 
   /* ── User detail modal ── */
   function openUserModal(id) {
-    const rdv = loadRdvs().find(r => r.id === id);
+    const rdv = currentAppointments.find(r => String(r.id) === String(id));
     if (!rdv) return;
     const { icon, cls } = typeIcon(rdv.type);
     const statusMap = {
@@ -82,12 +141,12 @@
   }
 
   /* ── USER VIEW ── */
-  function renderUserRdvs(filter = 'all') {
-    const list = loadRdvs();
-    const session = JSON.parse(localStorage.getItem('rdv_session') || 'null');
-    const userName = session ? session.name : '';
+  async function renderUserRdvs(filter = 'all') {
+    const list = currentAppointments.length ? currentAppointments : await loadAppointments();
+    const session = loadSession();
+    const userId = session && session.id;
 
-    const mine = list.filter(r => !userName || r.client === userName);
+    const mine = list.filter(r => String(r.user_id) === String(userId));
     const filtered = filter === 'all' ? mine : mine.filter(r => r.status === filter);
 
     const container = document.getElementById('user-rdv-list');
@@ -129,8 +188,8 @@
   }
 
   /* ── ADMIN VIEW ── */
-  function renderAdminStats() {
-    const list = loadRdvs();
+  async function renderAdminStats() {
+    const list = currentAppointments.length ? currentAppointments : await loadAppointments();
     const total   = list.length;
     const waiting = list.filter(r => r.status === 'En attente').length;
     const done    = list.filter(r => r.status === 'Confirmé').length;
@@ -143,8 +202,8 @@
     `;
   }
 
-  function renderAdminRdvs(filter = 'all') {
-    const list = loadRdvs();
+  async function renderAdminRdvs(filter = 'all') {
+    const list = currentAppointments.length ? currentAppointments : await loadAppointments();
     const filtered = filter === 'all' ? list : list.filter(r => r.status === filter);
 
     const container = document.getElementById('admin-rdv-list');
@@ -163,15 +222,15 @@
       card.className = 'rdv-card';
       card.style.animationDelay = `${i * 0.06}s`;
 
-      const actionBtns = rdv.status === 'En attente'
-        ? `<div class="rdv-card-actions">
-             <button class="btn-confirm" data-id="${rdv.id}">✅ Confirmer</button>
-             <button class="btn-refuse"  data-id="${rdv.id}">❌ Refuser</button>
-             <button class="btn-detail"  data-id="${rdv.id}">🔍 Détails</button>
-           </div>`
-        : `<div class="rdv-card-actions">
-             <button class="btn-detail" data-id="${rdv.id}">🔍 Détails</button>
-           </div>`;
+      const statusActions = rdv.status === 'En attente'
+        ? `<button class="btn-confirm" data-id="${rdv.id}">✅ Confirmer</button>
+           <button class="btn-refuse"  data-id="${rdv.id}">❌ Refuser</button>`
+        : '';
+      const actionBtns = `<div class="rdv-card-actions">
+        ${statusActions}
+        <button class="btn-detail" data-id="${rdv.id}">🔍 Détails</button>
+        <button class="btn-refuse btn-delete" data-id="${rdv.id}">🗑️ Supprimer</button>
+      </div>`;
 
       card.innerHTML = `
         <div class="rdv-card-icon ${cls}">${icon}</div>
@@ -189,49 +248,71 @@
       container.appendChild(card);
     });
 
-    // Confirm / Refuse inline
+    // Confirm / Refuse / Delete inline
     container.querySelectorAll('.btn-confirm').forEach(btn => {
       btn.addEventListener('click', () => updateStatus(+btn.dataset.id, 'Confirmé'));
     });
-    container.querySelectorAll('.btn-refuse').forEach(btn => {
+    container.querySelectorAll('.btn-refuse:not(.btn-delete)').forEach(btn => {
       btn.addEventListener('click', () => updateStatus(+btn.dataset.id, 'Refusé'));
     });
     container.querySelectorAll('.btn-detail').forEach(btn => {
       btn.addEventListener('click', () => openAdminModal(+btn.dataset.id));
     });
+    container.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', () => deleteAppointment(btn.dataset.id, btn.closest('.rdv-card')));
+    });
   }
 
-  function updateStatus(id, status) {
-    const list = loadRdvs();
-    const rdv = list.find(r => r.id === id);
-    if (!rdv) return;
-    rdv.status = status;
-    saveRdvs(list);
+  async function updateStatus(id, status) {
+    const list = currentAppointments.length ? currentAppointments : await loadAppointments();
+    const rdv = list.find(r => String(r.id) === String(id));
+    if (!rdv) return false;
 
-    // ── Notification pour le user ──
-    const userNotifs = JSON.parse(localStorage.getItem('rdv_user_notifications') || '[]');
-    userNotifs.unshift({
-      id: Date.now(),
-      rdvId: rdv.id,
-      client: rdv.client,
-      rdvType: rdv.type,
-      date: rdv.date,
-      time: rdv.time,
-      status,
-      read: false,
-      createdAt: new Date().toISOString(),
-    });
-    localStorage.setItem('rdv_user_notifications', JSON.stringify(userNotifs));
+    try {
+      const res = await fetch(`https://aliahnach.pythonanywhere.com/api/appointments/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      await readApiResponse(res);
 
-    renderAdminRdvs(currentFilter);
-    renderAdminStats();
+      await loadAppointments();
+      await renderAdminRdvs(currentFilter);
+      await renderAdminStats();
+      return true;
+    } catch (error) {
+      alert(error.message || 'Erreur réseau. Réessayez.');
+      return false;
+    }
+  }
+
+  async function deleteAppointment(id, card) {
+    const confirmed = window.confirm('Voulez-vous vraiment supprimer définitivement ce rendez-vous ?');
+    if (!confirmed) return false;
+
+    try {
+      const res = await fetch(`https://aliahnach.pythonanywhere.com/api/appointments/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+      });
+      await readApiResponse(res);
+
+      // La carte disparaît immédiatement, puis la source API et les compteurs sont synchronisés.
+      if (card) card.remove();
+      await loadAppointments();
+      await renderAdminRdvs(currentFilter);
+      await renderAdminStats();
+      return true;
+    } catch (error) {
+      alert(error.message || 'Erreur lors de la suppression du rendez-vous.');
+      return false;
+    }
   }
 
   /* ── Admin modal ── */
   let currentAdminRdv = null;
 
   function openAdminModal(id) {
-    const rdv = loadRdvs().find(r => r.id === id);
+    const rdv = currentAppointments.find(r => String(r.id) === String(id));
     if (!rdv) return;
     currentAdminRdv = rdv;
     document.getElementById('modal-client').textContent = rdv.client;
@@ -256,7 +337,7 @@
 
   /* ── Request modal (USER) ── */
   function openRequestModal() {
-    const session = JSON.parse(localStorage.getItem('rdv_session') || 'null');
+    const session = loadSession();
     if (session && session.isGuest) {
       document.getElementById('modal-guest').hidden = false;
       return;
@@ -276,7 +357,7 @@
 
   /* ── Filter state ── */
   let currentFilter = 'all';
-  const role = (typeof getUserRole === 'function') ? getUserRole() : 'user';
+  const role = getCurrentRole();
 
   function bindFilters(viewId, renderFn) {
     const view = document.getElementById(viewId);
@@ -292,13 +373,18 @@
   }
 
   /* ── Init ── */
-  function init() {
-    seedIfEmpty();
+  async function init() {
+    await loadAppointments();
+
+    const viewAdmin = document.getElementById('view-admin');
+    const viewUser = document.getElementById('view-user');
+    if (viewAdmin) viewAdmin.hidden = role !== 'admin';
+    if (viewUser) viewUser.hidden = role === 'admin';
 
     if (role === 'admin') {
       document.getElementById('view-admin').hidden = false;
-      renderAdminStats();
-      renderAdminRdvs('all');
+      await renderAdminStats();
+      await renderAdminRdvs('all');
       bindFilters('view-admin', (f) => { renderAdminRdvs(f); });
 
       // Admin modal events
@@ -307,20 +393,20 @@
       document.getElementById('rdv-modal').addEventListener('click', e => {
         if (e.target === document.getElementById('rdv-modal')) closeAdminModal();
       });
-      document.getElementById('modal-confirm-btn').addEventListener('click', () => {
+      document.getElementById('modal-confirm-btn').addEventListener('click', async () => {
         if (!currentAdminRdv) return;
-        updateStatus(currentAdminRdv.id, 'Confirmé');
-        closeAdminModal();
+        const ok = await updateStatus(currentAdminRdv.id, 'Confirmé');
+        if (ok) closeAdminModal();
       });
-      document.getElementById('modal-refuse-btn').addEventListener('click', () => {
+      document.getElementById('modal-refuse-btn').addEventListener('click', async () => {
         if (!currentAdminRdv) return;
-        updateStatus(currentAdminRdv.id, 'Refusé');
-        closeAdminModal();
+        const ok = await updateStatus(currentAdminRdv.id, 'Refusé');
+        if (ok) closeAdminModal();
       });
 
     } else {
       document.getElementById('view-user').hidden = false;
-      renderUserRdvs('all');
+      await renderUserRdvs('all');
       bindFilters('view-user', (f) => { renderUserRdvs(f); });
 
       // Request modal events
@@ -350,7 +436,7 @@
       document.getElementById('modal-user-detail-close2').addEventListener('click', closeUserModal);
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeUserModal(); });
 
-      document.getElementById('form-request').addEventListener('submit', e => {
+      document.getElementById('form-request').addEventListener('submit', async e => {
         e.preventDefault();
         const type = document.getElementById('req-type').value;
         const date = document.getElementById('req-date').value;
@@ -363,44 +449,44 @@
           return;
         }
 
-        const session = JSON.parse(localStorage.getItem('rdv_session') || 'null');
-        const list = loadRdvs();
-        const newRdv = {
-          id: Date.now(),
-          client: session ? session.name : 'Utilisateur',
-          date, time, type,
-          status: 'En attente',
-          desc,
-        };
-        list.push(newRdv);
-        saveRdvs(list);
+        const session = loadSession();
+        if (!session || !session.id) {
+          msg.textContent = 'Impossible de trouver l’utilisateur connecté.';
+          return;
+        }
 
-        // ── Notification pour l'admin ──
-        const notifs = JSON.parse(localStorage.getItem('rdv_notifications') || '[]');
-        notifs.unshift({
-          id: newRdv.id,
-          type: 'new_rdv',
-          client: newRdv.client,
-          rdvType: newRdv.type,
-          date: newRdv.date,
-          time: newRdv.time,
-          desc: newRdv.desc,
-          read: false,
-          createdAt: new Date().toISOString(),
-        });
-        localStorage.setItem('rdv_notifications', JSON.stringify(notifs));
+        try {
+          const res = await fetch('https://aliahnach.pythonanywhere.com/api/appointments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              service: type,
+              appointment_date: date,
+              appointment_time: time,
+              description: desc,
+              user_id: session.id,
+            }),
+          });
 
-        closeRequestModal();
-        renderUserRdvs(currentFilter);
+          await readApiResponse(res);
+
+          document.getElementById('form-request').reset();
+          await loadAppointments();
+          await renderUserRdvs(currentFilter);
+          msg.textContent = 'Votre demande a bien été envoyée.';
+          closeRequestModal();
+        } catch (error) {
+          msg.textContent = error.message || 'Erreur réseau. Réessayez.';
+        }
       });
     }
 
     // Search
     const search = document.getElementById('search');
     if (search) {
-      search.addEventListener('input', () => {
+      search.addEventListener('input', async () => {
         const q = search.value.trim().toLowerCase();
-        const list = loadRdvs();
+        const list = currentAppointments.length ? currentAppointments : await loadAppointments();
         const filtered = q
           ? list.filter(r => `${r.client} ${r.type} ${r.status} ${r.desc}`.toLowerCase().includes(q))
           : list;
@@ -431,5 +517,7 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('DOMContentLoaded', () => {
+    init().catch(() => {});
+  });
 })();

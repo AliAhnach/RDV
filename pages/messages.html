@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg"/>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Plateforme RDV - Messages</title>
-    <link rel="stylesheet" href="../assets/css/global.css">
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
-    <link rel="stylesheet" href="../assets/css/splash.css">
-    <link rel="stylesheet" href="../assets/css/responsive.css">
-    <script src="../assets/js/auth.service.js"></script>
+  <title>Mini Plateforme RDV - Messages</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/splash.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+  <script src="../assets/js/auth.service.js"></script>
+  <script>requireAuth();</script>
 </head>
 <body>
 
@@ -18,147 +19,401 @@
 
 <div class="container">
 
-    <aside class="sidebar" id="sidebar">
-        <a class="sidebar-logo" href="./index.html">
-            <div class="logo-badge"><span>RDV</span></div>
-            <div class="logo-text">
-                <span class="logo-text__main">RDV</span>
-                <span class="logo-text__sub">Plateforme</span>
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-logo" href="./index.html">
+      <div class="logo-badge"><span>RDV</span></div>
+      <div class="logo-text">
+        <span class="logo-text__main">RDV</span>
+        <span class="logo-text__sub">Plateforme</span>
+      </div>
+    </a>
+    <nav>
+      <a href="./index.html">🏠 Dashboard</a>
+      <a href="./appointments.html">📅 Rendez-vous</a>
+      <a href="./clients.html">👥 Clients</a>
+      <a href="./messages.html" class="active">💬 Messages</a>
+      <a href="./parametres.html">⚙️ Paramètres</a>
+      <a href="#" onclick="cognitoSignOut(); return false;">🚪 Déconnexion</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <header class="dash-header">
+      <div class="search-wrap">
+        <svg width="14" height="14" fill="none" stroke="#7a7a9a" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input id="search" type="text" placeholder="Rechercher dans les messages…"/>
+        <span class="kbd">⌘ K</span>
+      </div>
+      <div class="dash-header-right">
+        <button class="hdr-icon-btn" id="theme-toggle" title="Changer le thème" type="button" aria-label="Changer le thème">
+          🌙<span class="hdr-badge"></span>
+        </button>
+        <button class="hdr-icon-btn" id="btn-account" title="Compte" type="button" aria-label="Compte">
+          👤<span class="account-label">Compte</span><span class="hdr-badge" style="display:none;"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Messagerie layout -->
+    <div class="msg-layout" id="msg-layout">
+
+      <!-- Panneau liste -->
+      <div class="msg-list-panel">
+        <div class="msg-list-header">
+          <h2>
+            💬 Messages
+            <span class="msg-unread-badge" id="unread-count" style="display:none;">0</span>
+          </h2>
+          <p id="msg-list-subtitle">Chargement…</p>
+          <!-- Bouton nouveau message (utilisateur uniquement) -->
+          <button class="msg-new-btn" id="btn-new-msg" style="display:none;">✏️ Nouveau message</button>
+        </div>
+        <div class="msg-list-scroll" id="msg-list-scroll">
+          <div class="msg-empty-state" id="msg-list-loading">
+            <div class="msg-empty-icon">⏳</div>
+            Chargement des messages…
+          </div>
+        </div>
+      </div>
+
+      <!-- Panneau conversation -->
+      <div class="msg-thread-panel" id="msg-thread-panel">
+
+        <!-- État vide par défaut -->
+        <div class="msg-empty-state" id="msg-thread-empty">
+          <div class="msg-empty-icon">💬</div>
+          Sélectionnez une conversation
+        </div>
+
+        <!-- Conversation ouverte (masquée par défaut) -->
+        <div id="msg-thread-content" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
+          <div class="msg-thread-header">
+            <button id="btn-back" style="display:none; background:none; border:none; cursor:pointer; font-size:20px; padding:0 6px 0 0;">←</button>
+            <div class="msg-item-avatar" id="thread-avatar">?</div>
+            <div class="msg-thread-header-info">
+              <div class="msg-thread-header-name" id="thread-name">—</div>
+              <div class="msg-thread-header-sub" id="thread-sub">—</div>
             </div>
-        </a>
-  
-
-        <nav>
-            <a href="./index.html">🏠 Dashboard</a>
-            <a href="./appointments.html">📅 Rendez-vous</a>
-            <a href="./clients.html">👥 Clients</a>
-            <a href="./messages.html" class="active">💬 Messages</a>
-            <a href="./parametres.html">⚙️ Paramètres</a>
-            <a href="#" onclick="cognitoSignOut(); return false;">🚪 Déconnexion</a>
-        </nav>
-    </aside>
-
-    <main class="main">
-        <header class="dash-header">
-            <div class="search-wrap">
-                <svg width="14" height="14" fill="none" stroke="#7a7a9a" stroke-width="2" viewBox="0 0 24 24">
-                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                </svg>
-                <input id="search" type="text" placeholder="Rechercher dans les messages…"/>
-                <span class="kbd">⌘ K</span>
-            </div>
-            <div class="dash-header-right">
-                <button class="hdr-icon-btn" id="btn-account" title="Compte" type="button" aria-label="Compte">
-                    👤<span class="account-label">Compte</span><span class="hdr-badge" style="display:none;"></span>
-                </button>
-            </div>
-        </header>
-
-
-        <section style="padding: 28px 32px; display:flex; flex-direction:column; gap:20px;">
-
-          <!-- Header -->
-          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-            <div>
-              <h2 style="font-size:22px;font-weight:900;color:#0d3d7d;margin:0 0 4px;">💬 Notifications</h2>
-              <p style="font-size:13px;color:#7a7a9a;margin:0;">Demandes de rendez-vous reçues.</p>
-            </div>
-            <button id="btn-mark-all-read" style="padding:8px 18px;border-radius:999px;border:1px solid rgba(13,61,125,0.18);background:#fff;color:#1f5fbf;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✅ Tout marquer lu</button>
+            <button class="msg-mark-read-btn" id="btn-mark-read" style="display:none;">✅ Marquer lu</button>
           </div>
 
-          <!-- Liste -->
-          <div id="notif-list" style="display:flex;flex-direction:column;gap:12px;"></div>
-          <div id="notif-empty" hidden style="text-align:center;padding:48px 24px;color:#7a7a9a;font-size:14px;font-weight:600;background:#fff;border-radius:16px;border:1px dashed rgba(13,61,125,0.18);">
-            <div style="font-size:40px;margin-bottom:10px;">📭</div>
-            Aucune notification pour le moment.
+          <div class="msg-thread-scroll" id="msg-thread-scroll"></div>
+
+          <div class="msg-status-bar" id="msg-status-bar"></div>
+
+          <!-- Zone de réponse (admin) / nouveau message (user dans thread) -->
+          <div class="msg-compose" id="msg-compose">
+            <textarea id="compose-text" rows="1" placeholder="Écrire un message…"></textarea>
+            <button class="msg-send-btn" id="btn-send" title="Envoyer">➤</button>
           </div>
+        </div>
 
-        </section>
+      </div>
+    </div>
 
-    </main>
+    <!-- Formulaire nouveau message utilisateur (overlay dans la liste) -->
+    <div class="msg-new-form" id="msg-new-form" style="display:none;">
+      <div style="font-size:13px; font-weight:800; color:#0d3d7d; margin-bottom:2px;">✏️ Nouveau message</div>
+      <textarea id="new-msg-text" placeholder="Votre message à l'administrateur…"></textarea>
+      <div class="msg-new-form-actions">
+        <button class="msg-cancel-btn" id="btn-cancel-new">Annuler</button>
+        <button class="msg-send-btn" id="btn-send-new" style="width:auto; border-radius:999px; padding:8px 18px; font-size:12px; font-weight:700; font-family:Arial,sans-serif;">Envoyer ➤</button>
+      </div>
+    </div>
+
+  </main>
 </div>
 
 <script src="../assets/js/transition.js"></script>
 <script src="../assets/js/main.js"></script>
 <script>
 (() => {
-  const NOTIF_KEY = 'rdv_notifications';
-  const role = (typeof getUserRole === 'function') ? getUserRole() : 'user';
+  const user = getCurrentUser();
+  if (!user) return;
+  const isAdmin = user.role === 'admin';
 
-  function loadNotifs() {
-    try { return JSON.parse(localStorage.getItem(NOTIF_KEY) || '[]'); }
-    catch { return []; }
-  }
+  // ── DOM refs ──────────────────────────────────────────────
+  const listScroll    = document.getElementById('msg-list-scroll');
+  const listSubtitle  = document.getElementById('msg-list-subtitle');
+  const unreadBadge   = document.getElementById('unread-count');
+  const threadEmpty   = document.getElementById('msg-thread-empty');
+  const threadContent = document.getElementById('msg-thread-content');
+  const threadScroll  = document.getElementById('msg-thread-scroll');
+  const threadName    = document.getElementById('thread-name');
+  const threadSub     = document.getElementById('thread-sub');
+  const threadAvatar  = document.getElementById('thread-avatar');
+  const statusBar     = document.getElementById('msg-status-bar');
+  const composeText   = document.getElementById('compose-text');
+  const btnSend       = document.getElementById('btn-send');
+  const btnMarkRead   = document.getElementById('btn-mark-read');
+  const btnNewMsg     = document.getElementById('btn-new-msg');
+  const newMsgForm    = document.getElementById('msg-new-form');
+  const newMsgText    = document.getElementById('new-msg-text');
+  const btnSendNew    = document.getElementById('btn-send-new');
+  const btnCancelNew  = document.getElementById('btn-cancel-new');
+  const btnBack       = document.getElementById('btn-back');
+  const layout        = document.getElementById('msg-layout');
 
-  function saveNotifs(list) {
-    localStorage.setItem(NOTIF_KEY, JSON.stringify(list));
-  }
+  let activeConversationId = null;
+  let allConversations     = [];
 
-  function formatDate(iso) {
+  // ── Helpers ───────────────────────────────────────────────
+  function formatDateTime(iso) {
     if (!iso) return '—';
-    const [y, m, d] = iso.split('-');
-    return `${d}/${m}/${y}`;
+    const d = new Date(iso);
+    return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' })
+      + ' ' + d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
   }
 
-  function timeAgo(isoStr) {
-    const diff = Math.floor((Date.now() - new Date(isoStr)) / 1000);
-    if (diff < 60)  return 'il y a quelques secondes';
-    if (diff < 3600) return `il y a ${Math.floor(diff/60)} min`;
+  function timeAgo(iso) {
+    if (!iso) return '';
+    const diff = Math.floor((Date.now() - new Date(iso)) / 1000);
+    if (diff < 60)    return 'il y a quelques secondes';
+    if (diff < 3600)  return `il y a ${Math.floor(diff/60)} min`;
     if (diff < 86400) return `il y a ${Math.floor(diff/3600)}h`;
     return `il y a ${Math.floor(diff/86400)}j`;
   }
 
-  function render() {
-    const list = loadNotifs();
-    const listEl  = document.getElementById('notif-list');
-    const emptyEl = document.getElementById('notif-empty');
-    if (!listEl) return;
+  function initials(name) {
+    return String(name || '?').trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+  }
 
-    // Non-admin voit seulement ses propres notifs
-    const session = JSON.parse(localStorage.getItem('rdv_session') || 'null');
-    const filtered = role === 'admin' ? list : list.filter(n => n.client === (session && session.name));
+  function setStatus(msg, isError = false) {
+    statusBar.textContent = msg;
+    statusBar.className = 'msg-status-bar' + (isError ? ' error' : '');
+  }
 
-    listEl.innerHTML = '';
-    if (filtered.length === 0) { emptyEl.hidden = false; return; }
-    emptyEl.hidden = true;
+  function escHtml(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
 
-    filtered.forEach(n => {
-      const isUnread = !n.read;
-      const card = document.createElement('div');
-      card.style.cssText = `display:flex;align-items:flex-start;gap:14px;padding:16px 20px;background:${isUnread ? 'rgba(124,92,191,0.06)' : '#fff'};border:1px solid ${isUnread ? 'rgba(124,92,191,0.25)' : 'rgba(13,61,125,0.10)'};border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.04);transition:transform 180ms;cursor:default;`;
-      card.innerHTML = `
-        <div style="width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#ede8f9,#dbeafe);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📅</div>
-        <div style="flex:1;min-width:0;">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <span style="font-size:14px;font-weight:900;color:#0d3d7d;">${n.client}</span>
-            ${isUnread ? '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:linear-gradient(135deg,#7c5cbf,#60a5fa);color:#fff;">Nouveau</span>' : ''}
-          </div>
-          <div style="font-size:13px;color:#566574;margin-top:3px;">Demande de <strong>${n.rdvType}</strong> — 📅 ${formatDate(n.date)}  🕐 ${n.time}</div>
-          ${n.desc ? `<div style="font-size:12px;color:#7a7a9a;margin-top:4px;">📝 ${n.desc}</div>` : ''}
-          <div style="font-size:11px;color:#a0aec0;margin-top:6px;">${timeAgo(n.createdAt)}</div>
+  // ── Render liste ──────────────────────────────────────────
+  function renderList(conversations) {
+    allConversations = conversations;
+    listScroll.innerHTML = '';
+
+    const unread = conversations.filter(c => !c.is_read).length;
+    unreadBadge.textContent = unread;
+    unreadBadge.style.display = unread > 0 ? '' : 'none';
+
+    listSubtitle.textContent = isAdmin
+      ? `${conversations.length} conversation(s) reçue(s)`
+      : `${conversations.length} conversation(s)`;
+
+    if (conversations.length === 0) {
+      listScroll.innerHTML = `<div class="msg-empty-state"><div class="msg-empty-icon">📭</div>Aucun message pour le moment.</div>`;
+      return;
+    }
+
+    conversations.forEach(conversation => {
+      const lastMessage = conversation.messages && conversation.messages.length
+        ? conversation.messages[conversation.messages.length - 1]
+        : null;
+      const preview    = lastMessage ? lastMessage.content.slice(0, 55) + (lastMessage.content.length > 55 ? '…' : '') : '—';
+      const senderName = isAdmin ? (conversation.sender?.fullname || 'Utilisateur') : 'Administrateur';
+      const isUnread   = !conversation.is_read;
+      const timeStr    = lastMessage ? timeAgo(lastMessage.created_at) : timeAgo(conversation.created_at);
+
+      const item = document.createElement('div');
+      item.className = 'msg-item' + (isUnread ? ' unread' : '') + (activeConversationId === conversation.id ? ' active' : '');
+      item.dataset.id = conversation.id;
+      item.innerHTML = `
+        <div class="msg-item-avatar">${initials(senderName)}</div>
+        <div class="msg-item-body">
+          <div class="msg-item-name">${escHtml(senderName)}</div>
+          <div class="msg-item-preview">${escHtml(preview)}</div>
         </div>
-        ${role === 'admin' && isUnread ? `<button data-id="${n.id}" class="btn-mark-read" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(124,92,191,0.25);background:#fff;color:#7c5cbf;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">Marquer lu</button>` : ''}
-      `;
-      listEl.appendChild(card);
-    });
-
-    listEl.querySelectorAll('.btn-mark-read').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const all = loadNotifs();
-        const n = all.find(x => x.id === +btn.dataset.id);
-        if (n) { n.read = true; saveNotifs(all); render(); }
-      });
+        <div class="msg-item-meta">
+          <span class="msg-item-time">${timeStr}</span>
+          ${isUnread
+            ? '<span class="msg-badge-unread">Non lu</span>'
+            : '<span class="msg-badge-read">✓ Lu</span>'}
+        </div>`;
+      item.addEventListener('click', () => openThread(conversation));
+      listScroll.appendChild(item);
     });
   }
 
-  document.getElementById('btn-mark-all-read').addEventListener('click', () => {
-    const all = loadNotifs();
-    all.forEach(n => { n.read = true; });
-    saveNotifs(all);
-    render();
+  // ── Ouvrir conversation ───────────────────────────────────
+  function openThread(conversation) {
+    activeConversationId = conversation.id;
+
+    listScroll.querySelectorAll('.msg-item').forEach(el => {
+      el.classList.toggle('active', Number(el.dataset.id) === conversation.id);
+    });
+
+    const senderName = isAdmin ? (conversation.sender?.fullname || 'Utilisateur') : 'Administrateur';
+    threadAvatar.textContent = initials(senderName);
+    threadName.textContent   = senderName;
+    threadSub.textContent    = formatDateTime(conversation.created_at);
+
+    btnMarkRead.style.display = (isAdmin && !conversation.is_read) ? '' : 'none';
+
+    threadEmpty.style.display   = 'none';
+    threadContent.style.display = 'flex';
+    layout.classList.add('thread-open');
+    btnBack.style.display = window.innerWidth <= 768 ? '' : 'none';
+
+    renderThread(conversation);
+    setStatus('');
+  }
+
+  function renderThread(conversation) {
+    threadScroll.innerHTML = '';
+    const messages = conversation.messages || [];
+
+    messages.forEach(message => {
+      const sentByMe = isAdmin
+        ? message.sender_role === 'admin'
+        : message.sender_role === 'user';
+      const label = sentByMe ? 'Vous' : (isAdmin ? (conversation.sender?.fullname || 'Utilisateur') : 'Administrateur');
+
+      const wrap = document.createElement('div');
+      wrap.className = 'msg-bubble-wrap ' + (sentByMe ? 'sent' : 'received');
+      wrap.innerHTML = `
+        <div class="msg-bubble">${escHtml(message.content)}</div>
+        <div class="msg-bubble-meta">
+          <span>${escHtml(label)}</span>
+          <span>·</span>
+          <span>${formatDateTime(message.created_at)}</span>
+        </div>`;
+      threadScroll.appendChild(wrap);
+    });
+
+    threadScroll.scrollTop = threadScroll.scrollHeight;
+  }
+
+  // ── Charger conversations ─────────────────────────────────
+  async function loadMessages() {
+    listScroll.innerHTML = `<div class="msg-empty-state"><div class="msg-empty-icon">⏳</div>Chargement…</div>`;
+    try {
+      const url = isAdmin
+        ? `${API_BASE}/messages/admin`
+        : `${API_BASE}/messages/user/${encodeURIComponent(user.id)}`;
+      const res  = await fetch(url);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || `Erreur HTTP ${res.status}`);
+      const conversations = Array.isArray(data) ? data : (data.conversations || data.data || []);
+      conversations.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      renderList(conversations);
+    } catch (err) {
+      listScroll.innerHTML = `<div class="msg-empty-state"><div class="msg-empty-icon">⚠️</div>${escHtml(err.message || 'Erreur réseau.')}</div>`;
+    }
+  }
+
+  // ── Envoyer réponse ───────────────────────────────────────
+  btnSend.addEventListener('click', sendReply);
+  composeText.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply(); }
   });
 
-  render();
+  async function sendReply() {
+    const text = composeText.value.trim();
+    if (!text || !activeConversationId) return;
+    btnSend.disabled = true;
+    setStatus('Envoi…');
+    try {
+      const res = await fetch(`${API_BASE}/messages/${activeConversationId}/reply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sender_id: user.id, content: text })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || `Erreur HTTP ${res.status}`);
+      composeText.value = '';
+      setStatus('Message envoyé ✓');
+      await loadMessages();
+      const updated = allConversations.find(c => c.id === activeConversationId);
+      if (updated) openThread(updated);
+    } catch (err) {
+      setStatus(err.message || 'Erreur réseau.', true);
+    } finally {
+      btnSend.disabled = false;
+    }
+  }
+
+  // ── Marquer lu (admin) ────────────────────────────────────
+  btnMarkRead.addEventListener('click', async () => {
+    if (!activeConversationId) return;
+    btnMarkRead.disabled = true;
+    try {
+      const res = await fetch(`${API_BASE}/messages/${activeConversationId}/read`, { method: 'PUT' });
+      if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
+      btnMarkRead.style.display = 'none';
+      setStatus('Marqué comme lu ✓');
+      await loadMessages();
+      const updated = allConversations.find(c => c.id === activeConversationId);
+      if (updated) openThread(updated);
+    } catch (err) {
+      setStatus(err.message || 'Erreur réseau.', true);
+    } finally {
+      btnMarkRead.disabled = false;
+    }
+  });
+
+  // ── Nouveau message (utilisateur) ─────────────────────────
+  if (!isAdmin) {
+    btnNewMsg.style.display = '';
+    btnNewMsg.addEventListener('click', () => {
+      newMsgForm.style.display = '';
+      newMsgText.focus();
+      btnNewMsg.style.display = 'none';
+    });
+    btnCancelNew.addEventListener('click', () => {
+      newMsgForm.style.display = 'none';
+      newMsgText.value = '';
+      btnNewMsg.style.display = '';
+    });
+    btnSendNew.addEventListener('click', sendNewMessage);
+  }
+
+  async function sendNewMessage() {
+    const text = newMsgText.value.trim();
+    if (!text) return;
+    btnSendNew.disabled = true;
+    try {
+      const res = await fetch(`${API_BASE}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sender_id: user.id, content: text })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || `Erreur HTTP ${res.status}`);
+      newMsgText.value = '';
+      newMsgForm.style.display = 'none';
+      btnNewMsg.style.display = '';
+      await loadMessages();
+    } catch (err) {
+      setStatus(err.message || 'Erreur réseau.', true);
+    } finally {
+      btnSendNew.disabled = false;
+    }
+  }
+
+  // ── Retour mobile ─────────────────────────────────────────
+  btnBack.addEventListener('click', () => {
+    layout.classList.remove('thread-open');
+    threadContent.style.display = 'none';
+    threadEmpty.style.display = '';
+    activeConversationId = null;
+  });
+
+  // ── Recherche ─────────────────────────────────────────────
+  document.getElementById('search').addEventListener('input', e => {
+    const q = e.target.value.trim().toLowerCase();
+    if (!q) { renderList(allConversations); return; }
+    const filtered = allConversations.filter(c => {
+      const inMessages = (c.messages || []).some(m => m.content.toLowerCase().includes(q));
+      const inSender   = (c.sender?.fullname || '').toLowerCase().includes(q);
+      return inMessages || inSender;
+    });
+    renderList(filtered);
+  });
+
+  // ── Init ──────────────────────────────────────────────────
+  loadMessages();
 })();
 </script>
 </body>
