@@ -848,6 +848,39 @@ body.dark-mode .stat-value {
   gap: 20px;
 }
 
+.dash-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dash-header-actions .hdr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid #102d63;
+  border-radius: 8px;
+  background: #102d63;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.dash-header-actions .hdr-btn:hover {
+  background: #0d3d7d;
+  border-color: #0d3d7d;
+}
+
+.dash-header-actions .hdr-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
 .welcome-card {
   display: flex;
   align-items: center;
