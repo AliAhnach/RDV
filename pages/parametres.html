@@ -49,11 +49,12 @@
                 <svg width="14" height="14" fill="none" stroke="#7a7a9a" stroke-width="2" viewBox="0 0 24 24">
                     <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
                 </svg>
-                <input id="search" type="text" placeholder="Rechercher dans les paramètres…"/>
+                <input id="settings-search" type="search" placeholder="Rechercher dans les paramètres…" aria-label="Rechercher dans les paramètres">
                 <span class="kbd">⌘ K</span>
             </div>
             <div class="dash-header-right">
                 <button class="hdr-icon-btn" id="btn-account" title="Compte" type="button" aria-label="Compte">
+                    <img id="header-profile-avatar" class="header-profile-avatar" alt="Photo de profil" hidden>
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     <span class="account-label">Compte</span><span class="hdr-badge" style="display:none;"></span>
                 </button>
@@ -77,6 +78,18 @@
                     <div class="section-body">
                         <form id="settings-form" autocomplete="on">
                             <div class="field-group">
+                                <div class="profile-image-control">
+                                    <button id="profile-image-trigger" class="profile-image-preview" type="button" aria-label="Changer la photo de profil">
+                                        <img id="profile-image-preview" alt="Aperçu de la photo de profil" hidden>
+                                        <span id="profile-image-fallback" aria-hidden="true">?</span>
+                                    </button>
+                                    <div>
+                                        <strong>Photo de profil</strong>
+                                        <p>JPG ou PNG, affichée dans votre en-tête.</p>
+                                        <button id="profile-image-button" class="profile-image-button" type="button">Changer l'image</button>
+                                    </div>
+                                    <input id="profile-image-input" type="file" accept="image/jpeg,image/png" hidden>
+                                </div>
                                 <div class="field-row">
                                     <div class="field">
                                         <label for="settings-name">Nom complet</label>
@@ -98,14 +111,14 @@
                                         <label for="settings-password">Nouveau mot de passe</label>
                                         <div class="field-input-wrap">
                                             <i class="fa-solid fa-lock"></i>
-                                            <input id="settings-password" name="password" type="password" placeholder="Laisser vide pour ne pas changer" minlength="4"/>
+                                            <input id="settings-password" name="password" type="password" placeholder="Laisser vide pour ne pas changer" minlength="6"/>
                                         </div>
                                     </div>
                                     <div class="field">
                                         <label for="settings-phone">Téléphone</label>
                                         <div class="field-input-wrap">
                                             <i class="fa-solid fa-phone"></i>
-                                            <input id="settings-phone" name="phone" type="tel" placeholder="+213 XX XX XX XX"/>
+                                            <input id="settings-phone" name="phone" type="tel" placeholder="+212 6 XX XX XX XX"/>
                                         </div>
                                     </div>
                                 </div>
@@ -138,7 +151,7 @@
                                     <div class="toggle-info__desc">Recevoir une alerte avant chaque RDV</div>
                                 </div>
                             </div>
-                            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                            <label class="toggle"><input id="notification-reminders" type="checkbox" checked><span class="toggle-slider"></span></label>
                         </div>
                         <div class="toggle-row">
                             <div class="toggle-info">
@@ -148,7 +161,7 @@
                                     <div class="toggle-info__desc">Recevoir les résumés par email</div>
                                 </div>
                             </div>
-                            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                            <label class="toggle"><input id="notification-email" type="checkbox" checked><span class="toggle-slider"></span></label>
                         </div>
                         <div class="toggle-row">
                             <div class="toggle-info">
@@ -158,7 +171,7 @@
                                     <div class="toggle-info__desc">Alerte à chaque nouveau message</div>
                                 </div>
                             </div>
-                            <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+                            <label class="toggle"><input id="notification-messages" type="checkbox"><span class="toggle-slider"></span></label>
                         </div>
                     </div>
                 </div>
@@ -178,10 +191,10 @@
                                 <label>Langue</label>
                                 <div class="field-input-wrap">
                                     <i class="fa-solid fa-globe"></i>
-                                    <select>
-                                        <option selected>Français</option>
-                                        <option>العربية</option>
-                                        <option>English</option>
+                                    <select id="settings-language" name="language">
+                                        <option value="fr" selected>Français</option>
+                                        <option value="ar">العربية</option>
+                                        <option value="en">English</option>
                                     </select>
                                 </div>
                             </div>
@@ -189,14 +202,14 @@
                                 <label>Fuseau horaire</label>
                                 <div class="field-input-wrap">
                                     <i class="fa-solid fa-clock"></i>
-                                    <select>
-                                        <option selected>Africa/Algiers (UTC+1)</option>
-                                        <option>Europe/Paris (UTC+2)</option>
-                                        <option>UTC</option>
+                                    <select id="settings-timezone" name="timezone">
+                                        <option value="Africa/Casablanca" selected>Africa/Casablanca (UTC+1)</option>
+                                        <option value="Europe/Paris">Europe/Paris (UTC+2)</option>
+                                        <option value="UTC">UTC</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="toggle-row" style="padding-top:6px;">
+                            <div class="toggle-row toggle-row--theme">
                                 <div class="toggle-info">
                                     <div class="toggle-info__icon"><i class="fa-solid fa-moon"></i></div>
                                     <div>
@@ -204,7 +217,7 @@
                                         <div class="toggle-info__desc">Thème foncé pour l'interface</div>
                                     </div>
                                 </div>
-                                <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+                                <label class="toggle"><input id="settings-dark-mode" type="checkbox"><span class="toggle-slider"></span></label>
                             </div>
                         </div>
                     </div>
@@ -225,7 +238,7 @@
                                 <div class="danger-label">Se déconnecter</div>
                                 <div class="danger-desc">Terminer la session en cours</div>
                             </div>
-                            <button class="btn-danger" onclick="cognitoSignOut()">
+                            <button class="btn-danger" id="settings-logout" type="button">
                                 <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
                             </button>
                         </div>
@@ -234,7 +247,7 @@
                                 <div class="danger-label">Supprimer le compte</div>
                                 <div class="danger-desc">Supprime définitivement toutes vos données</div>
                             </div>
-                            <button class="btn-danger" onclick="deleteAccount()">
+                            <button class="btn-danger" id="settings-delete-account" type="button">
                                 <i class="fa-solid fa-trash"></i> Supprimer
                             </button>
                         </div>

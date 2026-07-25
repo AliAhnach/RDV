@@ -9,6 +9,46 @@ function $all(sel) {
   return Array.from(document.querySelectorAll(sel));
 }
 
+const APP_TRANSLATIONS = {
+  fr: { dashboard: 'Dashboard', appointments: 'Rendez-vous', clients: 'Clients', messages: 'Messages', settings: 'Paramètres', logout: 'Déconnexion', account: 'Compte' },
+  en: { dashboard: 'Dashboard', appointments: 'Appointments', clients: 'Clients', messages: 'Messages', settings: 'Settings', logout: 'Sign out', account: 'Account' },
+  ar: { dashboard: 'لوحة التحكم', appointments: 'المواعيد', clients: 'العملاء', messages: 'الرسائل', settings: 'الإعدادات', logout: 'تسجيل الخروج', account: 'الحساب' },
+};
+
+function updateLanguage(lang) {
+  const language = APP_TRANSLATIONS[lang] ? lang : 'fr';
+  const dictionary = APP_TRANSLATIONS[language];
+  localStorage.setItem('lang', language);
+  document.documentElement.lang = language;
+  document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+
+  document.querySelectorAll('[data-i18n]').forEach(element => {
+    const key = element.dataset.i18n;
+    if (dictionary[key]) element.textContent = dictionary[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+    const key = element.dataset.i18nPlaceholder;
+    if (dictionary[key]) element.placeholder = dictionary[key];
+  });
+
+  const navKeys = [
+    ['index.html', 'dashboard'], ['appointments.html', 'appointments'], ['clients.html', 'clients'],
+    ['messages.html', 'messages'], ['parametres.html', 'settings'],
+  ];
+  document.querySelectorAll('.sidebar nav a').forEach(link => {
+    const href = link.getAttribute('href') || '';
+    const match = navKeys.find(([path]) => href.includes(path));
+    const key = match ? match[1] : href === '#' ? 'logout' : null;
+    if (!key) return;
+    const textNode = Array.from(link.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.nodeValue.trim());
+    if (textNode) textNode.nodeValue = ` ${dictionary[key]}`;
+    else if (link.children.length === 0) link.textContent = dictionary[key];
+  });
+  document.querySelectorAll('.account-label').forEach(element => {
+    if (element.textContent.trim() === 'Compte' || element.dataset.i18n === 'account') element.textContent = dictionary.account;
+  });
+}
+
 function getPageId() {
   const path = window.location.pathname || "";
   const file = path.split("/").pop() || "index.html";
@@ -132,6 +172,7 @@ function applyTheme(theme) {
   const isLight = theme === 'light';
   document.body.classList.toggle('light-theme', isLight);
   document.body.classList.toggle('dark-mode', !isLight);
+  document.body.dataset.theme = isLight ? 'light' : 'dark';
   localStorage.setItem('theme', isLight ? 'light' : 'dark');
   // Maintient la préférence des anciennes pages qui lisent encore cette clé.
   localStorage.setItem('rdv-theme', isLight ? 'light' : 'dark');
@@ -198,6 +239,23 @@ function initProfileName() {
       accountBtn.appendChild(label);
     }
     label.textContent = firstName;
+
+    try {
+      const savedProfile = JSON.parse(localStorage.getItem('rdv_settings_profile') || '{}');
+      if (savedProfile.avatar) {
+        let avatar = accountBtn.querySelector('.header-profile-avatar');
+        if (!avatar) {
+          avatar = document.createElement('img');
+          avatar.className = 'header-profile-avatar';
+          avatar.alt = 'Photo de profil';
+          accountBtn.prepend(avatar);
+        }
+        avatar.src = savedProfile.avatar;
+        avatar.hidden = false;
+        const icon = accountBtn.querySelector('svg');
+        if (icon) icon.hidden = true;
+      }
+    } catch { /* Ignore an invalid locally saved profile. */ }
   }
 }
 
@@ -213,64 +271,204 @@ function initSettingsPage() {
   const form = document.getElementById('settings-form');
   if (!form) return;
 
-  const messageEl      = document.getElementById('settings-message');
-  const currentNameEl  = document.getElementById('settings-current-name');
-  const currentEmailEl = document.getElementById('settings-current-email');
-  const nameInput      = document.getElementById('settings-name');
-  const emailInput     = document.getElementById('settings-email');
-  const passwordInput  = document.getElementById('settings-password');
+  const STORAGE = {
+    profile: 'rdv_settings_profile',
+    notifications: 'rdv_settings_notifications',
+    preferences: 'rdv_settings_preferences',
+  };
+  const messageEl = document.getElementById('settings-message');
+  const nameInput = document.getElementById('settings-name');
+  const emailInput = document.getElementById('settings-email');
+  const phoneInput = document.getElementById('settings-phone');
+  const passwordInput = document.getElementById('settings-password');
+  const searchInput = document.getElementById('settings-search');
+  const languageSelect = document.getElementById('settings-language');
+  const timezoneSelect = document.getElementById('settings-timezone');
+  const darkModeInput = document.getElementById('settings-dark-mode');
 
-  function fillForm() {
-    const user = getCurrentUser();
-    if (!user) return;
-    if (currentNameEl)  currentNameEl.textContent  = user.fullname || '—';
-    if (currentEmailEl) currentEmailEl.textContent = user.email    || '—';
-    if (nameInput)      nameInput.value  = user.fullname || '';
-    if (emailInput)     emailInput.value = user.email    || '';
-    if (passwordInput)  passwordInput.value = '';
-  }
+  const readStorage = (key, fallback) => {
+    try { return { ...fallback, ...JSON.parse(localStorage.getItem(key) || '{}') }; }
+    catch { return fallback; }
+  };
+  const showMessage = (text, type = 'success') => {
+    if (messageEl) {
+      messageEl.textContent = text;
+      messageEl.style.color = type === 'error' ? '#dc2626' : '#15803d';
+    }
+    let toast = document.getElementById('settings-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'settings-toast';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      document.body.appendChild(toast);
+    }
+    toast.textContent = text;
+    toast.className = `settings-toast settings-toast--${type} is-visible`;
+    window.clearTimeout(showMessage.timer);
+    showMessage.timer = window.setTimeout(() => {
+      toast.classList.remove('is-visible');
+      if (messageEl) messageEl.textContent = '';
+    }, 3500);
+  };
 
-  fillForm();
+  const session = getCurrentUser();
+  let savedProfile = readStorage(STORAGE.profile, {});
+  if (nameInput) nameInput.value = savedProfile.name || session?.fullname || '';
+  if (emailInput) emailInput.value = savedProfile.email || session?.email || '';
+  if (phoneInput) phoneInput.value = savedProfile.phone || '';
+  if (passwordInput) passwordInput.value = '';
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (messageEl) messageEl.style.color = '#e53e3e';
-
-    const name     = (nameInput     ? nameInput.value     : '').trim();
-    const email    = (emailInput    ? emailInput.value    : '').trim().toLowerCase();
-    const password = (passwordInput ? passwordInput.value : '');
-
-    if (!name || !email) {
-      if (messageEl) messageEl.textContent = 'Nom et email sont requis.';
+  const profileImageInput = document.getElementById('profile-image-input');
+  const profileImageTrigger = document.getElementById('profile-image-trigger');
+  const profileImageButton = document.getElementById('profile-image-button');
+  const profileImagePreview = document.getElementById('profile-image-preview');
+  const profileImageFallback = document.getElementById('profile-image-fallback');
+  const headerProfileAvatar = document.getElementById('header-profile-avatar');
+  const setProfileImage = image => {
+    const hasImage = Boolean(image);
+    [profileImagePreview, headerProfileAvatar].forEach(element => {
+      if (!element) return;
+      element.hidden = !hasImage;
+      if (hasImage) element.src = image;
+    });
+    if (profileImageFallback) profileImageFallback.hidden = hasImage;
+    const accountIcon = document.querySelector('#btn-account > svg');
+    if (accountIcon) accountIcon.hidden = hasImage;
+  };
+  setProfileImage(savedProfile.avatar || '');
+  [profileImageTrigger, profileImageButton].forEach(button => button?.addEventListener('click', () => profileImageInput?.click()));
+  profileImageInput?.addEventListener('change', () => {
+    const file = profileImageInput.files?.[0];
+    if (!file) return;
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      showMessage('Choisissez une image JPG ou PNG.', 'error');
+      profileImageInput.value = '';
       return;
     }
-    if (!email.includes('@')) {
-      if (messageEl) messageEl.textContent = 'Email invalide.';
+    const reader = new FileReader();
+    reader.addEventListener('load', () => {
+      savedProfile = { ...savedProfile, avatar: reader.result };
+      localStorage.setItem(STORAGE.profile, JSON.stringify(savedProfile));
+      setProfileImage(savedProfile.avatar);
+      showMessage('Photo de profil mise à jour.');
+    });
+    reader.readAsDataURL(file);
+  });
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim().toLowerCase();
+    const phone = phoneInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!name || !email || !email.includes('@')) {
+      showMessage('Veuillez renseigner un nom et une adresse email valide.', 'error');
       return;
     }
-    if (password && password.length < 4) {
-      if (messageEl) messageEl.textContent = 'Mot de passe trop court (min. 4 caractères).';
+    if (password && password.length < 6) {
+      showMessage('Le mot de passe doit contenir au moins 6 caractères.', 'error');
       return;
     }
 
-    // Mettre à jour la session active
-    const session = getCurrentUser();
-    if (session) {
-      saveSession({ ...session, fullname: name, name, email });
-    }
-
-    // Rafraîchir l'affichage
-    if (currentNameEl)  currentNameEl.textContent  = name;
-    if (currentEmailEl) currentEmailEl.textContent = email;
-    if (passwordInput)  passwordInput.value = '';
+    savedProfile = { ...savedProfile, name, email, phone, passwordUpdatedAt: password ? Date.now() : savedProfile.passwordUpdatedAt || null };
+    localStorage.setItem(STORAGE.profile, JSON.stringify(savedProfile));
+    if (session) saveSession({ ...session, fullname: name, name, email });
+    passwordInput.value = '';
     const profileName = document.getElementById('profile-name');
     if (profileName) profileName.textContent = name;
+    showMessage('Modifications enregistrées avec succès !');
+  });
 
-    if (messageEl) {
-      messageEl.style.color = '#1f5fbf';
-      messageEl.textContent = 'Informations enregistrées ✅';
-      setTimeout(() => { messageEl.textContent = ''; }, 3000);
-    }
+  const notificationDefaults = { reminders: true, email: true, messages: false };
+  const notifications = readStorage(STORAGE.notifications, notificationDefaults);
+  const notificationInputs = {
+    reminders: document.getElementById('notification-reminders'),
+    email: document.getElementById('notification-email'),
+    messages: document.getElementById('notification-messages'),
+  };
+  Object.entries(notificationInputs).forEach(([key, input]) => {
+    if (!input) return;
+    input.checked = Boolean(notifications[key]);
+    input.addEventListener('change', () => {
+      notifications[key] = input.checked;
+      localStorage.setItem(STORAGE.notifications, JSON.stringify(notifications));
+      showMessage('Préférence de notification enregistrée.');
+    });
+  });
+
+  const preferences = readStorage(STORAGE.preferences, { language: 'fr', timezone: 'Africa/Casablanca' });
+  if (languageSelect) {
+    languageSelect.value = localStorage.getItem('lang') || preferences.language;
+    languageSelect.addEventListener('change', () => {
+      preferences.language = languageSelect.value;
+      localStorage.setItem(STORAGE.preferences, JSON.stringify(preferences));
+      localStorage.setItem('lang', languageSelect.value);
+      localStorage.setItem('rdv_lang', languageSelect.value);
+      updateLanguage(languageSelect.value);
+      showMessage('Langue enregistrée.');
+    });
+  }
+  if (timezoneSelect) {
+    timezoneSelect.value = preferences.timezone;
+    timezoneSelect.addEventListener('change', () => {
+      preferences.timezone = timezoneSelect.value;
+      localStorage.setItem(STORAGE.preferences, JSON.stringify(preferences));
+      showMessage('Fuseau horaire enregistré.');
+    });
+  }
+  if (darkModeInput) {
+    darkModeInput.checked = !document.body.classList.contains('light-theme');
+    document.body.classList.toggle('dark-theme', darkModeInput.checked);
+    darkModeInput.addEventListener('change', () => {
+      const theme = darkModeInput.checked ? 'dark' : 'light';
+      if (typeof window.applyTheme === 'function') window.applyTheme(theme);
+      else document.body.classList.toggle('light-theme', theme === 'light');
+      document.body.classList.toggle('dark-theme', theme === 'dark');
+      showMessage(`Mode ${theme === 'dark' ? 'sombre' : 'clair'} activé.`);
+    });
+  }
+
+  if (searchInput) {
+    const sections = Array.from(document.querySelectorAll('.settings-section'));
+    const empty = document.createElement('p');
+    empty.className = 'settings-search-empty';
+    empty.textContent = 'Aucun paramètre ne correspond à votre recherche.';
+    empty.hidden = true;
+    document.querySelector('.settings-grid')?.after(empty);
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.trim().toLocaleLowerCase('fr');
+      let matches = 0;
+      sections.forEach(section => {
+        const visible = !query || section.textContent.toLocaleLowerCase('fr').includes(query);
+        section.hidden = !visible;
+        if (visible) matches += 1;
+      });
+      empty.hidden = matches > 0;
+    });
+  }
+
+  document.getElementById('settings-logout')?.addEventListener('click', () => {
+    if (typeof window.logout === 'function') window.logout();
+    else window.location.href = './login.html';
+  });
+
+  document.getElementById('settings-delete-account')?.addEventListener('click', () => {
+    const modal = document.createElement('div');
+    modal.className = 'settings-modal';
+    modal.innerHTML = `<div class="settings-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="delete-account-title">
+      <h2 id="delete-account-title">Supprimer le compte ?</h2>
+      <p>Êtes-vous sûr ? Cette action est irréversible.</p>
+      <div class="settings-modal__actions"><button type="button" data-action="cancel">Annuler</button><button type="button" data-action="confirm">Supprimer définitivement</button></div>
+    </div>`;
+    document.body.appendChild(modal);
+    modal.querySelector('[data-action="cancel"]').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', event => { if (event.target === modal) modal.remove(); });
+    modal.querySelector('[data-action="confirm"]').addEventListener('click', () => {
+      ['rdv_session', STORAGE.profile, STORAGE.notifications, STORAGE.preferences, 'rdv_lang', 'theme', 'rdv-theme'].forEach(key => localStorage.removeItem(key));
+      window.location.href = './login.html';
+    });
   });
 }
 
@@ -551,15 +749,16 @@ function boot() {
 
   highlightActiveNav();
   initAuthStateUI();
+  updateLanguage(localStorage.getItem('lang') || localStorage.getItem('rdv_lang') || 'fr');
   initProfileName();
   initPillFromSession();
   initDashboardWelcome();
+  initGlobalTheme();
   initSettingsPage();
   initModal();
 
   initRdvPage();
   initTopIcons();
-  initGlobalTheme();
   initParametresPage();
   initUserDashboard();
   injectFooter();

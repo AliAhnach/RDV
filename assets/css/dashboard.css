@@ -668,6 +668,7 @@ body.light-theme .sidebar nav a:hover,
 body.light-theme .sidebar nav a.active { color: #ffffff; }
 .account-label,
 body.dark-mode .account-label { color: var(--text-primary); }
+.header-profile-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; }
 
 .sidebar nav a svg { width: 17px; height: 17px; }
 
