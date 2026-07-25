@@ -95,33 +95,51 @@
   };
 
   function setStatCard(cardId, valueId, iconKey, label, value) {
-    const row = document.querySelector('.stats-row');
+    const row = document.querySelector('.stats-row, .kpi-grid');
     let card = document.getElementById(cardId);
     const svg = STAT_ICONS[iconKey] || STAT_ICONS.calendar;
     const colorClass = STAT_COLOR[iconKey] || 'si-blue';
+    const kpiColorClass = {
+      calendar: 'kpi-icon--blue', users: 'kpi-icon--slate', clock: 'kpi-icon--green',
+      check: 'kpi-icon--green', x: 'kpi-icon--slate', pin: 'kpi-icon--blue', month: 'kpi-icon--slate',
+    }[iconKey] || 'kpi-icon--blue';
+
     if (!card && row) {
       card = document.createElement('div');
-      card.className = 'stat-card';
+      const isKpiGrid = row.classList.contains('kpi-grid');
+      card.className = isKpiGrid ? 'kpi-card' : 'stat-card';
       card.id = cardId;
-      card.innerHTML = `<div class="stat-icon ${colorClass}">${svg}</div><div class="stat-value" id="${valueId}">—</div><div class="stat-label"></div>`;
+      card.innerHTML = isKpiGrid
+        ? `<div class="kpi-icon ${kpiColorClass}">${svg}</div><div class="kpi-value" id="${valueId}">—</div><div class="kpi-label"></div>`
+        : `<div class="stat-icon ${colorClass}">${svg}</div><div class="stat-value" id="${valueId}">—</div><div class="stat-label"></div>`;
       row.appendChild(card);
     }
     if (!card) return;
-    const iconEl = card.querySelector('.stat-icon');
-    const valueEl = card.querySelector('.stat-value');
-    const labelEl = card.querySelector('.stat-label');
-    if (iconEl) { iconEl.innerHTML = svg; iconEl.className = `stat-icon ${colorClass}`; }
+    const isKpiCard = card.classList.contains('kpi-card');
+    const iconEl = card.querySelector('.stat-icon, .kpi-icon');
+    const valueEl = card.querySelector('.stat-value, .kpi-value');
+    const labelEl = card.querySelector('.stat-label, .kpi-label');
+    if (iconEl) {
+      iconEl.innerHTML = svg;
+      iconEl.className = isKpiCard ? `kpi-icon ${kpiColorClass}` : `stat-icon ${colorClass}`;
+    }
     if (valueEl) valueEl.textContent = value;
     if (labelEl) labelEl.textContent = label;
   }
 
   function setDashboardLoading() {
-    document.querySelectorAll('.stats-row .stat-value').forEach(el => { el.textContent = '…'; });
+    document.querySelectorAll('.stats-row .stat-value, .kpi-grid .kpi-value').forEach(el => { el.textContent = '…'; });
     const activity = document.getElementById('upcoming-rdvs');
-    if (activity) activity.innerHTML = '<div style="color:#94a3b8;font-size:13px;padding:14px 0;text-align:center;">Chargement des données…</div>';
+    if (activity) activity.innerHTML = '<p class="card-empty">Chargement des données…</p>';
   }
 
   function renderStats(stats) {
+    if (isAdmin) {
+      setStatCard('stat-card-rdv',      'stat-rdv',      'calendar', 'Rendez-vous', firstNumber(stats, ['total_appointments', 'appointments', 'total_rdvs', 'total', 'totalAppointments']));
+      setStatCard('stat-card-clients',  'stat-clients',  'users',    'Clients',      firstNumber(stats, ['total_users', 'users', 'user_count', 'users_count', 'totalUsers']));
+      setStatCard('stat-card-messages', 'stat-messages', 'clock',    'Messages',     firstNumber(stats, ['pending_messages', 'unread_messages', 'messages', 'pending_appointments', 'pending']));
+      return;
+    }
     setStatCard('stat-card-clients',   'stat-clients',   'users',    'Utilisateurs',  firstNumber(stats, ['total_users', 'users', 'user_count', 'users_count', 'totalUsers']));
     setStatCard('stat-card-rdv',       'stat-rdv',       'calendar', 'Rendez-vous',   firstNumber(stats, ['total_appointments', 'appointments', 'total_rdvs', 'total', 'totalAppointments']));
     setStatCard('stat-card-messages',  'stat-messages',  'clock',    'En attente',    firstNumber(stats, ['pending_appointments', 'pending', 'waiting_appointments', 'pending_count', 'pendingAppointments']));
@@ -137,7 +155,7 @@
 
     const recent = Array.isArray(appointments) ? appointments.slice(0, 5).map(normalizeAppointment) : [];
     if (recent.length === 0) {
-      activity.innerHTML = '<div style="color:#94a3b8;font-size:13px;padding:14px 0;text-align:center;">Aucune donnée disponible</div>';
+      activity.innerHTML = '<p class="card-empty">Aucune donnée disponible</p>';
       return;
     }
 
@@ -171,9 +189,9 @@
     renderRecentAppointments(recent);
   } catch (error) {
     console.error('Impossible de charger les statistiques du dashboard :', error);
-    document.querySelectorAll('.stats-row .stat-value').forEach(el => { el.textContent = '—'; });
+    document.querySelectorAll('.stats-row .stat-value, .kpi-grid .kpi-value').forEach(el => { el.textContent = '—'; });
     const activity = document.getElementById('upcoming-rdvs');
-    if (activity) activity.innerHTML = `<div style="color:#dc2626;font-size:13px;padding:14px 0;text-align:center;">${error.message || 'Erreur réseau. Réessayez.'}</div>`;
+    if (activity) activity.innerHTML = `<p class="card-empty">${error.message || 'Erreur réseau. Réessayez.'}</p>`;
   }
 
   // ── Notification badge ──
