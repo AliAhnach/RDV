@@ -1,13 +1,20 @@
 /* ── Appointments page logic ── */
 (() => {
+  const API_ROOT = typeof API_BASE === 'string'
+    ? API_BASE
+    : 'https://aliahnach.pythonanywhere.com/api';
+  const APPOINTMENTS_API = `${API_ROOT}/appointments`;
+  const STATUS_REFRESH_DELAY = 15000;
+
   const TYPE_ICONS = {
-    'Consultation': { icon: '🩺', cls: 'icon-consultation' },
-    'Suivi':        { icon: '💊', cls: 'icon-suivi' },
-    'Réunion':      { icon: '🤝', cls: 'icon-reunion' },
-    'Urgence':      { icon: '🚨', cls: 'icon-urgence' },
+    'Consultation': 'icon-consultation',
+    'Suivi':        'icon-suivi',
+    'Réunion':      'icon-reunion',
+    'Urgence':      'icon-urgence',
   };
 
   let currentAppointments = [];
+  let refreshTimer = null;
 
   /* ── Storage helpers ── */
   function loadSession() {
@@ -71,11 +78,9 @@
         return [];
       }
 
-      const isAdmin = String(session.role).toLowerCase() === 'admin';
-      const endpoint = isAdmin
-        ? 'https://aliahnach.pythonanywhere.com/api/appointments'
-        : `https://aliahnach.pythonanywhere.com/api/appointments/${encodeURIComponent(session.id)}`;
-      const res = await fetch(endpoint);
+      // The client view is filtered below.  Keeping a single read endpoint
+      // avoids a second API contract while preserving the admin list.
+      const res = await fetch(APPOINTMENTS_API);
       const data = await readApiResponse(res);
       const source = Array.isArray(data) ? data : data.appointments;
       const appointments = Array.isArray(source)
@@ -93,16 +98,43 @@
   /* ── Render helpers ── */
   function statusBadge(status) {
     const map = {
-      'Confirmé':   ['status-confirme',  '✅'],
-      'En attente': ['status-attente',   '⏳'],
-      'Refusé':     ['status-refuse',    '❌'],
+      'Confirmé':   'status-confirme',
+      'En attente': 'status-attente',
+      'Refusé':     'status-refuse',
     };
-    const [cls, icon] = map[status] || ['status-attente', '⏳'];
-    return `<span class="status-badge ${cls}">${icon} ${status}</span>`;
+    const cls = map[status] || 'status-attente';
+    return `<span class="status-badge ${cls}">${status}</span>`;
   }
 
   function typeIcon(type) {
-    return TYPE_ICONS[type] || { icon: '📅', cls: 'icon-default' };
+    return TYPE_ICONS[type] || 'icon-default';
+  }
+
+  function appointmentIcon() {
+    return `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18"/></svg>`;
+  }
+
+  function actionIcon(name) {
+    const paths = {
+      confirm: '<path d="m5 12 4 4L19 6"/>',
+      refuse: '<path d="m6 6 12 12M18 6 6 18"/>',
+      detail: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
+      delete: '<path d="M4 7h16M10 11v6m4-6v6M9 7l1-3h4l1 3M6 7l1 14h10l1-14"/>',
+      clock: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
+      note: '<path d="M5 3h10l4 4v14H5zM15 3v5h5M8 12h8m-8 4h6"/>',
+    };
+    return `<svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true">${paths[name] || ''}</svg>`;
+  }
+
+  function showFeedback(message, isError = false) {
+    const feedback = document.querySelector(
+      `${getCurrentRole() === 'admin' ? '#view-admin' : '#view-user'} .appointment-feedback`
+    );
+    if (!feedback) return;
+    feedback.textContent = message;
+    feedback.className = `appointment-feedback${isError ? ' appointment-feedback--error' : ''}`;
+    feedback.hidden = false;
+    window.setTimeout(() => { feedback.hidden = true; }, 3500);
   }
 
   function formatDate(d) {
@@ -115,23 +147,23 @@
   function openUserModal(id) {
     const rdv = currentAppointments.find(r => String(r.id) === String(id));
     if (!rdv) return;
-    const { icon, cls } = typeIcon(rdv.type);
+    const cls = typeIcon(rdv.type);
     const statusMap = {
-      'Confirmé':   { cls: 'status-confirme',  icon: '✅', msg: 'Votre rendez-vous est confirmé.' },
-      'En attente': { cls: 'status-attente',   icon: '⏳', msg: 'En attente de confirmation par l\'administrateur.' },
-      'Refusé':     { cls: 'status-refuse',    icon: '❌', msg: 'Ce rendez-vous a été refusé.' },
+      'Confirmé':   { cls: 'status-confirme', msg: 'Votre rendez-vous est confirmé.' },
+      'En attente': { cls: 'status-attente', msg: 'En attente de confirmation par l\'administrateur.' },
+      'Refusé':     { cls: 'status-refuse', msg: 'Ce rendez-vous a été refusé.' },
     };
     const s = statusMap[rdv.status] || statusMap['En attente'];
 
     document.getElementById('umodal-icon').className  = `rdv-card-icon ${cls}`;
-    document.getElementById('umodal-icon').textContent = icon;
+    document.getElementById('umodal-icon').innerHTML = appointmentIcon();
     document.getElementById('umodal-type').textContent   = rdv.type;
     document.getElementById('umodal-date').textContent   = formatDate(rdv.date);
     document.getElementById('umodal-time').textContent   = rdv.time;
     document.getElementById('umodal-desc').textContent   = rdv.desc || '—';
     const badge = document.getElementById('umodal-status');
     badge.className   = `status-badge ${s.cls}`;
-    badge.textContent = `${s.icon} ${rdv.status}`;
+    badge.textContent = rdv.status;
     document.getElementById('umodal-status-msg').textContent = s.msg;
     document.getElementById('modal-user-detail').hidden = false;
   }
@@ -160,23 +192,24 @@
     empty.hidden = true;
 
     filtered.forEach((rdv, i) => {
-      const { icon, cls } = typeIcon(rdv.type);
+      const cls = typeIcon(rdv.type);
       const card = document.createElement('div');
       card.className = 'rdv-card';
+      card.dataset.rdvId = rdv.id;
       card.style.animationDelay = `${i * 0.06}s`;
       card.innerHTML = `
-        <div class="rdv-card-icon ${cls}">${icon}</div>
+        <div class="rdv-card-icon ${cls}">${appointmentIcon()}</div>
         <div class="rdv-card-body">
           <div class="rdv-card-title">${rdv.type}</div>
           <div class="rdv-card-meta">
-            <span>📅 ${formatDate(rdv.date)}</span>
-            <span>🕐 ${rdv.time}</span>
-            ${rdv.desc ? `<span>📝 ${rdv.desc}</span>` : ''}
+            <span>${appointmentIcon()} ${formatDate(rdv.date)}</span>
+            <span>${actionIcon('clock')} ${rdv.time}</span>
+            ${rdv.desc ? `<span>${actionIcon('note')} ${rdv.desc}</span>` : ''}
           </div>
         </div>
         ${statusBadge(rdv.status)}
         <div class="rdv-card-actions">
-          <button class="btn-detail" data-id="${rdv.id}">🔍 Détails</button>
+          <button class="btn-detail" data-id="${rdv.id}">${actionIcon('detail')}Détails</button>
         </div>
       `;
       container.appendChild(card);
@@ -196,9 +229,9 @@
     const el = document.getElementById('admin-stats');
     if (!el) return;
     el.innerHTML = `
-      <div class="admin-stat-badge total">📋 ${total} total</div>
-      <div class="admin-stat-badge waiting">⏳ ${waiting} en attente</div>
-      <div class="admin-stat-badge done">✅ ${done} confirmés</div>
+      <div class="admin-stat-badge total">${total} total</div>
+      <div class="admin-stat-badge waiting">${waiting} en attente</div>
+      <div class="admin-stat-badge done">${done} confirmés</div>
     `;
   }
 
@@ -217,29 +250,30 @@
     empty.hidden = true;
 
     filtered.forEach((rdv, i) => {
-      const { icon, cls } = typeIcon(rdv.type);
+      const cls = typeIcon(rdv.type);
       const card = document.createElement('div');
       card.className = 'rdv-card';
+      card.dataset.rdvId = rdv.id;
       card.style.animationDelay = `${i * 0.06}s`;
 
       const statusActions = rdv.status === 'En attente'
-        ? `<button class="btn-confirm" data-id="${rdv.id}">✅ Confirmer</button>
-           <button class="btn-refuse"  data-id="${rdv.id}">❌ Refuser</button>`
+        ? `<button class="btn-confirm" data-id="${rdv.id}">${actionIcon('confirm')}Confirmer</button>
+           <button class="btn-refuse"  data-id="${rdv.id}">${actionIcon('refuse')}Refuser</button>`
         : '';
       const actionBtns = `<div class="rdv-card-actions">
         ${statusActions}
-        <button class="btn-detail" data-id="${rdv.id}">🔍 Détails</button>
-        <button class="btn-refuse btn-delete" data-id="${rdv.id}">🗑️ Supprimer</button>
+        <button class="btn-detail" data-id="${rdv.id}">${actionIcon('detail')}Détails</button>
+        <button class="btn-refuse btn-delete" data-id="${rdv.id}">${actionIcon('delete')}Supprimer</button>
       </div>`;
 
       card.innerHTML = `
-        <div class="rdv-card-icon ${cls}">${icon}</div>
+        <div class="rdv-card-icon ${cls}">${appointmentIcon()}</div>
         <div class="rdv-card-body">
           <div class="rdv-card-title">${rdv.client} — ${rdv.type}</div>
           <div class="rdv-card-meta">
-            <span>📅 ${formatDate(rdv.date)}</span>
-            <span>🕐 ${rdv.time}</span>
-            ${rdv.desc ? `<span>📝 ${rdv.desc}</span>` : ''}
+            <span>${appointmentIcon()} ${formatDate(rdv.date)}</span>
+            <span>${actionIcon('clock')} ${rdv.time}</span>
+            ${rdv.desc ? `<span>${actionIcon('note')} ${rdv.desc}</span>` : ''}
           </div>
         </div>
         ${statusBadge(rdv.status)}
@@ -263,25 +297,81 @@
     });
   }
 
+  function patchAppointmentStatus(appointment, isAdmin = false) {
+    const cards = document.querySelectorAll(`[data-rdv-id="${CSS.escape(String(appointment.id))}"]`);
+    cards.forEach(card => {
+      const oldBadge = card.querySelector('.status-badge');
+      if (oldBadge) oldBadge.outerHTML = statusBadge(appointment.status);
+      card.classList.remove('rdv-card--status-changed');
+      // Restart the small status-change animation even when a status changes twice.
+      void card.offsetWidth;
+      card.classList.add('rdv-card--status-changed');
+
+      if (isAdmin) {
+        card.querySelectorAll('.btn-confirm, .btn-refuse:not(.btn-delete)').forEach(button => button.remove());
+      }
+    });
+  }
+
+  async function refreshUserAppointments() {
+    const session = loadSession();
+    const previous = new Map(
+      currentAppointments
+        .filter(item => String(item.user_id) === String(session?.id))
+        .map(item => [String(item.id), item.status])
+    );
+    const beforeIds = new Set(previous.keys());
+    const appointments = await loadAppointments();
+    const mine = appointments.filter(item => String(item.user_id) === String(session?.id));
+    const sameAppointments = mine.length === beforeIds.size
+      && mine.every(item => beforeIds.has(String(item.id)));
+
+    // For the normal confirmation/refusal case, leave the list intact and
+    // alter only the affected badge. Filters can add/remove cards, so they
+    // deliberately receive a full list render.
+    if (sameAppointments && currentFilter === 'all') {
+      mine.forEach(item => {
+        if (previous.get(String(item.id)) !== item.status) patchAppointmentStatus(item);
+      });
+      return;
+    }
+    await renderUserRdvs(currentFilter);
+  }
+
+  function startUserRefresh() {
+    if (refreshTimer) window.clearInterval(refreshTimer);
+    refreshTimer = window.setInterval(() => {
+      if (!document.hidden) refreshUserAppointments();
+    }, STATUS_REFRESH_DELAY);
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) refreshUserAppointments();
+    });
+  }
+
   async function updateStatus(id, status) {
     const list = currentAppointments.length ? currentAppointments : await loadAppointments();
     const rdv = list.find(r => String(r.id) === String(id));
     if (!rdv) return false;
 
     try {
-      const res = await fetch(`https://aliahnach.pythonanywhere.com/api/appointments/${id}`, {
+      const res = await fetch(`${API_ROOT}/admin/appointments/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       });
-      await readApiResponse(res);
+      const data = await readApiResponse(res);
 
-      await loadAppointments();
-      await renderAdminRdvs(currentFilter);
+      const updated = data.appointment ? normalizeAppointment(data.appointment) : { ...rdv, status };
+      currentAppointments = currentAppointments.map(item =>
+        String(item.id) === String(id) ? updated : item
+      );
+      patchAppointmentStatus(updated, true);
       await renderAdminStats();
+      showFeedback(`Le rendez-vous a été ${status.toLowerCase()}.`);
       return true;
     } catch (error) {
-      alert(error.message || 'Erreur réseau. Réessayez.');
+      showFeedback(error.message || 'Impossible de mettre à jour le rendez-vous.', true);
       return false;
     }
   }
@@ -291,7 +381,7 @@
     if (!confirmed) return false;
 
     try {
-      const res = await fetch(`https://aliahnach.pythonanywhere.com/api/appointments/${encodeURIComponent(id)}`, {
+      const res = await fetch(`${APPOINTMENTS_API}/${encodeURIComponent(id)}`, {
         method: 'DELETE',
       });
       await readApiResponse(res);
@@ -408,6 +498,7 @@
       document.getElementById('view-user').hidden = false;
       await renderUserRdvs('all');
       bindFilters('view-user', (f) => { renderUserRdvs(f); });
+      startUserRefresh();
 
       // Request modal events
       document.getElementById('btn-open-request').addEventListener('click', openRequestModal);
@@ -456,7 +547,7 @@
         }
 
         try {
-          const res = await fetch('https://aliahnach.pythonanywhere.com/api/appointments', {
+          const res = await fetch(APPOINTMENTS_API, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -495,17 +586,17 @@
           const container = document.getElementById('admin-rdv-list');
           container.innerHTML = '';
           filtered.forEach((rdv, i) => {
-            const { icon, cls } = typeIcon(rdv.type);
+            const cls = typeIcon(rdv.type);
             const card = document.createElement('div');
             card.className = 'rdv-card';
             card.style.animationDelay = `${i * 0.06}s`;
             card.innerHTML = `
-              <div class="rdv-card-icon ${cls}">${icon}</div>
+              <div class="rdv-card-icon ${cls}">${appointmentIcon()}</div>
               <div class="rdv-card-body">
                 <div class="rdv-card-title">${rdv.client} — ${rdv.type}</div>
                 <div class="rdv-card-meta">
-                  <span>📅 ${formatDate(rdv.date)}</span>
-                  <span>🕐 ${rdv.time}</span>
+                  <span>${appointmentIcon()} ${formatDate(rdv.date)}</span>
+                  <span>${actionIcon('clock')} ${rdv.time}</span>
                 </div>
               </div>
               ${statusBadge(rdv.status)}

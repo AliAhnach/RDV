@@ -58,6 +58,7 @@
     <!-- ── USER VIEW ── -->
     <div id="view-user" hidden>
       <div class="appt-page">
+        <p class="appointment-feedback" role="status" aria-live="polite" hidden></p>
 
         <!-- Header -->
         <div class="appt-page-header">
@@ -81,7 +82,6 @@
         <!-- RDV list -->
         <div id="user-rdv-list"></div>
         <div id="user-rdv-empty" class="appt-empty" hidden>
-          <div class="appt-empty-icon">📭</div>
           <div>Aucun rendez-vous trouvé.</div>
           <button class="btn-new-rdv" id="btn-open-request2" style="margin-top:12px;">
             <span>＋</span> Demander un rendez-vous
@@ -94,6 +94,7 @@
     <!-- ── ADMIN VIEW ── -->
     <div id="view-admin" hidden>
       <div class="appt-page">
+        <p class="appointment-feedback" role="status" aria-live="polite" hidden></p>
 
         <div class="appt-page-header">
           <div>
@@ -113,7 +114,6 @@
 
         <div id="admin-rdv-list"></div>
         <div id="admin-rdv-empty" class="appt-empty" hidden>
-          <div class="appt-empty-icon">📭</div>
           <div>Aucun rendez-vous pour le moment.</div>
         </div>
 
@@ -146,11 +146,11 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div style="padding:12px;background:#f8f9fb;border-radius:10px;">
           <div style="font-size:10px;font-weight:700;color:#7a7a9a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Date</div>
-          <div style="font-size:14px;font-weight:800;color:#1a1a2e;">📅 <span id="umodal-date">—</span></div>
+          <div style="font-size:14px;font-weight:800;color:#1a1a2e;"><span id="umodal-date">—</span></div>
         </div>
         <div style="padding:12px;background:#f8f9fb;border-radius:10px;">
           <div style="font-size:10px;font-weight:700;color:#7a7a9a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Heure</div>
-          <div style="font-size:14px;font-weight:800;color:#1a1a2e;">🕐 <span id="umodal-time">—</span></div>
+          <div style="font-size:14px;font-weight:800;color:#1a1a2e;"><span id="umodal-time">—</span></div>
         </div>
       </div>
 
