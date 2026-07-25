@@ -1,175 +1,106 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
-  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mini Plateforme RDV - Mon Espace</title>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Tableau de bord personnel de la plateforme RDV.">
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+  <title>RDV — Mon espace</title>
   <script src="../assets/js/auth.service.js"></script>
   <script>
     requireAuth();
-    // Redirect admin away from user dashboard
     if (typeof getUserRole === 'function' && getUserRole() === 'admin') {
       window.location.replace('./index.html');
     }
   </script>
-
-  <link rel="stylesheet" href="../assets/css/global.css"/>
-  <link rel="stylesheet" href="../assets/css/dashboard.css"/>
-  <link rel="stylesheet" href="../assets/css/splash.css"/>
-  <link rel="stylesheet" href="../assets/css/responsive.css"/>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/splash.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
 </head>
 <body>
+  <button class="hamburger" id="hamburger" type="button" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
-<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <div class="container">
+    <aside class="sidebar" id="sidebar" aria-label="Navigation principale">
+      <a class="sidebar-logo" href="./user-dashboard.html" aria-label="RDV, accueil">
+        <span class="logo-badge">RDV</span>
+        <span class="logo-text"><span class="logo-text__main">RDV</span><span class="logo-text__sub">Plateforme</span></span>
+      </a>
+      <nav>
+        <a class="active" href="./user-dashboard.html"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z"/><path d="M9 21v-6h6v6"/></svg>Mon espace</a>
+        <a href="./appointments.html"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18"/></svg>Mes rendez-vous</a>
+        <a href="./messages.html"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 10 10 0 0 1-4.2-1L3 21l1.6-4.1A8.2 8.2 0 0 1 3 12a8.4 8.4 0 0 1 9-8.5 8.4 8.4 0 0 1 9 8Z"/></svg>Messages</a>
+        <a href="./parametres.html"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.1 2.1-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.2h-3v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-2.1-2.1.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H5.3v-3h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 2.1-2.1.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5v-.2h3v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 2.1 2.1-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2v3h-.2a1.7 1.7 0 0 0-1.4 1Z"/></svg>Paramètres</a>
+        <a href="#" onclick="cognitoSignOut(); return false;"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5m5 5H3"/><path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/></svg>Déconnexion</a>
+      </nav>
+    </aside>
 
-<div class="container">
+    <main class="main">
+      <header class="dash-header">
+        <label class="search-wrap" for="appointment-search">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <input id="appointment-search" type="search" placeholder="Rechercher un rendez-vous">
+        </label>
+        <div class="dash-header-right">
+          <button class="hdr-icon-btn" id="theme-toggle" type="button" aria-label="Changer le thème"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></button>
+          <button class="hdr-icon-btn hdr-account-btn" id="btn-account" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="account-label">Compte</span></button>
+        </div>
+      </header>
 
-  <!-- ── Sidebar ── -->
-  <aside class="sidebar" id="sidebar">
-    <a class="sidebar-logo" href="./user-dashboard.html">
-      <div class="logo-badge"><span>RDV</span></div>
-      <div class="logo-text">
-        <span class="logo-text__main">RDV</span>
-        <span class="logo-text__sub">Plateforme</span>
-      </div>
-    </a>
-
-    <nav>
-      <a href="./user-dashboard.html" class="active">🏠 Mon Espace</a>
-      <a href="./appointments.html">📅 Mes Rendez-vous</a>
-      <a href="./messages.html">💬 Messages</a>
-      <a href="./parametres.html">⚙️ Paramètres</a>
-      <a href="#" onclick="cognitoSignOut(); return false;">🚪 Déconnexion</a>
-    </nav>
-  </aside>
-
-  <!-- ── Main ── -->
-  <main class="main">
-
-    <!-- Topbar -->
-    <div class="dash-header">
-      <div class="search-wrap">
-        <svg width="14" height="14" fill="none" stroke="#7a7a9a" stroke-width="2" viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-        <input type="text" placeholder="Rechercher un rendez-vous…"/>
-      </div>
-
-      <div class="dash-header-right">
-        <button class="hdr-icon-btn" id="theme-toggle" title="Changer le thème" type="button" aria-label="Changer le thème">
-          🌙<span class="hdr-badge"></span>
-        </button>
-        <button class="hdr-icon-btn" id="btn-account" title="Compte" type="button" aria-label="Compte">
-          👤<span class="account-label">Compte</span><span class="hdr-badge" style="display:none;"></span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Content -->
-    <div class="dash-content" style="grid-template-columns: 1fr;">
-      <div class="right-panel" style="padding: 32px 36px; gap: 24px;">
-
-        <!-- Welcome -->
-        <div class="dashboard-hero">
+      <section class="dashboard-content main-content" aria-label="Tableau de bord">
+        <article class="dashboard-hero">
           <div>
-            <div class="hero-eyebrow">📊 Tableau de bord</div>
-            <div class="welcome-greeting">
-              Bonjour <span class="grad-name" id="welcome-name">!</span>
-            </div>
-            <div class="welcome-sub">Voici un aperçu clair de votre journée et de vos prochains rendez-vous.</div>
+            <p class="hero-eyebrow">Tableau de bord</p>
+            <h1>Bonjour <span class="grad-name" id="welcome-name">!</span></h1>
+            <p class="welcome-sub">Voici un aperçu de votre journée et de vos prochains rendez-vous.</p>
             <div class="hero-actions">
-              <a href="./appointments.html" class="hero-btn hero-btn-primary">🗓️ Voir mes RDV</a>
-              <a href="./messages.html" class="hero-btn hero-btn-secondary">💬 Messages</a>
+              <a href="./appointments.html" class="hero-btn hero-btn-primary"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18"/></svg>Voir mes RDV</a>
+              <a href="./messages.html" class="hero-btn hero-btn-secondary"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 10 10 0 0 1-4.2-1L3 21l1.6-4.1A8.2 8.2 0 0 1 3 12a8.4 8.4 0 0 1 9-8.5 8.4 8.4 0 0 1 9 8Z"/></svg>Messages</a>
             </div>
           </div>
-          <div class="hero-summary">
-            <div class="hero-mini-card">
-              <div class="hero-mini-label">Aujourd’hui</div>
-              <div class="hero-mini-date" id="hero-date"></div>
-              <div class="hero-mini-time" id="hero-time"></div>
-            </div>
-            <div class="hero-chip">✅ 2 confirmés</div>
-            <div class="hero-chip">📅 4 RDV</div>
-            <div class="hero-chip">⏰ Aujourd’hui</div>
+          <div class="hero-date-card">
+            <p>Aujourd'hui</p><time id="hero-date"></time><time id="hero-time"></time>
           </div>
-        </div>
+        </article>
 
-        <!-- Role info banner
-        <div class="role-banner">
-          <div class="role-banner-icon">👤</div>
-          <div class="role-banner-content">
-            <div class="role-banner-title">Compte Utilisateur</div>
-            <div class="role-banner-text">Vous avez accès à vos rendez-vous, messages et paramètres personnels.</div>
+        <section class="stats-row" aria-label="Indicateurs clés">
+          <article class="stat-card" id="stat-card-rdv"><span class="stat-icon si-blue"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18"/></svg></span><strong class="stat-value" id="stat-rdv">—</strong><span class="stat-label">Mes RDV</span></article>
+          <article class="stat-card" id="stat-card-confirmed"><span class="stat-icon si-green"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span><strong class="stat-value" id="stat-confirmed">—</strong><span class="stat-label">Confirmés</span></article>
+          <article class="stat-card" id="stat-card-messages"><span class="stat-icon si-purple"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 10 10 0 0 1-4.2-1L3 21l1.6-4.1A8.2 8.2 0 0 1 3 12a8.4 8.4 0 0 1 9-8.5 8.4 8.4 0 0 1 9 8Z"/></svg></span><strong class="stat-value" id="stat-messages">—</strong><span class="stat-label">Notifications</span></article>
+        </section>
+
+        <section class="appointments-card" aria-labelledby="upcoming-title">
+          <header class="card-header"><div><p class="hero-eyebrow">Aujourd'hui</p><h2 id="upcoming-title">Mes prochains rendez-vous</h2></div><a href="./appointments.html">Tout voir</a></header>
+          <div class="appointment-list" id="upcoming-rdvs">
+            <article class="appointment-item">
+              <span class="appointment-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M19 8h3m-1.5-1.5v3"/></svg></span>
+              <div class="appointment-info"><h3>Consultation médicale</h3><p>Aujourd'hui · 10:00</p></div><span class="status-badge status-badge--confirmed">Confirmé</span>
+            </article>
+            <article class="appointment-item">
+              <span class="appointment-icon appointment-icon--blue"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 3h6v4H9zM7 7h10v14H7z"/><path d="M10 12h4m-2-2v4"/></svg></span>
+              <div class="appointment-info"><h3>Suivi traitement</h3><p>Demain · 14:30</p></div><span class="status-badge status-badge--pending">En attente</span>
+            </article>
           </div>
-          <div class="role-banner-badge">✦ Standard</div>
-        </div> -->
-
-        <!-- Stats -->
-        <div class="stats-row" style="animation: fadeUp 0.55s ease 0.10s both;">
-          <div class="stat-card" id="stat-card-rdv" style="cursor:pointer;">
-            <div class="stat-icon si-purple">📅</div>
-            <div class="stat-value" id="stat-rdv">—</div>
-            <div class="stat-label">Mes RDV</div>
-          </div>
-          <div class="stat-card" id="stat-card-confirmed" style="cursor:pointer;">
-            <div class="stat-icon si-blue">✅</div>
-            <div class="stat-value" id="stat-confirmed">—</div>
-            <div class="stat-label">Confirmés</div>
-          </div>
-          <div class="stat-card" id="stat-card-messages" style="cursor:pointer;">
-            <div class="stat-icon si-green">💬</div>
-            <div class="stat-value" id="stat-messages">—</div>
-            <div class="stat-label">Notifications</div>
-          </div>
-        </div>
-
-        <!-- Prochains RDV -->
-        <div class="platform-desc-card" style="animation: fadeUp 0.55s ease 0.20s both;">
-          <div class="pdc-top">
-            <div class="pdc-icon">📅</div>
-            <span class="pdc-badge">Aujourd'hui</span>
-          </div>
-          <div class="pdc-title">Mes prochains rendez-vous</div>
-
-          <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
-
-            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(124,92,191,0.06);border:1px solid rgba(124,92,191,0.14);border-radius:12px;">
-              <div style="width:42px;height:42px;border-radius:10px;background:#ede8f9;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🩺</div>
-              <div style="flex:1;">
-                <div style="font-size:13px;font-weight:700;color:#1a1a2e;">Consultation médicale</div>
-                <div style="font-size:11px;color:#7a7a9a;margin-top:2px;">Aujourd'hui · 10:00</div>
-              </div>
-              <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;background:#dcfce7;color:#16a34a;">Confirmé</span>
-            </div>
-
-            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.14);border-radius:12px;">
-              <div style="width:42px;height:42px;border-radius:10px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">💊</div>
-              <div style="flex:1;">
-                <div style="font-size:13px;font-weight:700;color:#1a1a2e;">Suivi traitement</div>
-                <div style="font-size:11px;color:#7a7a9a;margin-top:2px;">Demain · 14:30</div>
-              </div>
-              <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;background:#fef3cd;color:#b45309;">En attente</span>
-            </div>
-
-          </div>
-
-          <div class="pdc-features" style="margin-top:16px;">
-            <span class="pdc-feat">📅 Rendez-vous</span>
-            <span class="pdc-feat">💬 Messages</span>
-            <span class="pdc-feat">⚙️ Paramètres</span>
-            <span class="pdc-feat">🔒 Sécurisé</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </main>
-</div>
-
-<script src="../assets/js/transition.js"></script>
-<script src="../assets/js/main.js"></script>
+        </section>
+      </section>
+    </main>
+  </div>
+  <script src="../assets/js/transition.js"></script>
+  <script src="../assets/js/main.js"></script>
+  <script>
+    const updateDashboardClock = () => {
+      const now = new Date();
+      document.getElementById('hero-date').textContent = now.toLocaleDateString('fr-FR', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+      });
+      document.getElementById('hero-time').textContent = now.toLocaleTimeString('fr-FR', {
+        hour: '2-digit', minute: '2-digit'
+      });
+    };
+    updateDashboardClock();
+    window.setInterval(updateDashboardClock, 60000);
+  </script>
 </body>
 </html>

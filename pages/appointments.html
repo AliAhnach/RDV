@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini Plateforme RDV - Rendez-vous</title>
+  <title>RDV — Rendez-vous</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../assets/css/global.css">
   <link rel="stylesheet" href="../assets/css/dashboard.css">
   <link rel="stylesheet" href="../assets/css/splash.css">
@@ -26,12 +29,12 @@
       </div>
     </a>
     <nav>
-      <a href="./index.html">🏠 Dashboard</a>
-      <a href="./appointments.html" class="active">📅 Rendez-vous</a>
-      <a href="./clients.html">👥 Clients</a>
-      <a href="./messages.html">💬 Messages</a>
-      <a href="./parametres.html">⚙️ Paramètres</a>
-      <a href="#" onclick="cognitoSignOut(); return false;">🚪 Déconnexion</a>
+      <a href="./index.html">Dashboard</a>
+      <a href="./appointments.html" class="active">Rendez-vous</a>
+      <a href="./clients.html">Clients</a>
+      <a href="./messages.html">Messages</a>
+      <a href="./parametres.html">Paramètres</a>
+      <a href="#" onclick="cognitoSignOut(); return false;">Déconnexion</a>
     </nav>
   </aside>
 
@@ -46,7 +49,8 @@
       </div>
       <div class="dash-header-right">
         <button class="hdr-icon-btn" id="btn-account" title="Compte" type="button" aria-label="Compte">
-          👤<span class="account-label">Compte</span><span class="hdr-badge" style="display:none;"></span>
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span class="account-label">Compte</span><span class="hdr-badge" style="display:none;"></span>
         </button>
       </div>
     </header>
@@ -58,7 +62,7 @@
         <!-- Header -->
         <div class="appt-page-header">
           <div>
-            <h2 class="appt-page-title">📅 Mes Rendez-vous</h2>
+            <h2 class="appt-page-title">Mes rendez-vous</h2>
             <p class="appt-page-sub">Consultez vos rendez-vous et leur statut en temps réel.</p>
           </div>
           <button class="btn-new-rdv" id="btn-open-request">
@@ -69,9 +73,9 @@
         <!-- Filters -->
         <div class="appt-filters">
           <button class="appt-filter active" data-filter="all">Tous</button>
-          <button class="appt-filter" data-filter="Confirmé">✅ Confirmés</button>
-          <button class="appt-filter" data-filter="En attente">⏳ En attente</button>
-          <button class="appt-filter" data-filter="Refusé">❌ Refusés</button>
+          <button class="appt-filter" data-filter="Confirmé">Confirmés</button>
+          <button class="appt-filter" data-filter="En attente">En attente</button>
+          <button class="appt-filter" data-filter="Refusé">Refusés</button>
         </div>
 
         <!-- RDV list -->
@@ -93,7 +97,7 @@
 
         <div class="appt-page-header">
           <div>
-            <h2 class="appt-page-title">📅 Gestion des Rendez-vous</h2>
+            <h2 class="appt-page-title">Gestion des rendez-vous</h2>
             <p class="appt-page-sub">Confirmez, refusez ou gérez toutes les demandes.</p>
           </div>
           <div class="appt-admin-stats" id="admin-stats"></div>
@@ -102,9 +106,9 @@
         <!-- Filters -->
         <div class="appt-filters">
           <button class="appt-filter active" data-filter="all">Tous</button>
-          <button class="appt-filter" data-filter="Confirmé">✅ Confirmés</button>
-          <button class="appt-filter" data-filter="En attente">⏳ En attente</button>
-          <button class="appt-filter" data-filter="Refusé">❌ Refusés</button>
+          <button class="appt-filter" data-filter="Confirmé">Confirmés</button>
+          <button class="appt-filter" data-filter="En attente">En attente</button>
+          <button class="appt-filter" data-filter="Refusé">Refusés</button>
         </div>
 
         <div id="admin-rdv-list"></div>
@@ -123,7 +127,7 @@
 <div id="modal-user-detail" class="modal-overlay" role="dialog" aria-modal="true" hidden>
   <div class="modal">
     <button class="modal-close" id="modal-user-detail-close">✖</button>
-    <h3>📅 Détails du rendez-vous</h3>
+    <h3>Détails du rendez-vous</h3>
     <div class="modal-body" style="margin-top:16px;display:flex;flex-direction:column;gap:14px;">
 
       <!-- Icon + type -->
@@ -167,7 +171,7 @@
 <div id="modal-request" class="modal-overlay" role="dialog" aria-modal="true" hidden>
   <div class="modal">
     <button class="modal-close" id="modal-request-close">✖</button>
-    <h3>📅 Demander un rendez-vous</h3>
+    <h3>Demander un rendez-vous</h3>
     <form id="form-request" class="modal-body" style="display:grid;gap:12px;margin-top:8px;">
       <label style="display:grid;gap:5px;font-weight:700;color:#2c3e50;font-size:13px;">
         Type de rendez-vous
@@ -214,8 +218,8 @@
       <p class="modal-desc"><strong>Motif :</strong> <span id="modal-desc">—</span></p>
     </div>
     <div class="modal-actions">
-      <button id="modal-confirm-btn" class="primary">✅ Confirmer</button>
-      <button id="modal-refuse-btn" class="ghost" style="color:#e53e3e;border-color:#e53e3e;">❌ Refuser</button>
+      <button id="modal-confirm-btn" class="primary">Confirmer</button>
+      <button id="modal-refuse-btn" class="ghost" style="color:#e53e3e;border-color:#e53e3e;">Refuser</button>
       <button id="modal-secondary" class="ghost">Fermer</button>
     </div>
   </div>
@@ -231,7 +235,7 @@
     <h3 class="guest-modal-title">Fonctionnalité réservée</h3>
     <p class="guest-modal-desc">Vous consultez en <strong>mode invité</strong>. Créez un compte gratuit pour demander un rendez-vous et accéder à toutes les fonctionnalités.</p>
     <div class="guest-modal-actions">
-      <button class="btn-new-rdv" id="guest-modal-signup">✨ Créer un compte</button>
+      <button class="btn-new-rdv" id="guest-modal-signup">Créer un compte</button>
       <button class="ghost guest-modal-cancel" id="guest-modal-cancel">Continuer en invité</button>
     </div>
   </div>

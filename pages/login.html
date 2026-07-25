@@ -1,17 +1,15 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RDV - Connexion</title>
+  <title>RDV — Connexion</title>
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Avb2QiuDEEvB4h8uHh2zYcGfHcZt1qg3r2h2V5uBzv0y9wQ6fQhKj2bWb8Qn9uQ3wQH2h2p0yB6nKcS7m7Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <link rel="stylesheet" href="../assets/css/auth.css" />
@@ -27,13 +25,12 @@
         <div class="overlay-inner" aria-live="polite">
           <div class="overlay-panel overlay-panel--signin" aria-hidden="true">
             <h1 class="overlay-title">Bon retour !</h1>
-            <p class="overlay-desc">Connectez-vous pour continuer à gérer vos rendez-vous sur RDV.</p>
-    
+            <p class="overlay-desc">Connectez-vous pour accéder à votre espace et gérer vos rendez-vous.</p>
           </div>
 
           <div class="overlay-panel overlay-panel--signup" aria-hidden="false">
             <h1 class="overlay-title">Rejoignez RDV</h1>
-            <p class="overlay-desc">Créez votre compte en quelques secondes. Gérez vos rendez-vous, clients et messages en un seul endroit.</p>
+            <p class="overlay-desc">Créez votre compte en quelques secondes. Gérez vos rendez-vous, clients et messages depuis un seul endroit.</p>
           </div>
         </div>
       </div>
@@ -50,27 +47,19 @@
         <!-- Sign In Form -->
         <div class="auth-forms-body">
         <form class="auth-form auth-form--signin" id="form-signin" novalidate autocomplete="on">
-          <h2 class="form-title">Connexion à RDV</h2>
-          <p class="form-subtitle">Use your email and password to access your dashboard.</p>
-
-
-
-          <div class="separator" role="separator" aria-label="Email separator">
-            <span class="separator-line" aria-hidden="true"></span>
-            <span class="separator-text"> use your email</span>
-            <span class="separator-line" aria-hidden="true"></span>
-          </div>
+          <h2 class="form-title">Connexion</h2>
+          <p class="form-subtitle">Entrez vos identifiants pour accéder à votre tableau de bord.</p>
 
           <div class="field">
-            <label class="field-label" for="signin-email">Email</label>
+            <label class="field-label" for="signin-email">Adresse email</label>
             <div class="input-with-icon">
               <i class="fa-regular fa-envelope" aria-hidden="true"></i>
-              <input id="signin-email" name="email" type="email" inputmode="email" placeholder="you@example.com" required />
+              <input id="signin-email" name="email" type="email" inputmode="email" placeholder="vous@exemple.com" required />
             </div>
           </div>
 
           <div class="field">
-            <label class="field-label" for="signin-password">Password</label>
+            <label class="field-label" for="signin-password">Mot de passe</label>
             <div class="input-with-icon">
               <i class="fa-solid fa-lock" aria-hidden="true"></i>
               <input id="signin-password" name="password" type="password" placeholder="••••••••" required />
@@ -78,20 +67,19 @@
           </div>
 
           <div class="form-actions">
-            <a class="forgot" href="#" aria-label="Forgot password">Forgot password?</a>
+            <a class="forgot" href="#" aria-label="Mot de passe oublié">Mot de passe oublié ?</a>
           </div>
 
           <p id="auth-message" class="auth-message" aria-live="polite"></p>
 
           <button class="primary-btn primary-btn--green" type="submit">
-            <span>Sign In</span>
+            <span>Se connecter</span>
             <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </button>
 
-
           <p class="switch-text">
-            New here?
-            <button type="button" class="link-btn" data-switch="signup" aria-label="Switch to Sign Up">Create an account</button>
+            Pas encore de compte ?
+            <button type="button" class="link-btn" data-switch="signup">Créer un compte</button>
           </p>
 
           <div class="guest-divider"><span>ou</span></div>
@@ -101,54 +89,44 @@
           </button>
         </form>
 
-        <!-- Sign Up Form -->
         <form class="auth-form auth-form--signup" id="form-signup" novalidate autocomplete="on">
-          <h2 class="form-title">Create Account</h2>
-          <p class="form-subtitle">Rejoignez RDV pour gérer vos clients, rendez-vous et messages facilement.</p>
-
-         
-
-          <div class="separator" role="separator" aria-label="Email separator">
-            <span class="separator-line" aria-hidden="true"></span>
-            <span class="separator-text"> use your email</span>
-            <span class="separator-line" aria-hidden="true"></span>
-          </div>
+          <h2 class="form-title">Créer un compte</h2>
+          <p class="form-subtitle">Rejoignez RDV pour gérer vos rendez-vous, clients et messages.</p>
 
           <div class="field">
-            <label class="field-label" for="signup-name">Full Name</label>
+            <label class="field-label" for="signup-name">Nom complet</label>
             <div class="input-with-icon">
               <i class="fa-regular fa-user" aria-hidden="true"></i>
-              <input id="signup-name" name="name" type="text" placeholder="Your full name" required />
+              <input id="signup-name" name="name" type="text" placeholder="Votre nom complet" required />
             </div>
           </div>
 
           <div class="field">
-            <label class="field-label" for="signup-email">Email</label>
+            <label class="field-label" for="signup-email">Adresse email</label>
             <div class="input-with-icon">
               <i class="fa-regular fa-envelope" aria-hidden="true"></i>
-              <input id="signup-email" name="email" type="email" inputmode="email" placeholder="you@example.com" required />
+              <input id="signup-email" name="email" type="email" inputmode="email" placeholder="vous@exemple.com" required />
             </div>
           </div>
 
           <div class="field">
-            <label class="field-label" for="signup-password">Password</label>
+            <label class="field-label" for="signup-password">Mot de passe</label>
             <div class="input-with-icon">
               <i class="fa-solid fa-lock" aria-hidden="true"></i>
-              <input id="signup-password" name="password" type="password" placeholder="Create a password" required minlength="4" />
+              <input id="signup-password" name="password" type="password" placeholder="Créer un mot de passe" required minlength="4" />
             </div>
           </div>
 
           <p id="auth-message2" class="auth-message" aria-live="polite"></p>
 
           <button class="primary-btn primary-btn--green" type="submit">
-            <span>Sign Up</span>
+            <span>Créer mon compte</span>
             <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </button>
 
-
           <p class="switch-text">
-            Already have an account?
-            <button type="button" class="link-btn" data-switch="signin" aria-label="Switch to Sign In">Sign in</button>
+            Déjà un compte ?
+            <button type="button" class="link-btn" data-switch="signin">Se connecter</button>
           </p>
 
           <div class="guest-divider"><span>ou</span></div>
@@ -159,10 +137,9 @@
         </form>
         </div><!-- /.auth-forms-body -->
 
-        <!-- Toggle buttons (kept hidden visually; overlay handles the main narrative) -->
-        <div class="sr-only" aria-hidden="false">
-          <button type="button" data-switch="signin">Sign In</button>
-          <button type="button" data-switch="signup">Sign Up</button>
+        <div class="sr-only" aria-hidden="true">
+          <button type="button" data-switch="signin">Connexion</button>
+          <button type="button" data-switch="signup">Inscription</button>
         </div>
       </div>
     </section>

@@ -1,43 +1,6 @@
 // ===== Auth page (géré par auth.ui.js) =====
 function initAuthPage() {}
 
-// ===== RDV =====
-
-const rdvData = [
-  {
-    id: 1,
-    client: "Ahmed Benali",
-    time: "10:00",
-    type: "Consultation",
-    status: "Confirmé",
-    description: "Revue médicale et plan de suivi."
-  },
-  {
-    id: 2,
-    client: "Sarah El Idrissi",
-    time: "11:30",
-    type: "Suivi",
-    status: "En attente",
-    description: "Vérification des résultats et ajustement du traitement."
-  },
-  {
-    id: 3,
-    client: "Youssef Karim",
-    time: "14:00",
-    type: "Réunion",
-    status: "En attente",
-    description: "Discussion sur les prochaines étapes du projet."
-  },
-  {
-    id: 4,
-    client: "Nadia Toumi",
-    time: "16:15",
-    type: "Consultation",
-    status: "Confirmé",
-    description: "Consultation de contrôle et recommandations."
-  }
-];
-
 function $(sel) {
   return document.querySelector(sel);
 }
@@ -113,34 +76,24 @@ function closeModal() {
 }
 
 function renderRdvList(list) {
-  const container = $("#rdv-list");
-  const empty = $("#rdv-empty");
+  const container = $('#rdv-list');
+  const empty = $('#rdv-empty');
   if (!container) return;
-
-  container.innerHTML = "";
-
+  container.innerHTML = '';
   if (!list || list.length === 0) {
     if (empty) empty.hidden = false;
     return;
   }
-
   if (empty) empty.hidden = true;
-
   list.forEach(rdv => {
-    const row = document.createElement("div");
-    row.className = "rdv";
-
-    const left = document.createElement("div");
-    left.innerHTML = `
-      <strong>${rdv.client}</strong>
-      <p>${rdv.time} - ${rdv.type}</p>
-    `;
-
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = "Voir";
-    btn.addEventListener("click", () => openModal(rdv));
-
+    const row = document.createElement('div');
+    row.className = 'rdv';
+    const left = document.createElement('div');
+    left.innerHTML = `<strong>${rdv.client}</strong><p>${rdv.time} — ${rdv.type}</p>`;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'Voir';
+    btn.addEventListener('click', () => openModal(rdv));
     row.appendChild(left);
     row.appendChild(btn);
     container.appendChild(row);
@@ -148,30 +101,7 @@ function renderRdvList(list) {
 }
 
 function initRdvPage() {
-  const searchInput = $("#search");
-  const hasRdvList = !!$("#rdv-list");
-  if (!hasRdvList) return;
-
-  const pageId = getPageId();
-
-  let base = rdvData;
-  if (pageId === "dashboard") base = rdvData.slice(0, 3);
-
-  renderRdvList(base);
-
-  if (!searchInput) return;
-
-  searchInput.addEventListener("input", () => {
-    const q = (searchInput.value || "").trim().toLowerCase();
-    if (!q) return renderRdvList(base);
-
-    const filtered = base.filter(r => {
-      const blob = `${r.client} ${r.type} ${r.status}`.toLowerCase();
-      return blob.includes(q);
-    });
-
-    renderRdvList(filtered);
-  });
+  if (!$('#rdv-list')) return;
 }
 
 function initModal() {
@@ -198,12 +128,21 @@ function initModal() {
   }
 }
 
-function applyTheme(isDark) {
-  document.body.classList.toggle('dark-mode', isDark);
-  localStorage.setItem('rdv-theme', isDark ? 'dark' : 'light');
+function applyTheme(theme) {
+  const isLight = theme === 'light';
+  document.body.classList.toggle('light-theme', isLight);
+  document.body.classList.toggle('dark-mode', !isLight);
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  // Maintient la préférence des anciennes pages qui lisent encore cette clé.
+  localStorage.setItem('rdv-theme', isLight ? 'light' : 'dark');
+
   const btn = document.getElementById('theme-toggle');
   if (btn) {
-    btn.innerHTML = isDark ? '☀️<span class="hdr-badge"></span>' : '🌙<span class="hdr-badge"></span>';
+    btn.setAttribute('aria-label', isLight ? 'Activer le mode sombre' : 'Activer le mode clair');
+    btn.setAttribute('title', isLight ? 'Activer le mode sombre' : 'Activer le mode clair');
+    btn.innerHTML = isLight
+      ? `<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>`
+      : `<svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>`;
   }
 }
 
@@ -213,8 +152,8 @@ function initTopIcons() {
     themeBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const isDark = !document.body.classList.contains('dark-mode');
-      applyTheme(isDark);
+      const nextTheme = document.body.classList.contains('light-theme') ? 'dark' : 'light';
+      applyTheme(nextTheme);
     });
   }
 
@@ -233,9 +172,8 @@ function initTopIcons() {
 }
 
 function initGlobalTheme() {
-  const saved = localStorage.getItem('rdv-theme') || 'light';
-  const isDark = saved === 'dark';
-  applyTheme(isDark);
+  const saved = localStorage.getItem('theme') || localStorage.getItem('rdv-theme') || 'dark';
+  applyTheme(saved === 'light' ? 'light' : 'dark');
 }
 
 function initProfileName() {
@@ -425,7 +363,7 @@ function injectFooter() {
   const footer = document.createElement('footer');
   footer.className = 'dash-footer';
   footer.innerHTML = `
-    <span class="footer-copy">© 2026 RDV Plateforme. Tous droits réservés.</span>
+    <span class="footer-copy">© 2025 RDV Plateforme. Tous droits réservés.</span>
     <a class="footer-dev-btn" href="https://github.com/AliAhnach" target="_blank" rel="noopener">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
       Ali Ahnach
@@ -628,4 +566,8 @@ function boot() {
   initHamburger();
 }
 
-boot();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot, { once: true });
+} else {
+  boot();
+}

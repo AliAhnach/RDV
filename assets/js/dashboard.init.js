@@ -53,19 +53,22 @@
   }
 
   // ── Profile pill ──
-  const initials = s.isGuest ? '👤' : (s.fullname || '').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '👤';
+  const initials = s.isGuest ? '?' : (s.fullname || '').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
   const pillInitials = document.getElementById('pill-initials');
   if (pillInitials) pillInitials.textContent = initials;
-  document.getElementById('pill-name').textContent     = s.isGuest ? 'Invité' : (s.fullname || '—');
-  document.getElementById('pill-handle').textContent   = s.isGuest ? 'Mode consultation' : (s.email || '—');
+  const pillName = document.getElementById('pill-name');
+  const pillHandle = document.getElementById('pill-handle');
+  if (pillName) pillName.textContent = s.isGuest ? 'Invité' : (s.fullname || '—');
+  if (pillHandle) pillHandle.textContent = s.isGuest ? 'Mode consultation' : (s.email || '—');
   const firstName = s.isGuest ? 'Invité' : (s.fullname || '').trim().split(' ')[0];
-  document.getElementById('welcome-name').textContent  = firstName + ' !';
+  const welcomeNameEl = document.getElementById('welcome-name');
+  if (welcomeNameEl) welcomeNameEl.textContent = firstName + ' !';
 
   // ── Guest banner ──
   if (s.isGuest) {
     const banner = document.createElement('div');
-    banner.style.cssText = 'background:linear-gradient(90deg,#1f5fbf,#102d63);color:#fff;text-align:center;padding:9px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:12px;flex-shrink:0;';
-    banner.innerHTML = '👁️ Vous consultez en mode invité — certaines fonctionnalités sont limitées. <a href="./login.html" style="color:#a8d4ff;font-weight:700;text-decoration:underline;">Créer un compte</a>';
+    banner.style.cssText = 'background:#1f5fbf;color:#fff;text-align:center;padding:9px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:12px;flex-shrink:0;';
+    banner.innerHTML = 'Vous consultez en mode invité — certaines fonctionnalités sont limitées. <a href="./login.html" style="color:#bfdbfe;font-weight:700;text-decoration:underline;">Créer un compte</a>';
     document.querySelector('.main').prepend(banner);
   }
 
@@ -77,21 +80,37 @@
     return 0;
   }
 
-  function setStatCard(cardId, valueId, icon, label, value) {
+  const STAT_ICONS = {
+    calendar: `<svg width="15" height="15" fill="none" stroke="#1f5fbf" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`,
+    users:    `<svg width="15" height="15" fill="none" stroke="#475569" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+    clock:    `<svg width="15" height="15" fill="none" stroke="#b45309" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>`,
+    check:    `<svg width="15" height="15" fill="none" stroke="#16a34a" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`,
+    x:        `<svg width="15" height="15" fill="none" stroke="#dc2626" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+    pin:      `<svg width="15" height="15" fill="none" stroke="#7c3aed" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
+    month:    `<svg width="15" height="15" fill="none" stroke="#0891b2" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`,
+  };
+  const STAT_COLOR = {
+    calendar: 'si-blue', users: 'si-slate', clock: 'si-slate',
+    check: 'si-green', x: 'si-slate', pin: 'si-purple', month: 'si-slate',
+  };
+
+  function setStatCard(cardId, valueId, iconKey, label, value) {
     const row = document.querySelector('.stats-row');
     let card = document.getElementById(cardId);
+    const svg = STAT_ICONS[iconKey] || STAT_ICONS.calendar;
+    const colorClass = STAT_COLOR[iconKey] || 'si-blue';
     if (!card && row) {
       card = document.createElement('div');
       card.className = 'stat-card';
       card.id = cardId;
-      card.innerHTML = `<div class="stat-icon si-purple">${icon}</div><div class="stat-value" id="${valueId}">—</div><div class="stat-label"></div>`;
+      card.innerHTML = `<div class="stat-icon ${colorClass}">${svg}</div><div class="stat-value" id="${valueId}">—</div><div class="stat-label"></div>`;
       row.appendChild(card);
     }
     if (!card) return;
     const iconEl = card.querySelector('.stat-icon');
     const valueEl = card.querySelector('.stat-value');
     const labelEl = card.querySelector('.stat-label');
-    if (iconEl) iconEl.textContent = icon;
+    if (iconEl) { iconEl.innerHTML = svg; iconEl.className = `stat-icon ${colorClass}`; }
     if (valueEl) valueEl.textContent = value;
     if (labelEl) labelEl.textContent = label;
   }
@@ -99,42 +118,42 @@
   function setDashboardLoading() {
     document.querySelectorAll('.stats-row .stat-value').forEach(el => { el.textContent = '…'; });
     const activity = document.getElementById('upcoming-rdvs');
-    if (activity) activity.innerHTML = '<div style="color:#7a7a9a;font-size:13px;padding:14px 0;text-align:center;">Chargement des données…</div>';
+    if (activity) activity.innerHTML = '<div style="color:#94a3b8;font-size:13px;padding:14px 0;text-align:center;">Chargement des données…</div>';
   }
 
   function renderStats(stats) {
-    setStatCard('stat-card-clients', 'stat-clients', '👥', 'Utilisateurs', firstNumber(stats, ['total_users', 'users', 'user_count', 'users_count', 'totalUsers']));
-    setStatCard('stat-card-rdv', 'stat-rdv', '📅', 'Rendez-vous', firstNumber(stats, ['total_appointments', 'appointments', 'total_rdvs', 'total', 'totalAppointments']));
-    setStatCard('stat-card-messages', 'stat-messages', '⏳', 'En attente', firstNumber(stats, ['pending_appointments', 'pending', 'waiting_appointments', 'pending_count', 'pendingAppointments']));
-    setStatCard('stat-card-confirmed', 'stat-confirmed', '✅', 'Confirmés', firstNumber(stats, ['confirmed_appointments', 'confirmed', 'confirmed_count', 'confirmedAppointments']));
-    setStatCard('stat-card-refused', 'stat-refused', '❌', 'Refusés', firstNumber(stats, ['refused_appointments', 'rejected_appointments', 'refused', 'rejected', 'refused_count', 'rejected_count']));
-    setStatCard('stat-card-today', 'stat-today', '📍', "Aujourd’hui", firstNumber(stats, ['appointments_today', 'today_appointments', 'today', 'today_count', 'appointmentsToday']));
-    setStatCard('stat-card-month', 'stat-month', '🗓️', 'Ce mois', firstNumber(stats, ['appointments_this_month', 'month_appointments', 'this_month', 'month_count', 'appointmentsMonth']));
+    setStatCard('stat-card-clients',   'stat-clients',   'users',    'Utilisateurs',  firstNumber(stats, ['total_users', 'users', 'user_count', 'users_count', 'totalUsers']));
+    setStatCard('stat-card-rdv',       'stat-rdv',       'calendar', 'Rendez-vous',   firstNumber(stats, ['total_appointments', 'appointments', 'total_rdvs', 'total', 'totalAppointments']));
+    setStatCard('stat-card-messages',  'stat-messages',  'clock',    'En attente',    firstNumber(stats, ['pending_appointments', 'pending', 'waiting_appointments', 'pending_count', 'pendingAppointments']));
+    setStatCard('stat-card-confirmed', 'stat-confirmed', 'check',    'Confirmés',     firstNumber(stats, ['confirmed_appointments', 'confirmed', 'confirmed_count', 'confirmedAppointments']));
+    setStatCard('stat-card-refused',   'stat-refused',   'x',        'Refusés',       firstNumber(stats, ['refused_appointments', 'rejected_appointments', 'refused', 'rejected', 'refused_count', 'rejected_count']));
+    setStatCard('stat-card-today',     'stat-today',     'pin',      "Aujourd'hui",   firstNumber(stats, ['appointments_today', 'today_appointments', 'today', 'today_count', 'appointmentsToday']));
+    setStatCard('stat-card-month',     'stat-month',     'month',    'Ce mois',       firstNumber(stats, ['appointments_this_month', 'month_appointments', 'this_month', 'month_count', 'appointmentsMonth']));
   }
 
   function renderRecentAppointments(appointments) {
     const activity = document.getElementById('upcoming-rdvs');
     if (!activity) return;
-    const title = activity.closest('.platform-desc-card')?.querySelector('.pdc-title');
-    if (title) title.textContent = 'Activité récente';
 
     const recent = Array.isArray(appointments) ? appointments.slice(0, 5).map(normalizeAppointment) : [];
     if (recent.length === 0) {
-      activity.innerHTML = '<div style="color:#7a7a9a;font-size:13px;padding:14px 0;text-align:center;">Aucune donnée disponible</div>';
+      activity.innerHTML = '<div style="color:#94a3b8;font-size:13px;padding:14px 0;text-align:center;">Aucune donnée disponible</div>';
       return;
     }
 
-    const typeIcons = { 'Consultation': '🩺', 'Suivi': '💊', 'Réunion': '🤝', 'Urgence': '🚨' };
-    activity.innerHTML = recent.map((appointment, index) => {
+    const calSvg = `<svg width="14" height="14" fill="none" stroke="#1f5fbf" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`;
+    const clockSvg = `<svg width="12" height="12" fill="none" stroke="#94a3b8" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>`;
+    const statusClass = st => st === 'Confirmé' ? 'status-badge--confirmed' : st === 'Refusé' ? 'status-badge--refused' : st === 'En attente' ? 'status-badge--pending' : 'status-badge--default';
+
+    activity.innerHTML = recent.map(appointment => {
       const date = appointment.date ? appointment.date.split('-').reverse().join('/') : '—';
-      const separator = index < recent.length - 1 ? 'border-bottom:1px solid rgba(200,190,230,0.25);' : '';
-      return `<div style="display:flex;align-items:center;gap:12px;padding:11px 0;${separator}">
-        <div style="width:38px;height:38px;border-radius:10px;background:#ede8f9;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${typeIcons[appointment.type] || '📅'}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:13px;font-weight:800;color:#1a1a2e;">${appointment.client} — ${appointment.type}</div>
-          <div style="font-size:11px;color:#7a7a9a;margin-top:2px;">📅 ${date} &nbsp;🕐 ${appointment.time || '—'}</div>
+      return `<div class="rdv-item">
+        <div class="rdv-item-icon">${calSvg}</div>
+        <div class="rdv-item-body">
+          <div class="rdv-item-name">${appointment.client} — ${appointment.type}</div>
+          <div class="rdv-item-meta">${calSvg} ${date} ${clockSvg} ${appointment.time || '—'}</div>
         </div>
-        <span class="status-badge">${appointment.status}</span>
+        <span class="status-badge ${statusClass(appointment.status)}">${appointment.status}</span>
       </div>`;
     }).join('');
   }
@@ -154,7 +173,7 @@
     console.error('Impossible de charger les statistiques du dashboard :', error);
     document.querySelectorAll('.stats-row .stat-value').forEach(el => { el.textContent = '—'; });
     const activity = document.getElementById('upcoming-rdvs');
-    if (activity) activity.innerHTML = `<div style="color:#b42318;font-size:13px;padding:14px 0;text-align:center;">${error.message || 'Erreur réseau. Réessayez.'}</div>`;
+    if (activity) activity.innerHTML = `<div style="color:#dc2626;font-size:13px;padding:14px 0;text-align:center;">${error.message || 'Erreur réseau. Réessayez.'}</div>`;
   }
 
   // ── Notification badge ──

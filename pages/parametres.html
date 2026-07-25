@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Plateforme RDV - Paramètres</title>
+    <title>RDV — Paramètres</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../assets/css/global.css">
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link rel="stylesheet" href="../assets/css/parametres.css">
@@ -31,12 +34,12 @@
   
 
         <nav>
-            <a href="./index.html">🏠 Dashboard</a>
-            <a href="./appointments.html">📅 Rendez-vous</a>
-            <a href="./clients.html">👥 Clients</a>
-            <a href="./messages.html">💬 Messages</a>
-            <a href="./parametres.html" class="active">⚙️ Paramètres</a>
-            <a href="#" onclick="cognitoSignOut(); return false;">🚪 Déconnexion</a>
+            <a href="./index.html">Dashboard</a>
+            <a href="./appointments.html">Rendez-vous</a>
+            <a href="./clients.html">Clients</a>
+            <a href="./messages.html">Messages</a>
+            <a href="./parametres.html" class="active">Paramètres</a>
+            <a href="#" onclick="cognitoSignOut(); return false;">Déconnexion</a>
         </nav>
     </aside>
 
@@ -51,7 +54,8 @@
             </div>
             <div class="dash-header-right">
                 <button class="hdr-icon-btn" id="btn-account" title="Compte" type="button" aria-label="Compte">
-                    👤<span class="account-label">Compte</span><span class="hdr-badge" style="display:none;"></span>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span class="account-label">Compte</span><span class="hdr-badge" style="display:none;"></span>
                 </button>
             </div>
         </header>

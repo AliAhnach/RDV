@@ -143,8 +143,7 @@ body.sidebar-open { overflow: hidden; }
   .stats-row { grid-template-columns: repeat(2, 1fr) !important; }
 
   /* ── Platform desc card ── */
-  .platform-desc-card { padding: 16px !important; }
-  .pdc-features { gap: 6px; }
+  .dash-card { padding: 16px !important; }
 
   /* ── Appointments page ── */
   .appt-page { padding: 16px !important; }
