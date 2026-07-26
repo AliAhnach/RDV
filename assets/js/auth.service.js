@@ -38,8 +38,8 @@ function saveSession(user) {
     email:     normalizedUser?.email || '',
     role:      normalizedUser?.role || 'user',
     isAdmin:   normalizedUser?.isAdmin || false,
+    token:     user?.token || user?.access_token || '',
     expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000
-    // token: user.token  ← décommenter pour JWT
   };
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
 }
@@ -119,8 +119,10 @@ async function login(email, password) {
   });
   const data = await res.json();
   if (!data.success) throw data.message || 'Email ou mot de passe incorrect.';
-  saveSession(data.user);
-  return data.user;
+  // Fusionne le token retourné à la racine avec l'objet user avant de sauvegarder
+  const user = { ...data.user, token: data.token || data.access_token || data.user?.token || '' };
+  saveSession(user);
+  return user;
 }
 
 // ── Guest access ──────────────────────────────────────────────
@@ -141,4 +143,41 @@ function continuerEnInvite() {
 
 function requireAuth() {
   if (!isAuthenticated()) window.location.replace('./login.html');
+}
+
+// ── apiFetch — fetch authentifié avec token JWT ───────────────
+
+/**
+ * Wrapper autour de fetch() qui injecte automatiquement le token JWT
+ * et redirige vers login en cas de réponse 401.
+ */
+async function apiFetch(url, options = {}) {
+  const user = getCurrentUser();
+  if (!user) {
+    window.location.replace('./login.html');
+    throw new Error('Non authentifié.');
+  }
+
+  const headers = new Headers(options.headers || {});
+  if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json');
+  }
+  if (user.token) {
+    headers.set('Authorization', `Bearer ${user.token}`);
+  }
+
+  let response;
+  try {
+    response = await fetch(url, { ...options, headers, credentials: 'include' });
+  } catch (networkError) {
+    throw new Error('Impossible de contacter le serveur. Vérifiez votre connexion.');
+  }
+
+  if (response.status === 401) {
+    localStorage.removeItem(SESSION_KEY);
+    window.location.replace('./login.html');
+    throw new Error('Session expirée. Veuillez vous reconnecter.');
+  }
+
+  return response;
 }

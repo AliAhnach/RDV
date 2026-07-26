@@ -682,7 +682,7 @@ function initUserDashboard() {
   async function loadDashboard() {
     setLoading();
     try {
-      const res = await fetch(`${API_BASE}/dashboard/user/${encodeURIComponent(session.id)}`);
+      const res = await apiFetch(`${API_BASE}/dashboard/user/${encodeURIComponent(session.id)}`);
       const body = await res.text();
       let data = {};
       try {

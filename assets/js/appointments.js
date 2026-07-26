@@ -547,7 +547,7 @@
         }
 
         try {
-          const res = await fetch(APPOINTMENTS_API, {
+          const res = await apiFetch(APPOINTMENTS_API, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -609,6 +609,6 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    init().catch(() => {});
+    init().catch(err => console.error('[appointments] init error:', err));
   });
 })();
