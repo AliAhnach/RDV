@@ -168,8 +168,9 @@ async function apiFetch(url, options = {}) {
 
   let response;
   try {
-    response = await fetch(url, { ...options, headers, credentials: 'include' });
+    response = await fetch(url, { ...options, headers });
   } catch (networkError) {
+    console.error('[apiFetch] Network error:', url, networkError);
     throw new Error('Impossible de contacter le serveur. Vérifiez votre connexion.');
   }
 
