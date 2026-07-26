@@ -9,13 +9,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/variables.css">
+  <link rel="stylesheet" href="../assets/css/background.css">
   <link rel="stylesheet" href="../assets/css/dashboard.css">
   <link rel="stylesheet" href="../assets/css/splash.css">
   <link rel="stylesheet" href="../assets/css/appointments.css">
   <link rel="stylesheet" href="../assets/css/responsive.css">
   <script src="../assets/js/auth.service.js"></script>
+  <script>requireAuth();</script>
 </head>
-<body>
+<body class="admin-bg">
 <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 <div class="container">
@@ -31,7 +34,6 @@
     <nav>
       <a href="./index.html">Dashboard</a>
       <a href="./appointments.html" class="active">Rendez-vous</a>
-      <a href="./clients.html">Clients</a>
       <a href="./messages.html">Messages</a>
       <a href="./parametres.html">Paramètres</a>
       <a href="#" onclick="cognitoSignOut(); return false;">Déconnexion</a>
@@ -221,22 +223,6 @@
       <button id="modal-confirm-btn" class="primary">Confirmer</button>
       <button id="modal-refuse-btn" class="ghost" style="color:#e53e3e;border-color:#e53e3e;">Refuser</button>
       <button id="modal-secondary" class="ghost">Fermer</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── Modal : Accès invité ── -->
-<div id="modal-guest" class="modal-overlay" role="dialog" aria-modal="true" hidden>
-  <div class="modal modal-guest-box">
-    <div class="guest-modal-logo">
-      <div class="logo-badge"><span>RDV</span></div>
-    </div>
-    <div class="guest-modal-icon">🔒</div>
-    <h3 class="guest-modal-title">Fonctionnalité réservée</h3>
-    <p class="guest-modal-desc">Vous consultez en <strong>mode invité</strong>. Créez un compte gratuit pour demander un rendez-vous et accéder à toutes les fonctionnalités.</p>
-    <div class="guest-modal-actions">
-      <button class="btn-new-rdv" id="guest-modal-signup">Créer un compte</button>
-      <button class="ghost guest-modal-cancel" id="guest-modal-cancel">Continuer en invité</button>
     </div>
   </div>
 </div>

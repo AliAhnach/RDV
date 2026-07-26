@@ -12,12 +12,14 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Avb2QiuDEEvB4h8uHh2zYcGfHcZt1qg3r2h2V5uBzv0y9wQ6fQhKj2bWb8Qn9uQ3wQH2h2p0yB6nKcS7m7Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+  <link rel="stylesheet" href="../assets/css/variables.css" />
+  <link rel="stylesheet" href="../assets/css/background.css" />
   <link rel="stylesheet" href="../assets/css/auth.css" />
   <link rel="stylesheet" href="../assets/css/splash.css" />
 
   <script src="../assets/js/auth.service.js"></script>
 </head>
-<body>
+<body class="admin-bg">
   <main class="auth-page" id="auth-page" aria-label="Authentication">
     <section class="auth-card" aria-label="Authentication card">
       <!-- Right overlay (always present on desktop) -->
@@ -30,7 +32,7 @@
 
           <div class="overlay-panel overlay-panel--signup" aria-hidden="false">
             <h1 class="overlay-title">Rejoignez RDV</h1>
-            <p class="overlay-desc">Créez votre compte en quelques secondes. Gérez vos rendez-vous, clients et messages depuis un seul endroit.</p>
+            <p class="overlay-desc">Créez votre compte en quelques secondes. Gérez vos rendez-vous et messages depuis un seul endroit.</p>
           </div>
         </div>
       </div>
@@ -81,17 +83,11 @@
             Pas encore de compte ?
             <button type="button" class="link-btn" data-switch="signup">Créer un compte</button>
           </p>
-
-          <div class="guest-divider"><span>ou</span></div>
-          <button type="button" class="guest-btn" onclick="continuerEnInvite()">
-            <i class="fa-solid fa-eye" aria-hidden="true"></i>
-            <span>Continuer en tant qu'invité</span>
-          </button>
         </form>
 
         <form class="auth-form auth-form--signup" id="form-signup" novalidate autocomplete="on">
           <h2 class="form-title">Créer un compte</h2>
-          <p class="form-subtitle">Rejoignez RDV pour gérer vos rendez-vous, clients et messages.</p>
+          <p class="form-subtitle">Rejoignez RDV pour gérer vos rendez-vous et messages.</p>
 
           <div class="field">
             <label class="field-label" for="signup-name">Nom complet</label>
@@ -128,12 +124,6 @@
             Déjà un compte ?
             <button type="button" class="link-btn" data-switch="signin">Se connecter</button>
           </p>
-
-          <div class="guest-divider"><span>ou</span></div>
-          <button type="button" class="guest-btn" onclick="continuerEnInvite()">
-            <i class="fa-solid fa-eye" aria-hidden="true"></i>
-            <span>Continuer en tant qu'invité</span>
-          </button>
         </form>
         </div><!-- /.auth-forms-body -->
 

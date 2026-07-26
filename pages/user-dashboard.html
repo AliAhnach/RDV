@@ -13,12 +13,15 @@
       window.location.replace('./index.html');
     }
   </script>
+  <link rel="stylesheet" href="../assets/css/variables.css">
+  <link rel="stylesheet" href="../assets/css/background.css">
+  <link rel="stylesheet" href="../assets/css/animations.css">
   <link rel="stylesheet" href="../assets/css/global.css">
   <link rel="stylesheet" href="../assets/css/dashboard.css">
   <link rel="stylesheet" href="../assets/css/splash.css">
   <link rel="stylesheet" href="../assets/css/responsive.css">
 </head>
-<body>
+<body class="admin-bg">
   <button class="hamburger" id="hamburger" type="button" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
@@ -29,23 +32,22 @@
         <span class="logo-text"><span class="logo-text__main">RDV</span><span class="logo-text__sub">Plateforme</span></span>
       </a>
       <nav>
-        <a class="active" href="./user-dashboard.html"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z"/><path d="M9 21v-6h6v6"/></svg>Mon espace</a>
-        <a href="./appointments.html"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18"/></svg>Mes rendez-vous</a>
-        <a href="./messages.html"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 10 10 0 0 1-4.2-1L3 21l1.6-4.1A8.2 8.2 0 0 1 3 12a8.4 8.4 0 0 1 9-8.5 8.4 8.4 0 0 1 9 8Z"/></svg>Messages</a>
-        <a href="./parametres.html"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.1 2.1-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.2h-3v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-2.1-2.1.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H5.3v-3h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 2.1-2.1.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5v-.2h3v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 2.1 2.1-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2v3h-.2a1.7 1.7 0 0 0-1.4 1Z"/></svg>Paramètres</a>
-        <a href="#" onclick="cognitoSignOut(); return false;"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5m5 5H3"/><path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/></svg>Déconnexion</a>
+        <a class="active" href="./user-dashboard.html">Mon espace</a>
+        <a href="./appointments.html">Mes rendez-vous</a>
+        <a href="./messages.html">Messages</a>
+        <a href="./parametres.html">Paramètres</a>
+        <a href="#" onclick="cognitoSignOut(); return false;">Déconnexion</a>
       </nav>
     </aside>
 
     <main class="main">
       <header class="dash-header">
         <label class="search-wrap" for="appointment-search">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
           <input id="appointment-search" type="search" placeholder="Rechercher un rendez-vous">
         </label>
         <div class="dash-header-right">
-          <button class="hdr-icon-btn" id="theme-toggle" type="button" aria-label="Changer le thème"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></button>
-          <button class="hdr-icon-btn hdr-account-btn" id="btn-account" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="account-label">Compte</span></button>
+          <button class="hdr-icon-btn" id="theme-toggle" type="button" aria-label="Changer le thème"></button>
+          <button class="hdr-icon-btn hdr-account-btn" id="btn-account" type="button"><span class="account-label">Compte</span></button>
         </div>
       </header>
 
@@ -56,8 +58,8 @@
             <h1>Bonjour <span class="grad-name" id="welcome-name">!</span></h1>
             <p class="welcome-sub">Voici un aperçu de votre journée et de vos prochains rendez-vous.</p>
             <div class="hero-actions">
-              <a href="./appointments.html" class="hero-btn hero-btn-primary"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18"/></svg>Voir mes RDV</a>
-              <a href="./messages.html" class="hero-btn hero-btn-secondary"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 10 10 0 0 1-4.2-1L3 21l1.6-4.1A8.2 8.2 0 0 1 3 12a8.4 8.4 0 0 1 9-8.5 8.4 8.4 0 0 1 9 8Z"/></svg>Messages</a>
+              <a href="./appointments.html" class="hero-btn hero-btn-primary">Voir mes RDV</a>
+              <a href="./messages.html" class="hero-btn hero-btn-secondary">Messages</a>
             </div>
           </div>
           <div class="hero-date-card">
@@ -66,20 +68,18 @@
         </article>
 
         <section class="stats-row" aria-label="Indicateurs clés">
-          <article class="stat-card" id="stat-card-rdv"><span class="stat-icon si-blue"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18"/></svg></span><strong class="stat-value" id="stat-rdv">—</strong><span class="stat-label">Mes RDV</span></article>
-          <article class="stat-card" id="stat-card-confirmed"><span class="stat-icon si-green"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span><strong class="stat-value" id="stat-confirmed">—</strong><span class="stat-label">Confirmés</span></article>
-          <article class="stat-card" id="stat-card-messages"><span class="stat-icon si-purple"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 10 10 0 0 1-4.2-1L3 21l1.6-4.1A8.2 8.2 0 0 1 3 12a8.4 8.4 0 0 1 9-8.5 8.4 8.4 0 0 1 9 8Z"/></svg></span><strong class="stat-value" id="stat-messages">—</strong><span class="stat-label">Notifications</span></article>
+          <article class="stat-card" id="stat-card-rdv"><strong class="stat-value" id="stat-rdv">—</strong><span class="stat-label">Mes RDV</span></article>
+          <article class="stat-card" id="stat-card-confirmed"><strong class="stat-value" id="stat-confirmed">—</strong><span class="stat-label">Confirmés</span></article>
+          <article class="stat-card" id="stat-card-messages"><strong class="stat-value" id="stat-messages">—</strong><span class="stat-label">Notifications</span></article>
         </section>
 
         <section class="appointments-card" aria-labelledby="upcoming-title">
           <header class="card-header"><div><p class="hero-eyebrow">Aujourd'hui</p><h2 id="upcoming-title">Mes prochains rendez-vous</h2></div><a href="./appointments.html">Tout voir</a></header>
           <div class="appointment-list" id="upcoming-rdvs">
             <article class="appointment-item">
-              <span class="appointment-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M19 8h3m-1.5-1.5v3"/></svg></span>
               <div class="appointment-info"><h3>Consultation médicale</h3><p>Aujourd'hui · 10:00</p></div><span class="status-badge status-badge--confirmed">Confirmé</span>
             </article>
             <article class="appointment-item">
-              <span class="appointment-icon appointment-icon--blue"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 3h6v4H9zM7 7h10v14H7z"/><path d="M10 12h4m-2-2v4"/></svg></span>
               <div class="appointment-info"><h3>Suivi traitement</h3><p>Demain · 14:30</p></div><span class="status-badge status-badge--pending">En attente</span>
             </article>
           </div>

@@ -78,14 +78,22 @@
         return [];
       }
 
-      // The client view is filtered below.  Keeping a single read endpoint
-      // avoids a second API contract while preserving the admin list.
-      const res = await apiFetch(APPOINTMENTS_API);
+      const isAdminRole = String(session.role).toLowerCase() === 'admin';
+      const url = isAdminRole
+        ? `${API_ROOT}/admin/appointments`
+        : `${APPOINTMENTS_API}?user_id=${encodeURIComponent(session.id)}`;
+
+      console.log('[appointments] loadAppointments URL:', url);
+      const res = await apiFetch(url);
       const data = await readApiResponse(res);
+      console.log('[appointments] réponse API:', JSON.stringify(data).slice(0, 300));
+
       const source = Array.isArray(data) ? data : data.appointments;
       const appointments = Array.isArray(source)
         ? source.map(normalizeAppointment)
         : [];
+
+      console.log('[appointments] nombre de rendez-vous reçus:', appointments.length);
       currentAppointments = appointments;
       return appointments;
     } catch (error) {
@@ -381,7 +389,11 @@
     if (!confirmed) return false;
 
     try {
-      const res = await apiFetch(`${APPOINTMENTS_API}/${encodeURIComponent(id)}`, {
+      const session = loadSession();
+      const deleteUrl = session?.id
+        ? `${APPOINTMENTS_API}/${encodeURIComponent(id)}?user_id=${encodeURIComponent(session.id)}`
+        : `${APPOINTMENTS_API}/${encodeURIComponent(id)}`;
+      const res = await apiFetch(deleteUrl, {
         method: 'DELETE',
       });
       await readApiResponse(res);
@@ -427,18 +439,9 @@
 
   /* ── Request modal (USER) ── */
   function openRequestModal() {
-    const session = loadSession();
-    if (session && session.isGuest) {
-      document.getElementById('modal-guest').hidden = false;
-      return;
-    }
     document.getElementById('form-request').reset();
     document.getElementById('req-message').textContent = '';
     document.getElementById('modal-request').hidden = false;
-  }
-
-  function closeGuestModal() {
-    document.getElementById('modal-guest').hidden = true;
   }
 
   function closeRequestModal() {
@@ -505,15 +508,6 @@
       const btn2 = document.getElementById('btn-open-request2');
       if (btn2) btn2.addEventListener('click', openRequestModal);
 
-      // Guest modal events
-      document.getElementById('guest-modal-cancel').addEventListener('click', closeGuestModal);
-      document.getElementById('guest-modal-signup').addEventListener('click', () => {
-        if (typeof window.navigateTo === 'function') window.navigateTo('./login.html');
-        else window.location.href = './login.html';
-      });
-      document.getElementById('modal-guest').addEventListener('click', e => {
-        if (e.target === document.getElementById('modal-guest')) closeGuestModal();
-      });
       document.getElementById('modal-request-close').addEventListener('click', closeRequestModal);
       document.getElementById('modal-request-cancel').addEventListener('click', closeRequestModal);
       document.getElementById('modal-request').addEventListener('click', e => {

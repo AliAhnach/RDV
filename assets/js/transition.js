@@ -6,7 +6,6 @@ window.navigateTo = null;
     'index.html':          'Dashboard Admin',
     'user-dashboard.html': 'Mon Espace',
     'appointments.html':   'Rendez-vous',
-    'clients.html':        'Clients',
     'messages.html':       'Messages',
     'parametres.html':     'Paramètres',
     'login.html':          'Connexion',

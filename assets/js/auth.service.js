@@ -5,7 +5,10 @@
    l'envoyer dans les headers fetch() des futures requêtes.
    ============================================================= */
 
-const API_BASE   = 'https://aliahnach.pythonanywhere.com/api';
+const _IS_LOCAL = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const API_BASE   = _IS_LOCAL
+  ? 'http://127.0.0.1:5000/api'
+  : 'https://aliahnach.pythonanywhere.com/api';
 const SESSION_KEY = 'rdv_session';
 
 // ── Session ───────────────────────────────────────────────────
@@ -125,20 +128,6 @@ async function login(email, password) {
   return user;
 }
 
-// ── Guest access ──────────────────────────────────────────────
-
-function continuerEnInvite() {
-  const session = {
-    fullname:  'Invité',
-    email:     '',
-    role:      'user',
-    isGuest:   true,
-    expiresAt: Date.now() + 2 * 60 * 60 * 1000
-  };
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-  window.location.href = './user-dashboard.html';
-}
-
 // ── Route Guard ───────────────────────────────────────────────
 
 function requireAuth() {
@@ -168,13 +157,16 @@ async function apiFetch(url, options = {}) {
 
   let response;
   try {
-    response = await fetch(url, { ...options, headers });
+    response = await fetch(url, { ...options, headers, credentials: 'include' });
   } catch (networkError) {
+    // Erreur réseau pure (serveur éteint, CORS, pas de connexion)
+    // On NE supprime PAS la session — l'utilisateur est toujours connecté
     console.error('[apiFetch] Network error:', url, networkError);
     throw new Error('Impossible de contacter le serveur. Vérifiez votre connexion.');
   }
 
   if (response.status === 401) {
+    // 401 = token expiré ou invalide côté serveur → on déconnecte
     localStorage.removeItem(SESSION_KEY);
     window.location.replace('./login.html');
     throw new Error('Session expirée. Veuillez vous reconnecter.');

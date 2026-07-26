@@ -50,4 +50,4 @@ Activer dans **Settings → Pages → Branch: main → / (root)**
 
 Authentification Flask avec session locale :
 - Session stockée dans `rdv_session` (expire 7 jours)
-- Mode invité disponible (expire 2 heures)
+- Accès réservé aux comptes authentifiés

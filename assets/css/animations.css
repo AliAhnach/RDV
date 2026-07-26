@@ -1,0 +1,621 @@
+/*
+ * ══════════════════════════════════════════════════════════════
+ *  RDV Admin — Premium Animations
+ *  Fichier isolé : ne modifie aucun style existant.
+ *  Toutes les animations respectent prefers-reduced-motion.
+ * ══════════════════════════════════════════════════════════════
+ */
+
+/* ── 0. Tokens d'animation ─────────────────────────────────── */
+:root {
+  --anim-float-duration:   8s;
+  --anim-pulse-duration:  10s;
+  --anim-shimmer-duration: 6s;
+  --anim-glow-duration:   12s;
+  --anim-enter-duration: 0.55s;
+  --anim-ease-smooth: cubic-bezier(0.45, 0, 0.55, 1);
+  --anim-ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   1. KEYFRAMES
+   ══════════════════════════════════════════════════════════════ */
+
+/* Floating — légère lévitation verticale */
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0px);   }
+  50%       { transform: translateY(-5px);  }
+}
+
+/* Shadow pulse — ombre qui respire + halo indigo */
+@keyframes shadowPulse {
+  0%, 100% {
+    box-shadow:
+      0 4px 20px rgba(9, 20, 38, 0.45),
+      0 0 0 1px rgba(99, 102, 241, 0.00),
+      inset 0 1px 0 rgba(255,255,255,0.07);
+  }
+  50% {
+    box-shadow:
+      0 12px 44px rgba(9, 20, 38, 0.65),
+      0 0 20px rgba(99, 102, 241, 0.18),
+      0 0 0 1px rgba(99, 102, 241, 0.22),
+      inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+}
+
+/* Welcome card — halo cyan + indigo */
+@keyframes welcomeShadowPulse {
+  0%, 100% {
+    box-shadow:
+      0 8px 32px rgba(9, 20, 38, 0.50),
+      0 0 0 1px rgba(6, 182, 212, 0.00),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  50% {
+    box-shadow:
+      0 18px 56px rgba(9, 20, 38, 0.65),
+      0 0 32px rgba(6, 182, 212, 0.22),
+      0 0 0 1px rgba(6, 182, 212, 0.28),
+      inset 0 1px 0 rgba(255,255,255,0.14);
+  }
+}
+
+/* Shimmer — reflet lumineux teinté cyan */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%) skewX(-12deg); opacity: 0;    }
+  15%  { opacity: 0.13; }
+  85%  { opacity: 0.13; }
+  100% { transform: translateX(220%)  skewX(-12deg); opacity: 0;    }
+}
+
+/* Border glow — Electric Blue → Cyan */
+@keyframes borderGlow {
+  0%   { border-color: rgba(99, 102, 241, 0.20); }
+  50%  { border-color: rgba(6,  182, 212, 0.55); }
+  100% { border-color: rgba(99, 102, 241, 0.20); }
+}
+
+/* Overlay background drift — fond qui dérive très lentement */
+@keyframes bgDrift {
+  0%   { background-position: center center; }
+  33%  { background-position: 52% 48%;       }
+  66%  { background-position: 48% 52%;       }
+  100% { background-position: center center; }
+}
+
+/* Sidebar nav item — indicateur actif Cyan pur */
+@keyframes activePulse {
+  0%, 100% { box-shadow: inset 3px 0 0 rgba(6, 182, 212, 0.75); }
+  50%       { box-shadow: inset 3px 0 0 rgba(6, 182, 212, 1.00), 0 0 8px rgba(6, 182, 212, 0.30); }
+}
+
+/* Logo badge — rotation très lente du dégradé interne */
+@keyframes logoBadgeSpin {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+
+/* Topbar — reflet horizontal lent */
+@keyframes headerShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/* ── Entrées au chargement ── */
+
+/* Fade + slide depuis le bas */
+@keyframes enterUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade + scale depuis le centre */
+@keyframes enterScale {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Fade simple */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Modal — scale + fade */
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Overlay modal — fade */
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* KPI counter — slide depuis le bas */
+@keyframes kpiEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Badge notification — pulse doux */
+@keyframes badgePulse {
+  0%, 100% { opacity: 1;    transform: scale(1);    }
+  50%       { opacity: 0.75; transform: scale(0.92); }
+}
+
+/* Sidebar logo badge — halo Purple → Indigo */
+@keyframes logoHalo {
+  0%, 100% { box-shadow: 0 4px 16px rgba(99, 102, 241, 0.55), 0 0 0 1px rgba(99,102,241,0.20); }
+  50%       { box-shadow: 0 4px 28px rgba(139, 92, 246, 0.80), 0 0 0 1px rgba(139,92,246,0.35); }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   2. FOND D'ÉCRAN — dérive très lente
+   ══════════════════════════════════════════════════════════════ */
+
+body.admin-bg {
+  animation: bgDrift 30s var(--anim-ease-smooth) infinite;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   3. SIDEBAR
+   ══════════════════════════════════════════════════════════════ */
+
+/* Entrée de la sidebar au chargement */
+.sidebar {
+  animation: enterUp var(--anim-enter-duration) var(--anim-ease-out) both;
+}
+
+/* Logo badge — halo pulsant */
+.logo-badge {
+  animation: logoHalo var(--anim-glow-duration) ease-in-out infinite;
+}
+
+/* Lien actif — indicateur gauche pulsant */
+.sidebar nav a.active {
+  animation: activePulse var(--anim-pulse-duration) ease-in-out infinite;
+  position: relative;
+}
+
+/* Transition enrichie sur tous les liens nav */
+.sidebar nav a {
+  transition:
+    background 220ms ease,
+    color 220ms ease,
+    padding-left 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.sidebar nav a:hover {
+  padding-left: 16px;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   4. TOPBAR
+   ══════════════════════════════════════════════════════════════ */
+
+.dash-header {
+  animation: enterUp var(--anim-enter-duration) var(--anim-ease-out) 0.05s both;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Reflet horizontal teinté cyan sur la topbar */
+.dash-header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 25%,
+    rgba(6, 182, 212, 0.07) 50%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  animation: headerShimmer 18s linear infinite;
+  pointer-events: none;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   5. WELCOME CARD
+   ══════════════════════════════════════════════════════════════ */
+
+.welcome-card {
+  animation:
+    enterUp var(--anim-enter-duration) var(--anim-ease-out) 0.10s both,
+    cardFloat var(--anim-float-duration) ease-in-out 1s infinite,
+    welcomeShadowPulse var(--anim-pulse-duration) ease-in-out 1s infinite;
+  position: relative;
+  overflow: hidden;
+  will-change: transform;
+}
+
+/* Reflet shimmer cyan sur la welcome card */
+.welcome-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(6, 182, 212, 0.13) 50%,
+    transparent 100%
+  );
+  animation: shimmer var(--anim-shimmer-duration) ease-in-out 2s infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   6. KPI CARDS
+   ══════════════════════════════════════════════════════════════ */
+
+/* Entrée décalée pour chaque carte */
+.kpi-card {
+  animation:
+    kpiEnter var(--anim-enter-duration) var(--anim-ease-out) both,
+    shadowPulse var(--anim-pulse-duration) ease-in-out infinite,
+    borderGlow var(--anim-glow-duration) ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.kpi-card:nth-child(1) { animation-delay: 0.15s, 0s, 0s; }
+.kpi-card:nth-child(2) { animation-delay: 0.25s, 1.5s, 2s; }
+.kpi-card:nth-child(3) { animation-delay: 0.35s, 3s, 4s; }
+
+/* Shimmer Electric Blue sur chaque KPI card */
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0.10) 50%,
+    transparent 100%
+  );
+  animation: shimmer var(--anim-shimmer-duration) ease-in-out infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.kpi-card:nth-child(1)::before { animation-delay: 0.5s;  }
+.kpi-card:nth-child(2)::before { animation-delay: 2s;    }
+.kpi-card:nth-child(3)::before { animation-delay: 3.5s;  }
+
+/* Hover — élévation + glow bleu */
+.kpi-card {
+  transition:
+    transform 280ms var(--anim-ease-out),
+    box-shadow 280ms ease,
+    border-color 280ms ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-5px) scale(1.012);
+  box-shadow:
+    0 16px 48px rgba(9, 20, 38, 0.60),
+    0 0 24px rgba(59, 130, 246, 0.28),
+    0 0 0 1px rgba(6, 182, 212, 0.45),
+    inset 0 1px 0 rgba(255,255,255,0.14);
+  border-color: rgba(6, 182, 212, 0.55);
+}
+
+/* Valeur KPI — légère animation au chargement */
+.kpi-value {
+  animation: enterScale 0.6s var(--anim-ease-out) 0.4s both;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   7. CARDS GÉNÉRIQUES (.page-body .card)
+   ══════════════════════════════════════════════════════════════ */
+
+.page-body .card {
+  animation:
+    enterUp var(--anim-enter-duration) var(--anim-ease-out) both,
+    shadowPulse var(--anim-pulse-duration) ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 280ms var(--anim-ease-out),
+    box-shadow 280ms ease,
+    border-color 280ms ease;
+  will-change: transform;
+}
+
+.page-body .card:nth-child(1) { animation-delay: 0.20s, 0.5s; }
+.page-body .card:nth-child(2) { animation-delay: 0.30s, 2.5s; }
+.page-body .card:nth-child(3) { animation-delay: 0.40s, 4.5s; }
+
+/* Shimmer Indigo sur les cards génériques */
+.page-body .card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(99, 102, 241, 0.09) 50%,
+    transparent 100%
+  );
+  animation: shimmer 9s ease-in-out 1s infinite;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
+}
+
+/* Hover card — glow Indigo */
+.page-body .card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 14px 42px rgba(9, 20, 38, 0.58),
+    0 0 20px rgba(99, 102, 241, 0.22),
+    0 0 0 1px rgba(99, 102, 241, 0.38),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+  border-color: rgba(99, 102, 241, 0.42);
+}
+
+/* Le contenu de la card doit rester au-dessus du shimmer */
+.page-body .card-header,
+.page-body .card-body {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   8. BOUTONS — glow au hover
+   ══════════════════════════════════════════════════════════════ */
+
+/* Boutons header */
+.dash-header-actions .hdr-btn {
+  transition:
+    background 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    transform 180ms var(--anim-ease-out);
+}
+
+.dash-header-actions .hdr-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.35), 0 0 0 1px rgba(6,182,212,0.20);
+}
+
+.dash-header-actions .hdr-btn:active {
+  transform: translateY(0);
+}
+
+/* Boutons primaires globaux */
+.primary,
+.rdv button,
+.btn-new-rdv,
+.msg-send-btn,
+.msg-new-btn {
+  transition:
+    background 200ms ease,
+    box-shadow 200ms ease,
+    transform 160ms var(--anim-ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.primary:hover,
+.rdv button:hover,
+.btn-new-rdv:hover,
+.msg-send-btn:hover,
+.msg-new-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.50), 0 0 0 1px rgba(59,130,246,0.25);
+}
+
+.primary:active,
+.rdv button:active,
+.btn-new-rdv:active,
+.msg-send-btn:active,
+.msg-new-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Ghost button */
+.ghost {
+  transition:
+    background 200ms ease,
+    border-color 200ms ease,
+    transform 160ms var(--anim-ease-out);
+}
+
+.ghost:hover {
+  transform: translateY(-1px);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   9. BADGES — pulse discret
+   ══════════════════════════════════════════════════════════════ */
+
+.msg-unread-badge,
+.msg-badge-unread,
+.hdr-badge {
+  animation: badgePulse 4s ease-in-out infinite;
+}
+
+.status-badge--confirmed,
+.status-badge--pending,
+.status-badge--refused {
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.status-badge--confirmed:hover,
+.status-badge--pending:hover,
+.status-badge--refused:hover {
+  transform: scale(1.06);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   10. LIGNES DE TABLEAU / LISTE RDV
+   ══════════════════════════════════════════════════════════════ */
+
+.rdv-item {
+  transition:
+    background 200ms ease,
+    padding-left 200ms ease,
+    border-color 200ms ease;
+}
+
+.rdv-item:hover {
+  background: rgba(59, 130, 246, 0.08);
+  padding-left: 6px;
+  border-color: rgba(6, 182, 212, 0.30);
+}
+
+/* Appointment items */
+.appointment-item {
+  transition:
+    background 220ms ease,
+    border-color 220ms ease,
+    transform 220ms var(--anim-ease-out),
+    box-shadow 220ms ease;
+}
+
+.appointment-item:hover {
+  background: rgba(59, 130, 246, 0.10);
+  border-color: rgba(6, 182, 212, 0.40);
+  transform: translateX(3px);
+  box-shadow: 0 2px 16px rgba(59, 130, 246, 0.20);
+}
+
+/* Message items */
+.msg-item {
+  transition:
+    background 200ms ease,
+    border-color 200ms ease,
+    transform 200ms var(--anim-ease-out);
+}
+
+.msg-item:hover {
+  transform: translateX(2px);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   11. MODAL — scale + fade
+   ══════════════════════════════════════════════════════════════ */
+
+.modal-overlay {
+  animation: overlayFadeIn 280ms ease both;
+}
+
+.modal {
+  animation: modalEnter 380ms var(--anim-ease-out) both;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   12. SEARCH BAR — focus glow
+   ══════════════════════════════════════════════════════════════ */
+
+.search-wrap {
+  transition:
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.search-wrap:focus-within {
+  border-color: rgba(6, 182, 212, 0.60);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.18), 0 0 12px rgba(6,182,212,0.12);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   13. WELCOME DATE CARD — float décalé
+   ══════════════════════════════════════════════════════════════ */
+
+.welcome-date {
+  animation: cardFloat var(--anim-float-duration) ease-in-out 2s infinite;
+  will-change: transform;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   14. CARD SECTION — entrée décalée
+   ══════════════════════════════════════════════════════════════ */
+
+.welcome-section {
+  animation: enterUp var(--anim-enter-duration) var(--anim-ease-out) 0.08s both;
+}
+
+.kpi-section {
+  animation: enterUp var(--anim-enter-duration) var(--anim-ease-out) 0.18s both;
+}
+
+.card-section {
+  animation: enterUp var(--anim-enter-duration) var(--anim-ease-out) 0.28s both;
+}
+
+.card-section:nth-of-type(2) {
+  animation-delay: 0.36s;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   15. ACCESSIBILITÉ — prefers-reduced-motion
+   Désactive toutes les animations permanentes pour les
+   utilisateurs sensibles aux mouvements.
+   ══════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

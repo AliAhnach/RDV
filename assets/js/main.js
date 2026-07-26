@@ -10,9 +10,9 @@ function $all(sel) {
 }
 
 const APP_TRANSLATIONS = {
-  fr: { dashboard: 'Dashboard', appointments: 'Rendez-vous', clients: 'Clients', messages: 'Messages', settings: 'Paramètres', logout: 'Déconnexion', account: 'Compte' },
-  en: { dashboard: 'Dashboard', appointments: 'Appointments', clients: 'Clients', messages: 'Messages', settings: 'Settings', logout: 'Sign out', account: 'Account' },
-  ar: { dashboard: 'لوحة التحكم', appointments: 'المواعيد', clients: 'العملاء', messages: 'الرسائل', settings: 'الإعدادات', logout: 'تسجيل الخروج', account: 'الحساب' },
+  fr: { dashboard: 'Dashboard', appointments: 'Rendez-vous', messages: 'Messages', settings: 'Paramètres', logout: 'Déconnexion', account: 'Compte' },
+  en: { dashboard: 'Dashboard', appointments: 'Appointments', messages: 'Messages', settings: 'Settings', logout: 'Sign out', account: 'Account' },
+  ar: { dashboard: 'لوحة التحكم', appointments: 'المواعيد', messages: 'الرسائل', settings: 'الإعدادات', logout: 'تسجيل الخروج', account: 'الحساب' },
 };
 
 function updateLanguage(lang) {
@@ -32,7 +32,7 @@ function updateLanguage(lang) {
   });
 
   const navKeys = [
-    ['index.html', 'dashboard'], ['appointments.html', 'appointments'], ['clients.html', 'clients'],
+    ['index.html', 'dashboard'], ['appointments.html', 'appointments'],
     ['messages.html', 'messages'], ['parametres.html', 'settings'],
   ];
   document.querySelectorAll('.sidebar nav a').forEach(link => {
@@ -54,7 +54,6 @@ function getPageId() {
   const file = path.split("/").pop() || "index.html";
   if (file === "index.html") return "dashboard";
   if (file.includes("appointments")) return "rendez-vous";
-  if (file.includes("clients")) return "clients";
   if (file.includes("messages")) return "messages";
   if (file.includes("parametres")) return "parametres";
   if (file.includes("deconnexion")) return "deconnexion";
@@ -71,7 +70,6 @@ function highlightActiveNav() {
     const href = a.getAttribute("href") || "";
     const isDashboard = href.includes("index.html");
     const isRdv = href.includes("appointments.html");
-    const isClients = href.includes("clients.html");
     const isMessages = href.includes("messages.html");
     const isParam = href.includes("parametres.html");
     const isLogout = href.includes("deconnexion.html");
@@ -79,7 +77,6 @@ function highlightActiveNav() {
     const shouldActive =
       (pageId === "dashboard" && isDashboard) ||
       (pageId === "rendez-vous" && isRdv) ||
-      (pageId === "clients" && isClients) ||
       (pageId === "messages" && isMessages) ||
       (pageId === "parametres" && isParam) ||
       (pageId === "deconnexion" && isLogout);
@@ -208,7 +205,6 @@ function initTopIcons() {
   };
   nav('btn-account',        './parametres.html');
   nav('stat-card-rdv',      './appointments.html');
-  nav('stat-card-clients',  './clients.html');
   nav('stat-card-messages', './messages.html');
 }
 
@@ -224,8 +220,8 @@ function initProfileName() {
   const accountBtn = document.getElementById('btn-account');
 
   const user = getCurrentUser();
-  const name = (user && user.fullname) ? user.fullname : 'Invité';
-  const firstName = String(name).trim().split(/\s+/)[0] || 'Invité';
+  const name = (user && user.fullname) ? user.fullname : 'Utilisateur';
+  const firstName = String(name).trim().split(/\s+/)[0] || 'Utilisateur';
 
   if (el) el.textContent = name;
   if (welcomeEl) welcomeEl.textContent = firstName;
@@ -263,8 +259,8 @@ function initDashboardWelcome() {
   const el = document.getElementById('dashboard-welcome-username');
   if (!el) return;
   const user = getCurrentUser();
-  const name = (user && user.fullname) ? user.fullname : 'Invité';
-  el.textContent = String(name).trim().split(/\s+/)[0] || 'Invité';
+  const name = (user && user.fullname) ? user.fullname : 'Utilisateur';
+  el.textContent = String(name).trim().split(/\s+/)[0] || 'Utilisateur';
 }
 
 function initSettingsPage() {
@@ -740,12 +736,6 @@ function initUserDashboard() {
 function boot() {
   initAuthPage();
   if (document.getElementById('form-signin') || document.getElementById('form-signup')) return;
-
-  // Hide clients link for non-admin users
-  const _u = getCurrentUser();
-  if (!_u || _u.role !== 'admin') {
-    document.querySelectorAll('.sidebar nav a[href*="clients"]').forEach(a => a.remove());
-  }
 
   highlightActiveNav();
   initAuthStateUI();

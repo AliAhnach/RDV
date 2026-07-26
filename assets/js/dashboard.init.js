@@ -6,17 +6,18 @@
       || appointment.user_fullname
       || appointment.fullname
       || appointment.user?.fullname
-      || appointment.user?.name;
+      || appointment.user?.name
+      || (appointment.user_id ? `Utilisateur #${appointment.user_id}` : null);
 
     return {
       ...appointment,
-      type: appointment.service ?? appointment.service_name ?? appointment.type ?? '—',
-      date: appointment.appointment_date ?? appointment.date,
-      time: appointment.appointment_time ?? appointment.time,
-      desc: appointment.description ?? appointment.desc,
-      status: appointment.status ?? 'En attente',
+      type:    appointment.service ?? appointment.service_name ?? appointment.type ?? '—',
+      date:    appointment.appointment_date ?? appointment.date,
+      time:    appointment.appointment_time ?? appointment.time,
+      desc:    appointment.description ?? appointment.desc,
+      status:  appointment.status ?? 'En attente',
       user_id: appointment.user_id ?? appointment.userId,
-      client: client || `Utilisateur #${appointment.user_id ?? appointment.userId ?? 'inconnu'}`,
+      client:  client || 'Client inconnu',
     };
   }
 
@@ -53,24 +54,16 @@
   }
 
   // ── Profile pill ──
-  const initials = s.isGuest ? '?' : (s.fullname || '').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+  const initials = (s.fullname || '').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
   const pillInitials = document.getElementById('pill-initials');
   if (pillInitials) pillInitials.textContent = initials;
   const pillName = document.getElementById('pill-name');
   const pillHandle = document.getElementById('pill-handle');
-  if (pillName) pillName.textContent = s.isGuest ? 'Invité' : (s.fullname || '—');
-  if (pillHandle) pillHandle.textContent = s.isGuest ? 'Mode consultation' : (s.email || '—');
-  const firstName = s.isGuest ? 'Invité' : (s.fullname || '').trim().split(' ')[0];
+  if (pillName) pillName.textContent = s.fullname || '—';
+  if (pillHandle) pillHandle.textContent = s.email || '—';
+  const firstName = (s.fullname || '').trim().split(' ')[0] || 'Utilisateur';
   const welcomeNameEl = document.getElementById('welcome-name');
   if (welcomeNameEl) welcomeNameEl.textContent = firstName + ' !';
-
-  // ── Guest banner ──
-  if (s.isGuest) {
-    const banner = document.createElement('div');
-    banner.style.cssText = 'background:#1f5fbf;color:#fff;text-align:center;padding:9px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:12px;flex-shrink:0;';
-    banner.innerHTML = 'Vous consultez en mode invité — certaines fonctionnalités sont limitées. <a href="./login.html" style="color:#bfdbfe;font-weight:700;text-decoration:underline;">Créer un compte</a>';
-    document.querySelector('.main').prepend(banner);
-  }
 
   function firstNumber(source, keys) {
     for (const key of keys) {
@@ -136,11 +129,9 @@
   function renderStats(stats) {
     if (isAdmin) {
       setStatCard('stat-card-rdv',      'stat-rdv',      'calendar', 'Rendez-vous', firstNumber(stats, ['total_appointments', 'appointments', 'total_rdvs', 'total', 'totalAppointments']));
-      setStatCard('stat-card-clients',  'stat-clients',  'users',    'Clients',      firstNumber(stats, ['total_users', 'users', 'user_count', 'users_count', 'totalUsers']));
       setStatCard('stat-card-messages', 'stat-messages', 'clock',    'Messages',     firstNumber(stats, ['pending_messages', 'unread_messages', 'messages', 'pending_appointments', 'pending']));
       return;
     }
-    setStatCard('stat-card-clients',   'stat-clients',   'users',    'Utilisateurs',  firstNumber(stats, ['total_users', 'users', 'user_count', 'users_count', 'totalUsers']));
     setStatCard('stat-card-rdv',       'stat-rdv',       'calendar', 'Rendez-vous',   firstNumber(stats, ['total_appointments', 'appointments', 'total_rdvs', 'total', 'totalAppointments']));
     setStatCard('stat-card-messages',  'stat-messages',  'clock',    'En attente',    firstNumber(stats, ['pending_appointments', 'pending', 'waiting_appointments', 'pending_count', 'pendingAppointments']));
     setStatCard('stat-card-confirmed', 'stat-confirmed', 'check',    'Confirmés',     firstNumber(stats, ['confirmed_appointments', 'confirmed', 'confirmed_count', 'confirmedAppointments']));
@@ -179,12 +170,18 @@
   // ── Dashboard statistics and recent activity from Flask ──
   setDashboardLoading();
   try {
-    const res = await apiFetch('https://aliahnach.pythonanywhere.com/api/dashboard/stats');
+    const _dashApiBase = (typeof API_BASE === 'string') ? API_BASE : 'https://aliahnach.pythonanywhere.com/api';
+    const _url = `${_dashApiBase}/dashboard/stats`;
+    console.log('[dashboard] GET', _url);
+    const res = await apiFetch(_url);
     const data = await readApiResponse(res);
+    console.log('[dashboard] réponse reçue :', JSON.stringify(data).slice(0, 300));
     const stats = data.stats ?? data.dashboard ?? data.data ?? data;
-    const recent = data.recent_appointments ?? data.recentAppointments ?? data.last_appointments
+    const recent = stats.recent
+      ?? data.recent_appointments ?? data.recentAppointments ?? data.last_appointments
       ?? data.data?.recent_appointments ?? data.data?.recentAppointments
       ?? stats.recent_appointments ?? stats.recentAppointments ?? [];
+    console.log('[dashboard] stats :', stats, '| recent count:', recent.length);
     renderStats(stats);
     renderRecentAppointments(recent);
   } catch (error) {
