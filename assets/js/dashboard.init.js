@@ -179,7 +179,7 @@
   // ── Dashboard statistics and recent activity from Flask ──
   setDashboardLoading();
   try {
-    const res = await fetch('https://aliahnach.pythonanywhere.com/api/dashboard/stats');
+    const res = await apiFetch('https://aliahnach.pythonanywhere.com/api/dashboard/stats');
     const data = await readApiResponse(res);
     const stats = data.stats ?? data.dashboard ?? data.data ?? data;
     const recent = data.recent_appointments ?? data.recentAppointments ?? data.last_appointments

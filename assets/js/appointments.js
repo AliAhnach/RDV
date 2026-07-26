@@ -80,7 +80,7 @@
 
       // The client view is filtered below.  Keeping a single read endpoint
       // avoids a second API contract while preserving the admin list.
-      const res = await fetch(APPOINTMENTS_API);
+      const res = await apiFetch(APPOINTMENTS_API);
       const data = await readApiResponse(res);
       const source = Array.isArray(data) ? data : data.appointments;
       const appointments = Array.isArray(source)
@@ -355,7 +355,7 @@
     if (!rdv) return false;
 
     try {
-      const res = await fetch(`${API_ROOT}/admin/appointments/${id}/status`, {
+      const res = await apiFetch(`${API_ROOT}/admin/appointments/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
@@ -381,7 +381,7 @@
     if (!confirmed) return false;
 
     try {
-      const res = await fetch(`${APPOINTMENTS_API}/${encodeURIComponent(id)}`, {
+      const res = await apiFetch(`${APPOINTMENTS_API}/${encodeURIComponent(id)}`, {
         method: 'DELETE',
       });
       await readApiResponse(res);
