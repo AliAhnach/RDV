@@ -117,16 +117,17 @@
   border: 1px solid #e2e8f0;
   border-radius: 4px; padding: 2px 6px; white-space: nowrap;
 }
-.dash-header-right { 
+.dash-header-right {
   display: flex;
   align-items: center;
   gap: 8px;
-  position: relative;
-  z-index: 110;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 .hdr-icon-btn {
   position: relative;
   height: 36px;
+  flex-shrink: 0;
   border-radius: 8px;
   background: #F8FAFC;
   border: 1px solid #e2e8f0;
@@ -872,12 +873,15 @@ body.dark-mode .stat-value {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .dash-header-actions .hdr-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   gap: 7px;
   min-height: 36px;
   padding: 0 10px;
