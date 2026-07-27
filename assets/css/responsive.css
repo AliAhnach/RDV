@@ -165,13 +165,6 @@ body.sidebar-open { overflow: hidden; }
   .settings-page { padding: 16px 16px 16px 16px !important; }
   .settings-grid { grid-template-columns: 1fr !important; }
   .field-row { grid-template-columns: 1fr !important; }
-  .profile-hero {
-    flex-direction: column;
-    text-align: center;
-    padding: 20px 16px !important;
-    gap: 14px;
-  }
-  .profile-hero__info { text-align: center; }
   .danger-row {
     flex-direction: column;
     align-items: flex-start;

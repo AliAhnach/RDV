@@ -384,17 +384,7 @@ function initSettingsPage() {
   });
 }
 
-function initParametresPage() {
-  const user = getCurrentUser();
-  if (!user) return;
-  const initials = (user.fullname || '?').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-  const avatar    = document.getElementById('hero-avatar');
-  const heroName  = document.getElementById('hero-name');
-  const heroEmail = document.getElementById('hero-email');
-  if (avatar)    avatar.textContent    = initials;
-  if (heroName)  heroName.textContent  = user.fullname || '—';
-  if (heroEmail) heroEmail.textContent = user.email     || '—';
-}
+function initParametresPage() {}
 
 function deleteAccount() {
   if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) return;

@@ -703,17 +703,6 @@ body.light-theme .sidebar nav a:hover,
 body.light-theme .sidebar nav a.active { color: #ffffff; }
 .account-label,
 body.dark-mode .account-label { color: var(--text-primary); }
-.header-profile-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; }
-.static-avatar {
-  width: 28px; height: 28px; border-radius: 50%;
-  object-fit: cover; flex: 0 0 auto;
-  box-shadow: 0 2px 8px rgba(13,61,125,0.30);
-  display: block;
-}
-.static-avatar--lg {
-  width: 64px; height: 64px;
-  box-shadow: 0 4px 16px rgba(13,61,125,0.30);
-}
 
 .dashboard-content,
 .main-content {
