@@ -367,3 +367,9 @@ body {
 /* RTL support (Arabic) */
 [dir="rtl"] .sidebar { left:auto; right:0; }
 [dir="rtl"] .main { margin-left:0; margin-right:220px; }
+[dir="rtl"] .sidebar nav a { flex-direction: row-reverse; }
+[dir="rtl"] .dash-header { flex-direction: row-reverse; }
+[dir="rtl"] .dash-header-actions,
+[dir="rtl"] .dash-header-right { flex-direction: row-reverse; }
+[dir="rtl"] .search-wrap { flex-direction: row-reverse; }
+

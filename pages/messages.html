@@ -33,11 +33,11 @@
       </div>
     </a>
     <nav>
-      <a href="./index.html">Dashboard</a>
-      <a href="./appointments.html">Rendez-vous</a>
-      <a href="./messages.html" class="active">Messages</a>
-      <a href="./parametres.html">Paramètres</a>
-      <a href="#" onclick="cognitoSignOut(); return false;">Déconnexion</a>
+      <a href="./index.html" data-i18n="nav.dashboard">Dashboard</a>
+      <a href="./appointments.html" data-i18n="nav.appointments">Rendez-vous</a>
+      <a href="./messages.html" class="active" data-i18n="nav.messages">Messages</a>
+      <a href="./parametres.html" data-i18n="nav.settings">Paramètres</a>
+      <a href="#" onclick="cognitoSignOut(); return false;" data-i18n="nav.logout">Déconnexion</a>
     </nav>
   </aside>
 
@@ -47,17 +47,13 @@
         <svg width="14" height="14" fill="none" stroke="#7a7a9a" stroke-width="2" viewBox="0 0 24 24">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
-        <input id="search" type="text" placeholder="Rechercher dans les messages…"/>
+        <input id="search" type="text" data-i18n-placeholder="search.messages" placeholder="Rechercher dans les messages…"/>
         <span class="kbd">⌘ K</span>
       </div>
-      <div class="dash-header-right">
-        <button class="hdr-icon-btn" id="theme-toggle" title="Changer le thème" type="button" aria-label="Changer le thème">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          <span class="hdr-badge"></span>
-        </button>
+      <div class="dash-header-right" id="dash-header-right">
         <button class="hdr-icon-btn" id="btn-account" title="Compte" type="button" aria-label="Compte">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span class="account-label">Compte</span><span class="hdr-badge" style="display:none;"></span>
+          <img class="static-avatar" src="../assets/images/favicon.svg" alt="Avatar">
+          <span class="account-label" data-i18n="account.label">Compte</span><span class="hdr-badge" style="display:none;"></span>
         </button>
       </div>
     </header>
@@ -69,12 +65,12 @@
       <div class="msg-list-panel">
         <div class="msg-list-header">
           <h2>
-            Messages
+            <span data-i18n="page.messages">Messages</span>
             <span class="msg-unread-badge" id="unread-count" style="display:none;">0</span>
           </h2>
           <p id="msg-list-subtitle">Chargement…</p>
           <!-- Bouton nouveau message (utilisateur uniquement) -->
-          <button class="msg-new-btn" id="btn-new-msg" style="display:none;">+ Nouveau message</button>
+          <button class="msg-new-btn" id="btn-new-msg" style="display:none;" data-i18n="btn.newmsg">+ Nouveau message</button>
         </div>
         <div class="msg-list-scroll" id="msg-list-scroll">
           <div class="msg-empty-state" id="msg-list-loading">
@@ -90,7 +86,7 @@
         <!-- État vide par défaut -->
         <div class="msg-empty-state" id="msg-thread-empty">
           <div class="msg-empty-icon">💬</div>
-          Sélectionnez une conversation
+          <span data-i18n="msg.select">Sélectionnez une conversation</span>
         </div>
 
         <!-- Conversation ouverte (masquée par défaut) -->
@@ -102,7 +98,7 @@
               <div class="msg-thread-header-name" id="thread-name">—</div>
               <div class="msg-thread-header-sub" id="thread-sub">—</div>
             </div>
-            <button class="msg-mark-read-btn" id="btn-mark-read" style="display:none;">Marquer comme lu</button>
+            <button class="msg-mark-read-btn" id="btn-mark-read" style="display:none;" data-i18n="btn.markread">Marquer comme lu</button>
           </div>
 
           <div class="msg-thread-scroll" id="msg-thread-scroll"></div>
@@ -111,7 +107,7 @@
 
           <!-- Zone de réponse (admin) / nouveau message (user dans thread) -->
           <div class="msg-compose" id="msg-compose">
-            <textarea id="compose-text" rows="1" placeholder="Écrire un message…"></textarea>
+            <textarea id="compose-text" rows="1" data-i18n-placeholder="msg.write" placeholder="Écrire un message…"></textarea>
             <button class="msg-send-btn" id="btn-send" title="Envoyer">➤</button>
           </div>
         </div>
@@ -122,9 +118,9 @@
     <!-- Formulaire nouveau message utilisateur (overlay dans la liste) -->
     <div class="msg-new-form" id="msg-new-form" style="display:none;">
       <div style="font-size:13px; font-weight:700; color:#0d3d7d; margin-bottom:2px;">Nouveau message</div>
-      <textarea id="new-msg-text" placeholder="Votre message à l'administrateur…"></textarea>
+      <textarea id="new-msg-text" data-i18n-placeholder="msg.newmsg" placeholder="Votre message à l'administrateur…"></textarea>
       <div class="msg-new-form-actions">
-        <button class="msg-cancel-btn" id="btn-cancel-new">Annuler</button>
+        <button class="msg-cancel-btn" id="btn-cancel-new" data-i18n="btn.cancel">Annuler</button>
         <button class="msg-send-btn" id="btn-send-new" style="width:auto; border-radius:999px; padding:8px 18px; font-size:12px; font-weight:700;">Envoyer</button>
       </div>
     </div>
@@ -132,6 +128,7 @@
   </main>
 </div>
 
+<script src="../assets/js/i18n.js"></script>
 <script src="../assets/js/transition.js"></script>
 <script src="../assets/js/main.js"></script>
 <script>

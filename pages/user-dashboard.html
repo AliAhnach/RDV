@@ -32,21 +32,20 @@
         <span class="logo-text"><span class="logo-text__main">RDV</span><span class="logo-text__sub">Plateforme</span></span>
       </a>
       <nav>
-        <a class="active" href="./user-dashboard.html">Mon espace</a>
-        <a href="./appointments.html">Mes rendez-vous</a>
-        <a href="./messages.html">Messages</a>
-        <a href="./parametres.html">Paramètres</a>
-        <a href="#" onclick="cognitoSignOut(); return false;">Déconnexion</a>
+        <a class="active" href="./user-dashboard.html" data-i18n="nav.myspace">Mon espace</a>
+        <a href="./appointments.html" data-i18n="nav.myrdv">Mes rendez-vous</a>
+        <a href="./messages.html" data-i18n="nav.messages">Messages</a>
+        <a href="./parametres.html" data-i18n="nav.settings">Paramètres</a>
+        <a href="#" onclick="cognitoSignOut(); return false;" data-i18n="nav.logout">Déconnexion</a>
       </nav>
     </aside>
 
     <main class="main">
       <header class="dash-header">
         <label class="search-wrap" for="appointment-search">
-          <input id="appointment-search" type="search" placeholder="Rechercher un rendez-vous">
+          <input id="appointment-search" type="search" data-i18n-placeholder="search.appointments" placeholder="Rechercher un rendez-vous">
         </label>
-        <div class="dash-header-right">
-          <button class="hdr-icon-btn" id="theme-toggle" type="button" aria-label="Changer le thème"></button>
+        <div class="dash-header-right" id="dash-header-right">
           <button class="hdr-icon-btn hdr-account-btn" id="btn-account" type="button"><span class="account-label">Compte</span></button>
         </div>
       </header>
@@ -54,27 +53,33 @@
       <section class="dashboard-content main-content" aria-label="Tableau de bord">
         <article class="dashboard-hero">
           <div>
-            <p class="hero-eyebrow">Tableau de bord</p>
-            <h1>Bonjour <span class="grad-name" id="welcome-name">!</span></h1>
-            <p class="welcome-sub">Voici un aperçu de votre journée et de vos prochains rendez-vous.</p>
+            <p class="hero-eyebrow" data-i18n="welcome.today">Tableau de bord</p>
+            <h1><span data-i18n="welcome.greeting">Bonjour</span> <span class="grad-name" id="welcome-name">!</span></h1>
+            <p class="welcome-sub" data-i18n="welcome.sub">Voici un aperçu de votre journée et de vos prochains rendez-vous.</p>
             <div class="hero-actions">
-              <a href="./appointments.html" class="hero-btn hero-btn-primary">Voir mes RDV</a>
-              <a href="./messages.html" class="hero-btn hero-btn-secondary">Messages</a>
+              <a href="./appointments.html" class="hero-btn hero-btn-primary" data-i18n="stat.myrdv">Voir mes RDV</a>
+              <a href="./messages.html" class="hero-btn hero-btn-secondary" data-i18n="nav.messages">Messages</a>
             </div>
           </div>
           <div class="hero-date-card">
-            <p>Aujourd'hui</p><time id="hero-date"></time><time id="hero-time"></time>
+            <p data-i18n="welcome.today">Aujourd'hui</p><time id="hero-date"></time><time id="hero-time"></time>
           </div>
         </article>
 
         <section class="stats-row" aria-label="Indicateurs clés">
-          <article class="stat-card" id="stat-card-rdv"><strong class="stat-value" id="stat-rdv">—</strong><span class="stat-label">Mes RDV</span></article>
-          <article class="stat-card" id="stat-card-confirmed"><strong class="stat-value" id="stat-confirmed">—</strong><span class="stat-label">Confirmés</span></article>
-          <article class="stat-card" id="stat-card-messages"><strong class="stat-value" id="stat-messages">—</strong><span class="stat-label">Notifications</span></article>
+          <article class="stat-card" id="stat-card-rdv"><strong class="stat-value" id="stat-rdv">—</strong><span class="stat-label" data-i18n="stat.myrdv">Mes RDV</span></article>
+          <article class="stat-card" id="stat-card-confirmed"><strong class="stat-value" id="stat-confirmed">—</strong><span class="stat-label" data-i18n="stat.confirmed">Confirmés</span></article>
+          <article class="stat-card" id="stat-card-messages"><strong class="stat-value" id="stat-messages">—</strong><span class="stat-label" data-i18n="stat.notifications">Notifications</span></article>
         </section>
 
         <section class="appointments-card" aria-labelledby="upcoming-title">
-          <header class="card-header"><div><p class="hero-eyebrow">Aujourd'hui</p><h2 id="upcoming-title">Mes prochains rendez-vous</h2></div><a href="./appointments.html">Tout voir</a></header>
+          <header class="card-header">
+            <div>
+              <p class="hero-eyebrow" data-i18n="welcome.today">Aujourd'hui</p>
+              <h2 id="upcoming-title" data-i18n="upcoming.title">Mes prochains rendez-vous</h2>
+            </div>
+            <a href="./appointments.html" data-i18n="btn.see.all">Tout voir</a>
+          </header>
           <div class="appointment-list" id="upcoming-rdvs">
             <article class="appointment-item">
               <div class="appointment-info"><h3>Consultation médicale</h3><p>Aujourd'hui · 10:00</p></div><span class="status-badge status-badge--confirmed">Confirmé</span>
@@ -87,6 +92,7 @@
       </section>
     </main>
   </div>
+  <script src="../assets/js/i18n.js"></script>
   <script src="../assets/js/transition.js"></script>
   <script src="../assets/js/main.js"></script>
   <script>

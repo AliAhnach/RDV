@@ -64,6 +64,8 @@
   const firstName = (s.fullname || '').trim().split(' ')[0] || 'Utilisateur';
   const welcomeNameEl = document.getElementById('welcome-name');
   if (welcomeNameEl) welcomeNameEl.textContent = firstName + ' !';
+  const headerUsername = document.getElementById('header-username');
+  if (headerUsername) headerUsername.textContent = s.fullname || s.name || 'Compte';
 
   function firstNumber(source, keys) {
     for (const key of keys) {

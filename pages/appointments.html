@@ -32,11 +32,11 @@
       </div>
     </a>
     <nav>
-      <a href="./index.html">Dashboard</a>
-      <a href="./appointments.html" class="active">Rendez-vous</a>
-      <a href="./messages.html">Messages</a>
-      <a href="./parametres.html">Paramètres</a>
-      <a href="#" onclick="cognitoSignOut(); return false;">Déconnexion</a>
+      <a href="./index.html" data-i18n="nav.dashboard">Dashboard</a>
+      <a href="./appointments.html" class="active" data-i18n="nav.appointments">Rendez-vous</a>
+      <a href="./messages.html" data-i18n="nav.messages">Messages</a>
+      <a href="./parametres.html" data-i18n="nav.settings">Paramètres</a>
+      <a href="#" onclick="cognitoSignOut(); return false;" data-i18n="nav.logout">Déconnexion</a>
     </nav>
   </aside>
 
@@ -46,13 +46,13 @@
         <svg width="14" height="14" fill="none" stroke="#7a7a9a" stroke-width="2" viewBox="0 0 24 24">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
-        <input id="search" type="text" placeholder="Rechercher un rendez-vous…"/>
+        <input id="search" type="text" data-i18n-placeholder="search.appointments" placeholder="Rechercher un rendez-vous…"/>
         <span class="kbd">⌘ K</span>
       </div>
-      <div class="dash-header-right">
+      <div class="dash-header-right" id="dash-header-right">
         <button class="hdr-icon-btn" id="btn-account" title="Compte" type="button" aria-label="Compte">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span class="account-label">Compte</span><span class="hdr-badge" style="display:none;"></span>
+          <img class="static-avatar" src="../assets/images/favicon.svg" alt="Avatar">
+          <span class="account-label" data-i18n="account.label">Compte</span><span class="hdr-badge" style="display:none;"></span>
         </button>
       </div>
     </header>
@@ -65,28 +65,28 @@
         <!-- Header -->
         <div class="appt-page-header">
           <div>
-            <h2 class="appt-page-title">Mes rendez-vous</h2>
-            <p class="appt-page-sub">Consultez vos rendez-vous et leur statut en temps réel.</p>
+            <h2 class="appt-page-title" data-i18n="page.myappointments">Mes rendez-vous</h2>
+            <p class="appt-page-sub" data-i18n="page.myappointments.sub">Consultez vos rendez-vous et leur statut en temps réel.</p>
           </div>
           <button class="btn-new-rdv" id="btn-open-request">
-            <span>＋</span> Demander un rendez-vous
+            <span>+</span> <span data-i18n="btn.new.rdv">Demander un rendez-vous</span>
           </button>
         </div>
 
         <!-- Filters -->
         <div class="appt-filters">
-          <button class="appt-filter active" data-filter="all">Tous</button>
-          <button class="appt-filter" data-filter="Confirmé">Confirmés</button>
-          <button class="appt-filter" data-filter="En attente">En attente</button>
-          <button class="appt-filter" data-filter="Refusé">Refusés</button>
+          <button class="appt-filter active" data-filter="all" data-i18n="filter.all">Tous</button>
+          <button class="appt-filter" data-filter="Confirmé" data-i18n="filter.confirmed">Confirmés</button>
+          <button class="appt-filter" data-filter="En attente" data-i18n="filter.pending">En attente</button>
+          <button class="appt-filter" data-filter="Refusé" data-i18n="filter.refused">Refusés</button>
         </div>
 
         <!-- RDV list -->
         <div id="user-rdv-list"></div>
         <div id="user-rdv-empty" class="appt-empty" hidden>
-          <div>Aucun rendez-vous trouvé.</div>
+          <div data-i18n="page.myappointments">Aucun rendez-vous trouvé.</div>
           <button class="btn-new-rdv" id="btn-open-request2" style="margin-top:12px;">
-            <span>＋</span> Demander un rendez-vous
+            <span>+</span> <span data-i18n="btn.new.rdv">Demander un rendez-vous</span>
           </button>
         </div>
 
@@ -100,23 +100,23 @@
 
         <div class="appt-page-header">
           <div>
-            <h2 class="appt-page-title">Gestion des rendez-vous</h2>
-            <p class="appt-page-sub">Confirmez, refusez ou gérez toutes les demandes.</p>
+            <h2 class="appt-page-title" data-i18n="page.appointments.admin">Gestion des rendez-vous</h2>
+            <p class="appt-page-sub" data-i18n="page.appointments.sub">Confirmez, refusez ou gérez toutes les demandes.</p>
           </div>
           <div class="appt-admin-stats" id="admin-stats"></div>
         </div>
 
         <!-- Filters -->
         <div class="appt-filters">
-          <button class="appt-filter active" data-filter="all">Tous</button>
-          <button class="appt-filter" data-filter="Confirmé">Confirmés</button>
-          <button class="appt-filter" data-filter="En attente">En attente</button>
-          <button class="appt-filter" data-filter="Refusé">Refusés</button>
+          <button class="appt-filter active" data-filter="all" data-i18n="filter.all">Tous</button>
+          <button class="appt-filter" data-filter="Confirmé" data-i18n="filter.confirmed">Confirmés</button>
+          <button class="appt-filter" data-filter="En attente" data-i18n="filter.pending">En attente</button>
+          <button class="appt-filter" data-filter="Refusé" data-i18n="filter.refused">Refusés</button>
         </div>
 
         <div id="admin-rdv-list"></div>
         <div id="admin-rdv-empty" class="appt-empty" hidden>
-          <div>Aucun rendez-vous pour le moment.</div>
+          <div data-i18n="page.appointments">Aucun rendez-vous pour le moment.</div>
         </div>
 
       </div>
@@ -129,7 +129,7 @@
 <div id="modal-user-detail" class="modal-overlay" role="dialog" aria-modal="true" hidden>
   <div class="modal">
     <button class="modal-close" id="modal-user-detail-close">✖</button>
-    <h3>Détails du rendez-vous</h3>
+    <h3 data-i18n="modal.rdv.title">Détails du rendez-vous</h3>
     <div class="modal-body" style="margin-top:16px;display:flex;flex-direction:column;gap:14px;">
 
       <!-- Icon + type -->
@@ -147,60 +147,64 @@
       <!-- Info rows -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div style="padding:12px;background:#f8f9fb;border-radius:10px;">
-          <div style="font-size:10px;font-weight:700;color:#7a7a9a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Date</div>
+          <div style="font-size:10px;font-weight:700;color:#7a7a9a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;" data-i18n="modal.rdv.date">Date</div>
           <div style="font-size:14px;font-weight:800;color:#1a1a2e;"><span id="umodal-date">—</span></div>
         </div>
         <div style="padding:12px;background:#f8f9fb;border-radius:10px;">
-          <div style="font-size:10px;font-weight:700;color:#7a7a9a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Heure</div>
+          <div style="font-size:10px;font-weight:700;color:#7a7a9a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;" data-i18n="modal.rdv.time">Heure</div>
           <div style="font-size:14px;font-weight:800;color:#1a1a2e;"><span id="umodal-time">—</span></div>
         </div>
       </div>
 
       <!-- Motif -->
       <div style="padding:12px;background:#f8f9fb;border-radius:10px;">
-        <div style="font-size:10px;font-weight:700;color:#7a7a9a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Motif</div>
+        <div style="font-size:10px;font-weight:700;color:#7a7a9a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;" data-i18n="modal.rdv.reason">Motif</div>
         <div style="font-size:13px;color:#2c3e50;line-height:1.5;" id="umodal-desc">—</div>
       </div>
 
     </div>
     <div class="modal-actions" style="margin-top:16px;">
-      <button class="ghost" id="modal-user-detail-close2">Fermer</button>
+      <button class="ghost" id="modal-user-detail-close2" data-i18n="btn.close">Fermer</button>
     </div>
   </div>
 </div>
 
 <!-- ── Modal : Demander un RDV (USER) ── -->
-<div id="modal-request" class="modal-overlay" role="dialog" aria-modal="true" hidden>
-  <div class="modal">
-    <button class="modal-close" id="modal-request-close">✖</button>
-    <h3>Demander un rendez-vous</h3>
-    <form id="form-request" class="modal-body" style="display:grid;gap:12px;margin-top:8px;">
-      <label style="display:grid;gap:5px;font-weight:700;color:#2c3e50;font-size:13px;">
-        Type de rendez-vous
-        <select id="req-type" required style="padding:10px 12px;border-radius:10px;border:1px solid rgba(13,61,125,0.18);outline:none;font-size:14px;">
-          <option value="">-- Choisir --</option>
-          <option>Consultation</option>
-          <option>Suivi</option>
-          <option>Réunion</option>
-          <option>Urgence</option>
-        </select>
-      </label>
-      <label style="display:grid;gap:5px;font-weight:700;color:#2c3e50;font-size:13px;">
-        Date souhaitée
-        <input id="req-date" type="date" required style="padding:10px 12px;border-radius:10px;border:1px solid rgba(13,61,125,0.18);outline:none;font-size:14px;">
-      </label>
-      <label style="display:grid;gap:5px;font-weight:700;color:#2c3e50;font-size:13px;">
-        Heure souhaitée
-        <input id="req-time" type="time" required style="padding:10px 12px;border-radius:10px;border:1px solid rgba(13,61,125,0.18);outline:none;font-size:14px;">
-      </label>
-      <label style="display:grid;gap:5px;font-weight:700;color:#2c3e50;font-size:13px;">
-        Motif / Description
-        <textarea id="req-desc" rows="3" placeholder="Décrivez brièvement le motif..." style="padding:10px 12px;border-radius:10px;border:1px solid rgba(13,61,125,0.18);outline:none;font-size:14px;resize:vertical;font-family:inherit;"></textarea>
-      </label>
-      <p id="req-message" style="font-size:13px;color:#e53e3e;min-height:16px;"></p>
-      <div class="modal-actions">
-        <button type="submit" class="primary">Envoyer la demande</button>
-        <button type="button" class="ghost" id="modal-request-cancel">Annuler</button>
+<div id="modal-request" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-request-title" hidden>
+  <div class="modal modal--request">
+    <button class="modal-close" id="modal-request-close" aria-label="Fermer">✖</button>
+    <h3 id="modal-request-title" class="modal-request-title" data-i18n="modal.request.title">Demander un rendez-vous</h3>
+    <form id="form-request" novalidate>
+      <div class="rdv-form-body">
+        <label class="rdv-field">
+          <span class="rdv-label" data-i18n="form.type">Type de rendez-vous</span>
+          <select id="req-type" required class="rdv-input">
+            <option value="">-- Choisir --</option>
+            <option>Consultation</option>
+            <option>Suivi</option>
+            <option>Réunion</option>
+            <option>Urgence</option>
+          </select>
+        </label>
+        <div class="rdv-row">
+          <label class="rdv-field">
+            <span class="rdv-label" data-i18n="form.date">Date souhaitée</span>
+            <input id="req-date" type="date" required class="rdv-input">
+          </label>
+          <label class="rdv-field">
+            <span class="rdv-label" data-i18n="form.time">Heure souhaitée</span>
+            <input id="req-time" type="time" required class="rdv-input">
+          </label>
+        </div>
+        <label class="rdv-field">
+          <span class="rdv-label" data-i18n="form.reason">Motif / Description</span>
+          <textarea id="req-desc" rows="4" placeholder="Décrivez brièvement le motif..." class="rdv-input rdv-textarea"></textarea>
+        </label>
+        <p id="req-message" class="rdv-error-msg" role="alert"></p>
+      </div>
+      <div class="rdv-form-footer">
+        <button type="submit" class="primary" data-i18n="modal.request.send">Envoyer la demande</button>
+        <button type="button" class="ghost" id="modal-request-cancel" data-i18n="btn.cancel">Annuler</button>
       </div>
     </form>
   </div>
@@ -210,7 +214,7 @@
 <div id="rdv-modal" class="modal-overlay" role="dialog" aria-modal="true" hidden>
   <div class="modal">
     <button class="modal-close" id="rdv-modal-close">✖</button>
-    <h3 id="rdv-modal-title">Détails du rendez-vous</h3>
+    <h3 id="rdv-modal-title" data-i18n="modal.rdv.title">Détails du rendez-vous</h3>
     <div class="modal-body">
       <p><strong>Client :</strong> <span id="modal-client">—</span></p>
       <p><strong>Date :</strong> <span id="modal-date">—</span></p>
@@ -220,13 +224,14 @@
       <p class="modal-desc"><strong>Motif :</strong> <span id="modal-desc">—</span></p>
     </div>
     <div class="modal-actions">
-      <button id="modal-confirm-btn" class="primary">Confirmer</button>
-      <button id="modal-refuse-btn" class="ghost" style="color:#e53e3e;border-color:#e53e3e;">Refuser</button>
-      <button id="modal-secondary" class="ghost">Fermer</button>
+      <button id="modal-confirm-btn" class="primary" data-i18n="btn.confirm">Confirmer</button>
+      <button id="modal-refuse-btn" class="ghost" style="color:#e53e3e;border-color:#e53e3e;" data-i18n="btn.refuse">Refuser</button>
+      <button id="modal-secondary" class="ghost" data-i18n="btn.close">Fermer</button>
     </div>
   </div>
 </div>
 
+<script src="../assets/js/i18n.js"></script>
 <script src="../assets/js/transition.js"></script>
 <script src="../assets/js/main.js"></script>
 <script src="../assets/js/appointments.js"></script>

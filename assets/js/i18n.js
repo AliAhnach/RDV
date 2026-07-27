@@ -1,195 +1,183 @@
-const TRANSLATIONS = {
-  fr: {
-    // Sidebar
-    'nav.dashboard':    '🏠 Dashboard',
-    'nav.appointments': '📅 Rendez-vous',
-    'nav.messages':     '💬 Messages',
-    'nav.settings':     '⚙️ Paramètres',
-    'nav.logout':       '🚪 Déconnexion',
-    // Topbar
-    'search.placeholder': 'Rechercher…',
-    // Dashboard
-    'welcome.greeting':   'Bonjour',
-    'welcome.sub':        'Ravi de vous revoir sur votre espace santé.',
-    'stat.appointments':  'Rendez-vous',
-    'stat.messages':      'Messages',
-    'platform.badge':     'Nouveau',
-    'platform.title':     'Mini Plateforme RDV',
-    'platform.desc':      'Gérez vos rendez-vous et communiquez en temps réel depuis une interface simple, rapide et sécurisée.',
-    // Left panel
-    'panel.refill':       'Needs refill soon',
-    'panel.prescription': 'Others by prescription',
-    'order.btn':          'Place Order',
-    // Footer
-    'footer.copy':        '© 2026 RDV Plateforme. Tous droits réservés.',
-    'footer.dev':         'Développeur',
-    // Pages titles
-    'page.appointments':  'Tous les rendez-vous',
-    'page.messages':      'Messages',
-    // Search placeholders
-    'search.appointments': 'Rechercher un rendez-vous…',
-    'search.messages':     'Rechercher dans les messages…',
-    'search.settings':     'Rechercher…',
-    // Settings
-    'settings.personal.title': 'Informations personnelles',
-    'settings.personal.sub':   'Modifiez votre nom, email et mot de passe',
-    'settings.notif.title':    'Notifications',
-    'settings.notif.sub':      'Gérez vos alertes',
-    'settings.pref.title':     'Préférences',
-    'settings.pref.sub':       'Langue et affichage',
-    'settings.security.title': 'Sécurité',
-    'settings.security.sub':   'Gérez l\'accès à votre compte',
-    'settings.save':           'Enregistrer',
-    'settings.logout':         'Se déconnecter',
-    'settings.logout.desc':    'Terminer la session en cours',
-    'settings.delete':         'Supprimer le compte',
-    'settings.delete.desc':    'Supprime définitivement toutes vos données',
-    'settings.active':         'Compte actif',
-  },
-  en: {
-    'nav.dashboard':    '🏠 Dashboard',
-    'nav.appointments': '📅 Appointments',
-    'nav.messages':     '💬 Messages',
-    'nav.settings':     '⚙️ Settings',
-    'nav.logout':       '🚪 Logout',
-    'search.placeholder': 'Search…',
-    'welcome.greeting':   'Hello',
-    'welcome.sub':        'Welcome back to your health space.',
-    'stat.appointments':  'Appointments',
-    'stat.messages':      'Messages',
-    'platform.badge':     'New',
-    'platform.title':     'RDV Mini Platform',
-    'platform.desc':      'Manage your appointments and communicate in real time from a simple, fast and secure interface.',
-    'panel.refill':       'Needs refill soon',
-    'panel.prescription': 'Others by prescription',
-    'order.btn':          'Place Order',
-    'footer.copy':        '© 2026 RDV Platform. All rights reserved.',
-    'footer.dev':         'Developer',
-    'page.appointments':  'All Appointments',
-    'page.messages':      'Messages',
-    'search.appointments': 'Search an appointment…',
-    'search.messages':     'Search messages…',
-    'search.settings':     'Search…',
-    'settings.personal.title': 'Personal Information',
-    'settings.personal.sub':   'Edit your name, email and password',
-    'settings.notif.title':    'Notifications',
-    'settings.notif.sub':      'Manage your alerts',
-    'settings.pref.title':     'Preferences',
-    'settings.pref.sub':       'Language and display',
-    'settings.security.title': 'Security',
-    'settings.security.sub':   'Manage access to your account',
-    'settings.save':           'Save',
-    'settings.logout':         'Sign out',
-    'settings.logout.desc':    'End the current session',
-    'settings.delete':         'Delete account',
-    'settings.delete.desc':    'Permanently deletes all your data',
-    'settings.active':         'Active account',
-  },
-  ar: {
-    'nav.dashboard':    '🏠 لوحة التحكم',
-    'nav.appointments': '📅 المواعيد',
-    'nav.messages':     '💬 الرسائل',
-    'nav.settings':     '⚙️ الإعدادات',
-    'nav.logout':       '🚪 تسجيل الخروج',
-    'search.placeholder': 'بحث…',
-    'welcome.greeting':   'مرحباً',
-    'welcome.sub':        'أهلاً بعودتك إلى فضائك الصحي.',
-    'stat.appointments':  'المواعيد',
-    'stat.messages':      'الرسائل',
-    'platform.badge':     'جديد',
-    'platform.title':     'منصة RDV المصغرة',
-    'platform.desc':      'أدر مواعيدك، تابع عملاءك وتواصل في الوقت الفعلي من خلال واجهة بسيطة وسريعة وآمنة.',
-    'panel.refill':       'تحتاج إعادة تعبئة قريباً',
-    'panel.prescription': 'أخرى بوصفة طبية',
-    'order.btn':          'تأكيد الطلب',
-    'footer.copy':        '© 2026 منصة RDV. جميع الحقوق محفوظة.',
-    'footer.dev':         'المطور',
-    'page.appointments':  'جميع المواعيد',
-    'page.messages':      'الرسائل',
-    'search.appointments': 'البحث عن موعد…',
-    'search.messages':     'البحث في الرسائل…',
-    'search.settings':     'بحث…',
-    'settings.personal.title': 'المعلومات الشخصية',
-    'settings.personal.sub':   'عدّل اسمك وبريدك الإلكتروني وكلمة المرور',
-    'settings.notif.title':    'الإشعارات',
-    'settings.notif.sub':      'إدارة التنبيهات',
-    'settings.pref.title':     'التفضيلات',
-    'settings.pref.sub':       'اللغة والعرض',
-    'settings.security.title': 'الأمان',
-    'settings.security.sub':   'إدارة الوصول إلى حسابك',
-    'settings.save':           'حفظ',
-    'settings.logout':         'تسجيل الخروج',
-    'settings.logout.desc':    'إنهاء الجلسة الحالية',
-    'settings.delete':         'حذف الحساب',
-    'settings.delete.desc':    'يحذف جميع بياناتك نهائياً',
-    'settings.active':         'حساب نشط',
-  }
+/**
+ * i18n.js — Système multilingue RDV
+ * Langues : fr | en | ar
+ * Persistance : localStorage (clé rdv_lang)
+ */
+
+const I18N_KEY  = 'rdv_lang';
+const SUPPORTED = ['fr', 'en', 'ar'];
+const LANG_META = {
+  fr: { flag: '🇫🇷', label: 'Français' },
+  en: { flag: '🇬🇧', label: 'English'  },
+  ar: { flag: '🇲🇦', label: 'العربية'  },
 };
 
-const LANG_KEY = 'rdv_lang';
+// Cache des dictionnaires déjà chargés
+const _cache = {};
 
+// ── Résolution du chemin vers les fichiers JSON ──────────────────────────────
+function _langPath(code) {
+  // Fonctionne depuis pages/ (../assets/js/lang/) ou depuis la racine (assets/js/lang/)
+  const isPages = window.location.pathname.includes('/pages/');
+  const base = isPages ? '../assets/js/lang/' : 'assets/js/lang/';
+  return `${base}${code}.json`;
+}
+
+// ── Chargement asynchrone d'un dictionnaire ──────────────────────────────────
+async function _loadDict(code) {
+  if (_cache[code]) return _cache[code];
+  try {
+    const res  = await fetch(_langPath(code));
+    const dict = await res.json();
+    _cache[code] = dict;
+    return dict;
+  } catch {
+    return {};
+  }
+}
+
+// ── Getters / setters ────────────────────────────────────────────────────────
 function getLang() {
-  return localStorage.getItem(LANG_KEY) || 'fr';
+  const saved = localStorage.getItem(I18N_KEY) || localStorage.getItem('lang') || 'fr';
+  return SUPPORTED.includes(saved) ? saved : 'fr';
 }
 
-function setLang(lang) {
-  localStorage.setItem(LANG_KEY, lang);
-  applyLang(lang);
+function setLang(code) {
+  if (!SUPPORTED.includes(code)) return;
+  localStorage.setItem(I18N_KEY, code);
+  localStorage.setItem('lang', code);
+  applyLang(code);
 }
 
-function t(key) {
-  const lang = getLang();
-  return (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || (TRANSLATIONS['fr'][key]) || key;
-}
+// ── Application de la langue ─────────────────────────────────────────────────
+async function applyLang(code) {
+  const isRTL  = code === 'ar';
 
-function applyLang(lang) {
-  const dict = TRANSLATIONS[lang] || TRANSLATIONS['fr'];
-  const isRTL = lang === 'ar';
+  // Mise à jour immédiate du bouton (avant le chargement du dictionnaire)
+  _updateSwitcherUI(code);
 
-  document.documentElement.lang = lang;
+  // Direction + langue HTML
+  document.documentElement.lang = code;
   document.documentElement.dir  = isRTL ? 'rtl' : 'ltr';
 
-  // Apply all data-i18n elements
+  // Police arabe
+  if (isRTL) {
+    if (!document.getElementById('arabic-font')) {
+      const link = document.createElement('link');
+      link.id   = 'arabic-font';
+      link.rel  = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap';
+      document.head.appendChild(link);
+    }
+    document.body.style.fontFamily = "'Cairo', 'Inter', sans-serif";
+  } else {
+    document.body.style.fontFamily = '';
+  }
+
+  // Charger et appliquer les traductions
+  const dict   = await _loadDict(code);
+
+  // Textes data-i18n
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
-    if (dict[key]) el.textContent = dict[key];
+    if (dict[key] !== undefined) el.textContent = dict[key];
   });
 
-  // Placeholders
+  // Placeholders data-i18n-placeholder
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.dataset.i18nPlaceholder;
-    if (dict[key]) el.placeholder = dict[key];
+    if (dict[key] !== undefined) el.placeholder = dict[key];
   });
 
-  // Update lang switcher — show current lang on button, hide it from dropdown
-  const currentBtn = document.getElementById('lang-current-btn');
-  const labels = { fr: 'FR', en: 'EN', ar: '\u0639' };
-  if (currentBtn) currentBtn.textContent = labels[lang] || lang.toUpperCase();
-  document.querySelectorAll('.lang-option').forEach(btn => {
-    btn.style.display = btn.dataset.lang === lang ? 'none' : '';
-  });
-
-  // RTL sidebar margin fix
+  // RTL : ajustement sidebar
   const main   = document.querySelector('.main');
   const footer = document.querySelector('.dash-footer');
-  if (main)   { main.style.marginLeft   = isRTL ? '0'     : ''; main.style.marginRight   = isRTL ? '240px' : ''; }
-  if (footer) { footer.style.marginLeft = isRTL ? '0'     : ''; footer.style.marginRight = isRTL ? '240px' : ''; }
+  if (main) {
+    main.style.marginLeft  = isRTL ? '0'     : '';
+    main.style.marginRight = isRTL ? '220px' : '';
+  }
+  if (footer) {
+    footer.style.marginLeft  = isRTL ? '0'     : '';
+    footer.style.marginRight = isRTL ? '220px' : '';
+  }
 }
 
-function toggleLangDropdown(e) {
-  if (e) e.stopPropagation();
-  const dd = document.getElementById('lang-dropdown');
-  if (!dd) return;
-  dd.classList.toggle('open');
-}
-document.addEventListener('click', () => {
-  const dd = document.getElementById('lang-dropdown');
-  if (dd) dd.classList.remove('open');
-});
+// ── UI du sélecteur ──────────────────────────────────────────────────────────
+function _updateSwitcherUI(code) {
+  const meta = LANG_META[code];
+  const btn  = document.getElementById('lang-switcher-btn');
+  if (!btn) return;
 
-// ── Page transitions with splash screen ──
+  const flagEl = btn.querySelector('.ls-flag');
+  const labelEl = btn.querySelector('.ls-label');
+
+  if (flagEl) flagEl.textContent = meta.flag;
+  if (labelEl) labelEl.textContent = meta.label;
+
+  document.querySelectorAll('.ls-option').forEach(opt => {
+    opt.classList.toggle('ls-option--active', opt.dataset.lang === code);
+  });
+}
+
+// ── Injection du sélecteur dans un conteneur ─────────────────────────────────
+function injectLangSwitcher(container) {
+  if (!container || document.getElementById('lang-switcher')) return;
+
+  const current = getLang();
+  const meta    = LANG_META[current];
+
+  const wrapper = document.createElement('div');
+  wrapper.id        = 'lang-switcher';
+  wrapper.className = 'lang-switcher';
+  wrapper.innerHTML = `
+    <button id="lang-switcher-btn" class="ls-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+      <span class="ls-flag">${meta.flag}</span>
+      <span class="ls-label">${meta.label}</span>
+      <svg class="ls-arrow" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <ul class="ls-dropdown" role="listbox" aria-label="Choisir la langue">
+      ${SUPPORTED.map(code => `
+        <li class="ls-option${code === current ? ' ls-option--active' : ''}"
+            role="option" data-lang="${code}" tabindex="0"
+            aria-selected="${code === current}">
+          <span class="ls-opt-flag">${LANG_META[code].flag}</span>
+          <span class="ls-opt-label">${LANG_META[code].label}</span>
+        </li>`).join('')}
+    </ul>`;
+
+  container.appendChild(wrapper);
+
+  const btn      = wrapper.querySelector('#lang-switcher-btn');
+  const dropdown = wrapper.querySelector('.ls-dropdown');
+
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = wrapper.classList.toggle('ls-open');
+    btn.setAttribute('aria-expanded', open);
+  });
+
+  wrapper.querySelectorAll('.ls-option').forEach(opt => {
+    const select = () => {
+      setLang(opt.dataset.lang);
+      wrapper.classList.remove('ls-open');
+      btn.setAttribute('aria-expanded', 'false');
+    };
+    opt.addEventListener('click', select);
+    opt.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') select(); });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!wrapper.contains(e.target)) {
+      wrapper.classList.remove('ls-open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
+// ── Transitions de page (splash) ─────────────────────────────────────────────
 (function () {
-
   function createSplash() {
     const el = document.createElement('div');
     el.id = 'page-splash';
@@ -199,8 +187,8 @@ document.addEventListener('click', () => {
           <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#4a9eff"/>
-                <stop offset="50%" stop-color="#1f5fbf"/>
+                <stop offset="0%"   stop-color="#4a9eff"/>
+                <stop offset="50%"  stop-color="#1f5fbf"/>
                 <stop offset="100%" stop-color="#0d3d7d"/>
               </linearGradient>
             </defs>
@@ -220,18 +208,14 @@ document.addEventListener('click', () => {
 
   function showSplash(href) {
     const splash = createSplash();
-    // force reflow then animate in
     requestAnimationFrame(() => {
       splash.classList.add('splash-in');
       setTimeout(() => { window.location.href = href; }, 820);
     });
   }
 
-  // Fade in page on load
   document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('page-enter');
-
-    // Scroll reveal
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
@@ -240,7 +224,6 @@ document.addEventListener('click', () => {
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
   });
 
-  // Intercept nav clicks
   document.addEventListener('click', (e) => {
     const link = e.target.closest('a[href]');
     if (!link) return;
@@ -249,8 +232,7 @@ document.addEventListener('click', () => {
     e.preventDefault();
     showSplash(href);
   });
-
 })();
 
-// Init on load
+// ── Init au chargement ────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => applyLang(getLang()));

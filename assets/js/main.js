@@ -165,36 +165,7 @@ function initModal() {
   }
 }
 
-function applyTheme(theme) {
-  const isLight = theme === 'light';
-  document.body.classList.toggle('light-theme', isLight);
-  document.body.classList.toggle('dark-mode', !isLight);
-  document.body.dataset.theme = isLight ? 'light' : 'dark';
-  localStorage.setItem('theme', isLight ? 'light' : 'dark');
-  // Maintient la préférence des anciennes pages qui lisent encore cette clé.
-  localStorage.setItem('rdv-theme', isLight ? 'light' : 'dark');
-
-  const btn = document.getElementById('theme-toggle');
-  if (btn) {
-    btn.setAttribute('aria-label', isLight ? 'Activer le mode sombre' : 'Activer le mode clair');
-    btn.setAttribute('title', isLight ? 'Activer le mode sombre' : 'Activer le mode clair');
-    btn.innerHTML = isLight
-      ? `<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>`
-      : `<svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>`;
-  }
-}
-
 function initTopIcons() {
-  const themeBtn = document.getElementById('theme-toggle');
-  if (themeBtn) {
-    themeBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const nextTheme = document.body.classList.contains('light-theme') ? 'dark' : 'light';
-      applyTheme(nextTheme);
-    });
-  }
-
   const nav = (id, href) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -208,11 +179,6 @@ function initTopIcons() {
   nav('stat-card-messages', './messages.html');
 }
 
-function initGlobalTheme() {
-  const saved = localStorage.getItem('theme') || localStorage.getItem('rdv-theme') || 'dark';
-  applyTheme(saved === 'light' ? 'light' : 'dark');
-}
-
 function initProfileName() {
   const el = document.getElementById('profile-name');
   const welcomeEl = document.getElementById('welcome-name');
@@ -220,10 +186,10 @@ function initProfileName() {
   const accountBtn = document.getElementById('btn-account');
 
   const user = getCurrentUser();
-  const name = (user && user.fullname) ? user.fullname : 'Utilisateur';
-  const firstName = String(name).trim().split(/\s+/)[0] || 'Utilisateur';
+  const fullName = (user && user.fullname) ? user.fullname : (user && user.name) ? user.name : 'Utilisateur';
+  const firstName = String(fullName).trim().split(/\s+/)[0] || 'Utilisateur';
 
-  if (el) el.textContent = name;
+  if (el) el.textContent = fullName;
   if (welcomeEl) welcomeEl.textContent = firstName;
   if (dashboardWelcomeEl) dashboardWelcomeEl.textContent = firstName;
 
@@ -234,24 +200,8 @@ function initProfileName() {
       label.className = 'account-label';
       accountBtn.appendChild(label);
     }
-    label.textContent = firstName;
-
-    try {
-      const savedProfile = JSON.parse(localStorage.getItem('rdv_settings_profile') || '{}');
-      if (savedProfile.avatar) {
-        let avatar = accountBtn.querySelector('.header-profile-avatar');
-        if (!avatar) {
-          avatar = document.createElement('img');
-          avatar.className = 'header-profile-avatar';
-          avatar.alt = 'Photo de profil';
-          accountBtn.prepend(avatar);
-        }
-        avatar.src = savedProfile.avatar;
-        avatar.hidden = false;
-        const icon = accountBtn.querySelector('svg');
-        if (icon) icon.hidden = true;
-      }
-    } catch { /* Ignore an invalid locally saved profile. */ }
+    label.textContent = fullName.length > 10 ? firstName : fullName;
+    label.title = fullName;
   }
 }
 
@@ -315,43 +265,6 @@ function initSettingsPage() {
   if (phoneInput) phoneInput.value = savedProfile.phone || '';
   if (passwordInput) passwordInput.value = '';
 
-  const profileImageInput = document.getElementById('profile-image-input');
-  const profileImageTrigger = document.getElementById('profile-image-trigger');
-  const profileImageButton = document.getElementById('profile-image-button');
-  const profileImagePreview = document.getElementById('profile-image-preview');
-  const profileImageFallback = document.getElementById('profile-image-fallback');
-  const headerProfileAvatar = document.getElementById('header-profile-avatar');
-  const setProfileImage = image => {
-    const hasImage = Boolean(image);
-    [profileImagePreview, headerProfileAvatar].forEach(element => {
-      if (!element) return;
-      element.hidden = !hasImage;
-      if (hasImage) element.src = image;
-    });
-    if (profileImageFallback) profileImageFallback.hidden = hasImage;
-    const accountIcon = document.querySelector('#btn-account > svg');
-    if (accountIcon) accountIcon.hidden = hasImage;
-  };
-  setProfileImage(savedProfile.avatar || '');
-  [profileImageTrigger, profileImageButton].forEach(button => button?.addEventListener('click', () => profileImageInput?.click()));
-  profileImageInput?.addEventListener('change', () => {
-    const file = profileImageInput.files?.[0];
-    if (!file) return;
-    if (!['image/jpeg', 'image/png'].includes(file.type)) {
-      showMessage('Choisissez une image JPG ou PNG.', 'error');
-      profileImageInput.value = '';
-      return;
-    }
-    const reader = new FileReader();
-    reader.addEventListener('load', () => {
-      savedProfile = { ...savedProfile, avatar: reader.result };
-      localStorage.setItem(STORAGE.profile, JSON.stringify(savedProfile));
-      setProfileImage(savedProfile.avatar);
-      showMessage('Photo de profil mise à jour.');
-    });
-    reader.readAsDataURL(file);
-  });
-
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     const name = nameInput.value.trim();
@@ -396,13 +309,16 @@ function initSettingsPage() {
 
   const preferences = readStorage(STORAGE.preferences, { language: 'fr', timezone: 'Africa/Casablanca' });
   if (languageSelect) {
-    languageSelect.value = localStorage.getItem('lang') || preferences.language;
+    languageSelect.value = localStorage.getItem('rdv_lang') || localStorage.getItem('lang') || preferences.language || 'fr';
     languageSelect.addEventListener('change', () => {
       preferences.language = languageSelect.value;
       localStorage.setItem(STORAGE.preferences, JSON.stringify(preferences));
-      localStorage.setItem('lang', languageSelect.value);
-      localStorage.setItem('rdv_lang', languageSelect.value);
-      updateLanguage(languageSelect.value);
+      if (typeof setLang === 'function') {
+        setLang(languageSelect.value);
+      } else {
+        localStorage.setItem('rdv_lang', languageSelect.value);
+        localStorage.setItem('lang', languageSelect.value);
+      }
       showMessage('Langue enregistrée.');
     });
   }
@@ -418,11 +334,11 @@ function initSettingsPage() {
     darkModeInput.checked = !document.body.classList.contains('light-theme');
     document.body.classList.toggle('dark-theme', darkModeInput.checked);
     darkModeInput.addEventListener('change', () => {
-      const theme = darkModeInput.checked ? 'dark' : 'light';
-      if (typeof window.applyTheme === 'function') window.applyTheme(theme);
-      else document.body.classList.toggle('light-theme', theme === 'light');
-      document.body.classList.toggle('dark-theme', theme === 'dark');
-      showMessage(`Mode ${theme === 'dark' ? 'sombre' : 'clair'} activé.`);
+      const isDark = darkModeInput.checked;
+      document.body.classList.toggle('light-theme', !isDark);
+      document.body.classList.toggle('dark-theme', isDark);
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      showMessage(`Mode ${isDark ? 'sombre' : 'clair'} activé.`);
     });
   }
 
@@ -743,7 +659,6 @@ function boot() {
   initProfileName();
   initPillFromSession();
   initDashboardWelcome();
-  initGlobalTheme();
   initSettingsPage();
   initModal();
 

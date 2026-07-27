@@ -7,7 +7,7 @@
   <title>RDV — Tableau de bord</title>
 
   <script src="../assets/js/auth.service.js"></script>
-  <script>requireAdmin();</script>
+  <script>requireAuth();</script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -46,26 +46,26 @@
           <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
           <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
         </svg>
-        Dashboard
+        <span data-i18n="nav.dashboard">Dashboard</span>
       </a>
       <a href="./appointments.html">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
           <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
         </svg>
-        Rendez-vous
+        <span data-i18n="nav.appointments">Rendez-vous</span>
       </a>
       <a href="./messages.html">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
-        Messages
+        <span data-i18n="nav.messages">Messages</span>
       </a>
       <a href="./parametres.html">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
-        Paramètres
+        <span data-i18n="nav.settings">Paramètres</span>
       </a>
       <a href="#" class="nav-logout" onclick="cognitoSignOut(); return false;">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
@@ -73,7 +73,7 @@
           <polyline points="16 17 21 12 16 7"/>
           <line x1="21" y1="12" x2="9" y2="12"/>
         </svg>
-        Déconnexion
+        <span data-i18n="nav.logout">Déconnexion</span>
       </a>
     </nav>
   </aside>
@@ -87,21 +87,13 @@
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
-        <input type="search" placeholder="Rechercher…" aria-label="Rechercher"/>
+        <input type="search" data-i18n-placeholder="search.placeholder" placeholder="Rechercher…" aria-label="Rechercher"/>
         <kbd class="kbd">⌘ K</kbd>
       </div>
 
-      <div class="dash-header-actions">
-        <button class="hdr-btn" id="theme-toggle" type="button" aria-label="Changer le thème" title="Changer le thème">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
-        </button>
+      <div class="dash-header-actions" id="dash-header-actions">
         <button class="hdr-btn hdr-btn--account" id="btn-account" type="button" aria-label="Mon compte" title="Mon compte">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
+          <img class="static-avatar" src="../assets/images/favicon.svg" alt="Avatar">
           <span class="account-label" id="header-username">Compte</span>
         </button>
       </div>
@@ -115,11 +107,11 @@
         <div class="welcome-card">
           <div class="welcome-text">
             <p class="welcome-eyebrow">Tableau de bord</p>
-            <h1 class="welcome-heading">Bonjour, <span id="welcome-name">—</span></h1>
-            <p class="welcome-sub">Voici un résumé de votre activité du jour.</p>
+            <h1 class="welcome-heading"><span data-i18n="welcome.greeting">Bonjour</span>, <span id="welcome-name">—</span></h1>
+            <p class="welcome-sub" data-i18n="welcome.sub">Voici un résumé de votre activité du jour.</p>
           </div>
           <div class="welcome-date" aria-live="polite">
-            <p class="date-label">Aujourd'hui</p>
+            <p class="date-label" data-i18n="welcome.today">Aujourd'hui</p>
             <p class="date-value" id="hero-date">—</p>
             <p class="date-time" id="hero-time">—</p>
           </div>
@@ -137,7 +129,7 @@
               </svg>
             </div>
             <div class="kpi-value" id="stat-rdv">—</div>
-            <div class="kpi-label">Rendez-vous</div>
+            <div class="kpi-label" data-i18n="stat.appointments">Rendez-vous</div>
           </article>
 
           <article class="kpi-card" id="stat-card-messages" role="button" tabindex="0" aria-label="Messages">
@@ -147,7 +139,7 @@
               </svg>
             </div>
             <div class="kpi-value" id="stat-messages">—</div>
-            <div class="kpi-label">Messages</div>
+            <div class="kpi-label" data-i18n="stat.messages">Messages</div>
           </article>
 
         </div>
@@ -163,10 +155,10 @@
                   <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
                 </svg>
               </div>
-              <h2 class="card-title">Prochains rendez-vous</h2>
+              <h2 class="card-title" data-i18n="rdv.upcoming.title">Prochains rendez-vous</h2>
             </div>
             <a href="./appointments.html" class="card-action-link">
-              Voir tout
+              <span data-i18n="rdv.upcoming.link">Voir tout</span>
               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M5 12h14M12 5l7 7-7 7"/>
               </svg>
@@ -188,12 +180,12 @@
                   <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
                 </svg>
               </div>
-              <h2 class="card-title">Plateforme RDV</h2>
+              <h2 class="card-title" data-i18n="rdv.platform.title">Plateforme RDV</h2>
             </div>
             <span class="card-badge">v1.0</span>
           </header>
           <div class="card-body">
-            <p class="card-desc">
+            <p class="card-desc" data-i18n="platform.desc">
               Gérez vos rendez-vous et communiquez en temps réel
               depuis une interface claire, rapide et sécurisée.
             </p>
@@ -205,6 +197,7 @@
   </main>
 </div><!-- /.container -->
 
+<script src="../assets/js/i18n.js"></script>
 <script src="../assets/js/transition.js"></script>
 <script src="../assets/js/main.js"></script>
 <script src="../assets/js/dashboard.init.js"></script>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RDV — Paramètres</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -34,14 +34,13 @@
                 <span class="logo-text__sub">Plateforme</span>
             </div>
         </a>
-  
 
         <nav>
-            <a href="./index.html">Dashboard</a>
-            <a href="./appointments.html">Rendez-vous</a>
-            <a href="./messages.html">Messages</a>
-            <a href="./parametres.html" class="active">Paramètres</a>
-            <a href="#" onclick="cognitoSignOut(); return false;">Déconnexion</a>
+            <a href="./index.html" data-i18n="nav.dashboard">Dashboard</a>
+            <a href="./appointments.html" data-i18n="nav.appointments">Rendez-vous</a>
+            <a href="./messages.html" data-i18n="nav.messages">Messages</a>
+            <a href="./parametres.html" class="active" data-i18n="nav.settings">Paramètres</a>
+            <a href="#" onclick="cognitoSignOut(); return false;" data-i18n="nav.logout">Déconnexion</a>
         </nav>
     </aside>
 
@@ -51,14 +50,13 @@
                 <svg width="14" height="14" fill="none" stroke="#7a7a9a" stroke-width="2" viewBox="0 0 24 24">
                     <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
                 </svg>
-                <input id="settings-search" type="search" placeholder="Rechercher dans les paramètres…" aria-label="Rechercher dans les paramètres">
+                <input id="settings-search" type="search" data-i18n-placeholder="search.settings" placeholder="Rechercher dans les paramètres…" aria-label="Rechercher dans les paramètres">
                 <span class="kbd">⌘ K</span>
             </div>
-            <div class="dash-header-right">
+            <div class="dash-header-right" id="dash-header-right">
                 <button class="hdr-icon-btn" id="btn-account" title="Compte" type="button" aria-label="Compte">
-                    <img id="header-profile-avatar" class="header-profile-avatar" alt="Photo de profil" hidden>
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    <span class="account-label">Compte</span><span class="hdr-badge" style="display:none;"></span>
+                    <img class="static-avatar" src="../assets/images/favicon.svg" alt="Avatar">
+                    <span class="account-label" data-i18n="account.label">Compte</span><span class="hdr-badge" style="display:none;"></span>
                 </button>
             </div>
         </header>
@@ -73,35 +71,23 @@
                     <div class="section-header">
                         <div class="section-header__icon"><i class="fa-solid fa-user"></i></div>
                         <div>
-                            <div class="section-header__title">Informations personnelles</div>
-                            <div class="section-header__sub">Modifiez votre nom, email et mot de passe</div>
+                            <div class="section-header__title" data-i18n="settings.personal.title">Informations personnelles</div>
+                            <div class="section-header__sub" data-i18n="settings.personal.sub">Modifiez votre nom, email et mot de passe</div>
                         </div>
                     </div>
                     <div class="section-body">
                         <form id="settings-form" autocomplete="on">
                             <div class="field-group">
-                                <div class="profile-image-control">
-                                    <button id="profile-image-trigger" class="profile-image-preview" type="button" aria-label="Changer la photo de profil">
-                                        <img id="profile-image-preview" alt="Aperçu de la photo de profil" hidden>
-                                        <span id="profile-image-fallback" aria-hidden="true">?</span>
-                                    </button>
-                                    <div>
-                                        <strong>Photo de profil</strong>
-                                        <p>JPG ou PNG, affichée dans votre en-tête.</p>
-                                        <button id="profile-image-button" class="profile-image-button" type="button">Changer l'image</button>
-                                    </div>
-                                    <input id="profile-image-input" type="file" accept="image/jpeg,image/png" hidden>
-                                </div>
                                 <div class="field-row">
                                     <div class="field">
-                                        <label for="settings-name">Nom complet</label>
+                                        <label for="settings-name" data-i18n="settings.name.label">Nom complet</label>
                                         <div class="field-input-wrap">
                                             <i class="fa-solid fa-user"></i>
                                             <input id="settings-name" name="name" type="text" required placeholder="Votre nom"/>
                                         </div>
                                     </div>
                                     <div class="field">
-                                        <label for="settings-email">Adresse email</label>
+                                        <label for="settings-email" data-i18n="settings.email.label">Adresse email</label>
                                         <div class="field-input-wrap">
                                             <i class="fa-solid fa-envelope"></i>
                                             <input id="settings-email" name="email" type="email" required placeholder="vous@exemple.com"/>
@@ -110,14 +96,14 @@
                                 </div>
                                 <div class="field-row">
                                     <div class="field">
-                                        <label for="settings-password">Nouveau mot de passe</label>
+                                        <label for="settings-password" data-i18n="settings.password.label">Nouveau mot de passe</label>
                                         <div class="field-input-wrap">
                                             <i class="fa-solid fa-lock"></i>
                                             <input id="settings-password" name="password" type="password" placeholder="Laisser vide pour ne pas changer" minlength="6"/>
                                         </div>
                                     </div>
                                     <div class="field">
-                                        <label for="settings-phone">Téléphone</label>
+                                        <label for="settings-phone" data-i18n="settings.phone.label">Téléphone</label>
                                         <div class="field-input-wrap">
                                             <i class="fa-solid fa-phone"></i>
                                             <input id="settings-phone" name="phone" type="tel" placeholder="+212 6 XX XX XX XX"/>
@@ -126,7 +112,7 @@
                                 </div>
                                 <div class="save-bar">
                                     <button class="btn-save" type="submit">
-                                        <i class="fa-solid fa-floppy-disk"></i> Enregistrer
+                                        <i class="fa-solid fa-floppy-disk"></i> <span data-i18n="settings.save">Enregistrer</span>
                                     </button>
                                     <span id="settings-message" role="status" aria-live="polite"></span>
                                 </div>
@@ -140,8 +126,8 @@
                     <div class="section-header">
                         <div class="section-header__icon"><i class="fa-solid fa-bell"></i></div>
                         <div>
-                            <div class="section-header__title">Notifications</div>
-                            <div class="section-header__sub">Gérez vos alertes</div>
+                            <div class="section-header__title" data-i18n="settings.notif.title">Notifications</div>
+                            <div class="section-header__sub" data-i18n="settings.notif.sub">Gérez vos alertes</div>
                         </div>
                     </div>
                     <div class="section-body">
@@ -149,8 +135,8 @@
                             <div class="toggle-info">
                                 <div class="toggle-info__icon"><i class="fa-solid fa-calendar-check"></i></div>
                                 <div>
-                                    <div class="toggle-info__label">Rappels de rendez-vous</div>
-                                    <div class="toggle-info__desc">Recevoir une alerte avant chaque RDV</div>
+                                    <div class="toggle-info__label" data-i18n="settings.notif.reminders.label">Rappels de rendez-vous</div>
+                                    <div class="toggle-info__desc" data-i18n="settings.notif.reminders.desc">Recevoir une alerte avant chaque RDV</div>
                                 </div>
                             </div>
                             <label class="toggle"><input id="notification-reminders" type="checkbox" checked><span class="toggle-slider"></span></label>
@@ -159,8 +145,8 @@
                             <div class="toggle-info">
                                 <div class="toggle-info__icon"><i class="fa-solid fa-envelope"></i></div>
                                 <div>
-                                    <div class="toggle-info__label">Notifications email</div>
-                                    <div class="toggle-info__desc">Recevoir les résumés par email</div>
+                                    <div class="toggle-info__label" data-i18n="settings.notif.email.label">Notifications email</div>
+                                    <div class="toggle-info__desc" data-i18n="settings.notif.email.desc">Recevoir les résumés par email</div>
                                 </div>
                             </div>
                             <label class="toggle"><input id="notification-email" type="checkbox" checked><span class="toggle-slider"></span></label>
@@ -169,8 +155,8 @@
                             <div class="toggle-info">
                                 <div class="toggle-info__icon"><i class="fa-solid fa-comment"></i></div>
                                 <div>
-                                    <div class="toggle-info__label">Nouveaux messages</div>
-                                    <div class="toggle-info__desc">Alerte à chaque nouveau message</div>
+                                    <div class="toggle-info__label" data-i18n="settings.notif.messages.label">Nouveaux messages</div>
+                                    <div class="toggle-info__desc" data-i18n="settings.notif.messages.desc">Alerte à chaque nouveau message</div>
                                 </div>
                             </div>
                             <label class="toggle"><input id="notification-messages" type="checkbox"><span class="toggle-slider"></span></label>
@@ -183,14 +169,14 @@
                     <div class="section-header">
                         <div class="section-header__icon"><i class="fa-solid fa-sliders"></i></div>
                         <div>
-                            <div class="section-header__title">Préférences</div>
-                            <div class="section-header__sub">Langue et affichage</div>
+                            <div class="section-header__title" data-i18n="settings.pref.title">Préférences</div>
+                            <div class="section-header__sub" data-i18n="settings.pref.sub">Langue et affichage</div>
                         </div>
                     </div>
                     <div class="section-body">
                         <div class="field-group">
                             <div class="field">
-                                <label>Langue</label>
+                                <label data-i18n="settings.lang.label">Langue</label>
                                 <div class="field-input-wrap">
                                     <i class="fa-solid fa-globe"></i>
                                     <select id="settings-language" name="language">
@@ -201,7 +187,7 @@
                                 </div>
                             </div>
                             <div class="field">
-                                <label>Fuseau horaire</label>
+                                <label data-i18n="settings.tz.label">Fuseau horaire</label>
                                 <div class="field-input-wrap">
                                     <i class="fa-solid fa-clock"></i>
                                     <select id="settings-timezone" name="timezone">
@@ -215,8 +201,8 @@
                                 <div class="toggle-info">
                                     <div class="toggle-info__icon"><i class="fa-solid fa-moon"></i></div>
                                     <div>
-                                        <div class="toggle-info__label">Mode sombre</div>
-                                        <div class="toggle-info__desc">Thème foncé pour l'interface</div>
+                                        <div class="toggle-info__label" data-i18n="settings.dark.label">Mode sombre</div>
+                                        <div class="toggle-info__desc" data-i18n="settings.dark.desc">Thème foncé pour l'interface</div>
                                     </div>
                                 </div>
                                 <label class="toggle"><input id="settings-dark-mode" type="checkbox"><span class="toggle-slider"></span></label>
@@ -230,27 +216,27 @@
                     <div class="section-header">
                         <div class="section-header__icon"><i class="fa-solid fa-shield-halved"></i></div>
                         <div>
-                            <div class="section-header__title">Sécurité</div>
-                            <div class="section-header__sub">Gérez l'accès à votre compte</div>
+                            <div class="section-header__title" data-i18n="settings.security.title">Sécurité</div>
+                            <div class="section-header__sub" data-i18n="settings.security.sub">Gérez l'accès à votre compte</div>
                         </div>
                     </div>
                     <div class="section-body">
                         <div class="danger-row">
                             <div>
-                                <div class="danger-label">Se déconnecter</div>
-                                <div class="danger-desc">Terminer la session en cours</div>
+                                <div class="danger-label" data-i18n="settings.logout">Se déconnecter</div>
+                                <div class="danger-desc" data-i18n="settings.logout.desc">Terminer la session en cours</div>
                             </div>
                             <button class="btn-danger" id="settings-logout" type="button">
-                                <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+                                <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="settings.logout">Déconnexion</span>
                             </button>
                         </div>
                         <div class="danger-row">
                             <div>
-                                <div class="danger-label">Supprimer le compte</div>
-                                <div class="danger-desc">Supprime définitivement toutes vos données</div>
+                                <div class="danger-label" data-i18n="settings.delete">Supprimer le compte</div>
+                                <div class="danger-desc" data-i18n="settings.delete.desc">Supprime définitivement toutes vos données</div>
                             </div>
                             <button class="btn-danger" id="settings-delete-account" type="button">
-                                <i class="fa-solid fa-trash"></i> Supprimer
+                                <i class="fa-solid fa-trash"></i> <span data-i18n="settings.delete">Supprimer</span>
                             </button>
                         </div>
                     </div>
@@ -262,6 +248,7 @@
     </main>
 </div>
 
+<script src="../assets/js/i18n.js"></script>
 <script src="../assets/js/transition.js"></script>
 <script src="../assets/js/main.js"></script>
 </body>
