@@ -1,8 +1,8 @@
 /* =============================================================
    RDV — Auth Service (Flask backend)
-   Remplace l'ancien système localStorage / Cognito simulé.
-   Prêt pour JWT : ajouter le token dans saveSession() et
-   l'envoyer dans les headers fetch() des futures requêtes.
+   Authentification par session Flask (cookie).
+   credentials: 'include' sur tous les appels API pour que
+   le navigateur envoie automatiquement le cookie de session.
    ============================================================= */
 
 const _IS_LOCAL = ['localhost', '127.0.0.1'].includes(window.location.hostname);
@@ -31,7 +31,7 @@ function normalizeSessionUser(user) {
   };
 }
 
-/** Sauvegarde l'utilisateur en session (7 jours). */
+/** Sauvegarde les infos utilisateur en localStorage (7 jours). */
 function saveSession(user) {
   const normalizedUser = normalizeSessionUser(user);
   const session = {
@@ -41,7 +41,6 @@ function saveSession(user) {
     email:     normalizedUser?.email || '',
     role:      normalizedUser?.role || 'user',
     isAdmin:   normalizedUser?.isAdmin || false,
-    token:     user?.token || user?.access_token || '',
     expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000
   };
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
@@ -68,9 +67,12 @@ function isAuthenticated() {
   return getCurrentUser() !== null;
 }
 
-/** Supprime la session et redirige vers login. */
-function logout() {
+/** Supprime la session locale, invalide la session Flask, redirige vers login. */
+async function logout() {
   localStorage.removeItem(SESSION_KEY);
+  try {
+    await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'include' });
+  } catch { /* serveur injoignable, on continue */ }
   window.location.href = './login.html';
 }
 
@@ -99,9 +101,10 @@ function requireAdmin() {
  */
 async function register(fullname, email, password) {
   const res = await fetch(`${API_BASE}/register`, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ fullname, email, password })
+    method:      'POST',
+    credentials: 'include',
+    headers:     { 'Content-Type': 'application/json' },
+    body:        JSON.stringify({ fullname, email, password })
   });
   const data = await res.json();
   if (!data.success) throw data.message || 'Erreur lors de l\'inscription.';
@@ -116,16 +119,16 @@ async function register(fullname, email, password) {
  */
 async function login(email, password) {
   const res = await fetch(`${API_BASE}/login`, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ email, password })
+    method:      'POST',
+    credentials: 'include',
+    headers:     { 'Content-Type': 'application/json' },
+    body:        JSON.stringify({ email, password })
   });
   const data = await res.json();
   if (!data.success) throw data.message || 'Email ou mot de passe incorrect.';
-  // Fusionne le token retourné à la racine avec l'objet user avant de sauvegarder
-  const user = { ...data.user, token: data.token || data.access_token || data.user?.token || '' };
-  saveSession(user);
-  return user;
+  console.log('[login] cookie de session reçu, user:', data.user);
+  saveSession(data.user);
+  return data.user;
 }
 
 // ── Route Guard ───────────────────────────────────────────────
@@ -134,11 +137,12 @@ function requireAuth() {
   if (!isAuthenticated()) window.location.replace('./login.html');
 }
 
-// ── apiFetch — fetch authentifié avec token JWT ───────────────
+// ── apiFetch — fetch authentifié par cookie de session Flask ──
 
 /**
- * Wrapper autour de fetch() qui injecte automatiquement le token JWT
- * et redirige vers login en cas de réponse 401.
+ * Wrapper autour de fetch() qui envoie automatiquement le cookie
+ * de session Flask (credentials: 'include') et redirige vers
+ * login en cas de réponse 401.
  */
 async function apiFetch(url, options = {}) {
   const user = getCurrentUser();
@@ -151,22 +155,18 @@ async function apiFetch(url, options = {}) {
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
   }
-  if (user.token) {
-    headers.set('Authorization', `Bearer ${user.token}`);
-  }
+  // Pas de Authorization Bearer — l'auth se fait via le cookie de session Flask
 
   let response;
   try {
     response = await fetch(url, { ...options, headers, credentials: 'include' });
+    console.log(`[apiFetch] ${options.method || 'GET'} ${url} → ${response.status}`);
   } catch (networkError) {
-    // Erreur réseau pure (serveur éteint, CORS, pas de connexion)
-    // On NE supprime PAS la session — l'utilisateur est toujours connecté
-    console.error('[apiFetch] Network error:', url, networkError);
+    console.error('[apiFetch] Erreur réseau:', url, networkError);
     throw new Error('Impossible de contacter le serveur. Vérifiez votre connexion.');
   }
 
   if (response.status === 401) {
-    // 401 = token expiré ou invalide côté serveur → on déconnecte
     localStorage.removeItem(SESSION_KEY);
     window.location.replace('./login.html');
     throw new Error('Session expirée. Veuillez vous reconnecter.');
