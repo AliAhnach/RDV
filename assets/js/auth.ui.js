@@ -44,7 +44,7 @@
 
   function showMessage(el, text, isError = true) {
     if (!el) return;
-    el.textContent  = text;
+    el.textContent  = (text instanceof Error) ? text.message : String(text || '');
     el.style.color  = isError ? '#e53e3e' : '#1f5fbf';
   }
 
@@ -73,11 +73,13 @@
     showMessage(msg, '');
 
     try {
+      console.log('[signin] tentative de connexion →', API_BASE + '/login');
       const user = await login(email, password);
+      console.log('[signin] connecté :', user);
       const role = resolveUserRole(user);
-      const isAdmin = role === 'admin';
-      window.location.href = isAdmin ? './index.html' : './user-dashboard.html';
+      window.location.href = role === 'admin' ? './index.html' : './user-dashboard.html';
     } catch (err) {
+      console.error('[signin] échec :', err);
       showMessage(msg, err);
       setSubmitting(btn, false);
     }
@@ -103,13 +105,15 @@
     showMessage(msg, '');
 
     try {
+      console.log('[signup] inscription →', API_BASE + '/register');
       await register(fullname, email, password);
       showMessage(msg, 'Compte créé ! Connexion en cours…', false);
       const user = await login(email, password);
+      console.log('[signup] connecté :', user);
       const role = resolveUserRole(user);
-      const isAdmin = role === 'admin';
-      window.location.href = isAdmin ? './index.html' : './user-dashboard.html';
+      window.location.href = role === 'admin' ? './index.html' : './user-dashboard.html';
     } catch (err) {
+      console.error('[signup] échec :', err);
       showMessage(msg, err);
       setSubmitting(btn, false);
     }
