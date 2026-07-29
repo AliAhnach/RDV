@@ -206,7 +206,8 @@
 }
 .btn-confirm,
 .btn-refuse,
-.btn-detail {
+.btn-detail,
+.btn-receipt {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -238,6 +239,19 @@
   font-family: inherit;
 }
 .btn-detail:hover { background: rgba(31,95,191,0.06); }
+.btn-receipt {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(31,95,191,0.18);
+  background: #eff6ff;
+  color: #1f5fbf;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 160ms;
+  font-family: inherit;
+}
+.btn-receipt:hover { background: rgba(31,95,191,0.12); }
 
 #user-rdv-list,
 #admin-rdv-list {

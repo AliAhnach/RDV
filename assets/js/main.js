@@ -469,17 +469,6 @@ function initHamburger() {
   btn.setAttribute('aria-controls', 'sidebar');
   btn.setAttribute('aria-expanded', 'false');
 
-  // Créer le bouton close une seule fois
-  let closeBtn = sidebar.querySelector('.sidebar-close');
-  if (!closeBtn) {
-    closeBtn = document.createElement('button');
-    closeBtn.type = 'button';
-    closeBtn.className = 'sidebar-close';
-    closeBtn.setAttribute('aria-label', 'Fermer le menu');
-    closeBtn.innerHTML = '✕';
-    sidebar.insertBefore(closeBtn, sidebar.firstChild);
-  }
-
   function openSidebar() {
     sidebar.classList.add('open');
     if (backdrop) backdrop.classList.add('open');
@@ -492,7 +481,6 @@ function initHamburger() {
     closeMobileSidebar();
   }
 
-  closeBtn.addEventListener('click', closeSidebar);
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();

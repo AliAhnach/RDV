@@ -5,13 +5,15 @@
    le navigateur envoie automatiquement le cookie de session.
    ============================================================= */
 
-// Unique production API origin. All application requests must use this base.
-const API_BASE = 'https://aliahnach.pythonanywhere.com/api';
-const API_ORIGIN = new URL(API_BASE).origin;
+// Base URL de l'API de production PythonAnywhere.
+const API_BASE = 'https://AliAhnach.pythonanywhere.com/api';
+
+// Affiche l'URL de l'API utilisée dans la console pour le débogage.
+console.log(`[AuthService] L'API de base est : ${API_BASE}`);
 
 async function healthCheck() {
   try {
-    const response = await fetch(`${API_ORIGIN}/health`, { credentials: 'include' });
+    const response = await fetch(`${API_BASE}/health`, { credentials: 'include' });
     if (!response.ok) throw new Error('Health check failed');
     return await response.json();
   } catch (error) {
@@ -188,7 +190,8 @@ async function apiFetch(url, options = {}) {
   }
 
   const headers = new Headers(options.headers || {});
-  if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
+  const method = (options.method || 'GET').toUpperCase();
+  if (!headers.has('Content-Type') && options.body && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
   }
   // Pas de Authorization Bearer — l'auth se fait via le cookie de session Flask

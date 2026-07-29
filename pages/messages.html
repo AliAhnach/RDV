@@ -98,6 +98,7 @@
               <div class="msg-thread-header-sub" id="thread-sub">—</div>
             </div>
             <button class="msg-mark-read-btn" id="btn-mark-read" style="display:none;" data-i18n="btn.markread">Marquer comme lu</button>
+            <button class="msg-delete-conversation-btn" id="btn-delete-conversation" style="display:none;">Supprimer la conversation</button>
           </div>
 
           <div class="msg-thread-scroll" id="msg-thread-scroll"></div>
@@ -150,6 +151,7 @@
   const composeText   = document.getElementById('compose-text');
   const btnSend       = document.getElementById('btn-send');
   const btnMarkRead   = document.getElementById('btn-mark-read');
+  const btnDeleteConversation = document.getElementById('btn-delete-conversation');
   const btnNewMsg     = document.getElementById('btn-new-msg');
   const newMsgForm    = document.getElementById('msg-new-form');
   const newMsgText    = document.getElementById('new-msg-text');
@@ -252,6 +254,7 @@
     threadSub.textContent    = formatDateTime(conversation.created_at);
 
     btnMarkRead.style.display = (isAdmin && !conversation.is_read) ? '' : 'none';
+    btnDeleteConversation.style.display = isAdmin ? '' : 'none';
 
     threadEmpty.style.display   = 'none';
     threadContent.style.display = 'flex';
@@ -274,8 +277,15 @@
 
       const wrap = document.createElement('div');
       wrap.className = 'msg-bubble-wrap ' + (sentByMe ? 'sent' : 'received');
+      wrap.dataset.messageId = message.id;
+
+      const deleteBtnHtml = isAdmin ? `
+        <button class="msg-delete-btn" type="button" data-message-id="${message.id}" aria-label="Supprimer ce message">✕</button>
+      ` : '';
+
       wrap.innerHTML = `
-        <div class="msg-bubble">${escHtml(message.content)}</div>
+        <div class="msg-bubble" data-message-id="${message.id}">${escHtml(message.content)}</div>
+        ${deleteBtnHtml}
         <div class="msg-bubble-meta">
           <span>${escHtml(label)}</span>
           <span>·</span>
@@ -284,7 +294,48 @@
       threadScroll.appendChild(wrap);
     });
 
+    threadScroll.querySelectorAll('.msg-delete-btn').forEach(btn => {
+      btn.addEventListener('click', async (event) => {
+        event.stopPropagation();
+        await handleDeleteMessage(btn.dataset.messageId);
+      });
+    });
+
     threadScroll.scrollTop = threadScroll.scrollHeight;
+  }
+
+  async function handleDeleteMessage(messageId) {
+    if (!window.confirm("Voulez-vous vraiment supprimer ce message ?\nCette action est irréversible.")) {
+      return;
+    }
+
+    const button = threadScroll.querySelector(`.msg-delete-btn[data-message-id=\"${messageId}\"]`);
+    if (button) button.disabled = true;
+
+    try {
+      const res = await apiFetch(`${API_BASE}/messages/${messageId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || `Erreur HTTP ${res.status}`);
+
+      const conversation = allConversations.find(c => c.id === activeConversationId);
+      if (conversation) {
+        conversation.messages = (conversation.messages || []).filter(msg => msg.id !== parseInt(messageId, 10));
+      }
+
+      const bubbleWrap = threadScroll.querySelector(`.msg-bubble-wrap[data-message-id=\"${messageId}\"]`);
+      if (bubbleWrap) bubbleWrap.remove();
+
+      setStatus('Message supprimé avec succès.');
+
+      if (conversation && conversation.messages.length === 0) {
+        threadScroll.innerHTML = `<div class="msg-empty-state"><div class="msg-empty-icon">🗑️</div>Aucun message dans cette conversation.</div>`;
+      }
+    } catch (err) {
+      console.error('Delete message failed:', err);
+      setStatus(err.message || 'Erreur lors de la suppression du message.', true);
+    } finally {
+      if (button) button.disabled = false;
+    }
   }
 
   // ── Charger conversations ─────────────────────────────────
@@ -371,26 +422,36 @@
     btnSendNew.addEventListener('click', sendNewMessage);
   }
 
-  async function sendNewMessage() {
-    const text = newMsgText.value.trim();
-    if (!text) return;
-    btnSendNew.disabled = true;
+  if (btnDeleteConversation) {
+    btnDeleteConversation.addEventListener('click', async () => {
+      if (!activeConversationId) return;
+      await deleteConversation(activeConversationId);
+    });
+  }
+
+  async function deleteConversation(conversationId) {
+    if (!window.confirm('Voulez-vous vraiment supprimer cette conversation et tous ses messages ?')) {
+      return;
+    }
+
+    btnDeleteConversation.disabled = true;
     try {
-      const res = await apiFetch(`${API_BASE}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sender_id: user.id, content: text })
-      });
+      const res = await apiFetch(`${API_BASE}/messages/conversation/${conversationId}`, { method: 'DELETE' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || `Erreur HTTP ${res.status}`);
-      newMsgText.value = '';
-      newMsgForm.style.display = 'none';
-      btnNewMsg.style.display = '';
-      await loadMessages();
+
+      allConversations = allConversations.filter(c => c.id !== conversationId);
+      activeConversationId = null;
+      threadContent.style.display = 'none';
+      threadEmpty.style.display = '';
+      layout.classList.remove('thread-open');
+      renderList(allConversations);
+      setStatus('Conversation supprimée avec succès.');
     } catch (err) {
-      setStatus(err.message || 'Erreur réseau.', true);
+      console.error('Delete conversation failed:', err);
+      setStatus(err.message || 'Erreur lors de la suppression de la conversation.', true);
     } finally {
-      btnSendNew.disabled = false;
+      btnDeleteConversation.disabled = false;
     }
   }
 

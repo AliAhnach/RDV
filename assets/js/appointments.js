@@ -1,6 +1,6 @@
 /* ── Appointments page logic ── */
 (() => {
-  const API_ROOT = API_BASE;
+  const API_ROOT = API_BASE; // Use the globally defined API_BASE
   const APPOINTMENTS_API = `${API_ROOT}/appointments`;
   const STATUS_REFRESH_DELAY = 15000;
 
@@ -128,25 +128,27 @@
       delete: '<path d="M4 7h16M10 11v6m4-6v6M9 7l1-3h4l1 3M6 7l1 14h10l1-14"/>',
       clock: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
       note: '<path d="M5 3h10l4 4v14H5zM15 3v5h5M8 12h8m-8 4h6"/>',
+      download: '<path d="M12 3v12m0 0l-4-4m4 4l4-4M6 17h12"/>',
     };
     return `<svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true">${paths[name] || ''}</svg>`;
-  }
-
-  function showFeedback(message, isError = false) {
-    const feedback = document.querySelector(
-      `${getCurrentRole() === 'admin' ? '#view-admin' : '#view-user'} .appointment-feedback`
-    );
-    if (!feedback) return;
-    feedback.textContent = message;
-    feedback.className = `appointment-feedback${isError ? ' appointment-feedback--error' : ''}`;
-    feedback.hidden = false;
-    window.setTimeout(() => { feedback.hidden = true; }, 3500);
   }
 
   function formatDate(d) {
     if (!d) return '—';
     const [y, m, day] = d.split('-');
     return `${day}/${m}/${y}`;
+  }
+
+  function showFeedback(message, isError = false) {
+    const feedback = document.querySelector('.appointment-feedback');
+    if (!feedback) {
+      alert(message);
+      return;
+    }
+    feedback.textContent = message;
+    feedback.className = `appointment-feedback${isError ? ' appointment-feedback--error' : ''}`;
+    feedback.hidden = false;
+    window.setTimeout(() => { feedback.hidden = true; }, 4000);
   }
 
   /* ── User detail modal ── */
@@ -203,6 +205,9 @@
       card.className = 'rdv-card';
       card.dataset.rdvId = rdv.id;
       card.style.animationDelay = `${i * 0.06}s`;
+      const receiptButton = rdv.status === 'Confirmé'
+        ? `<button class="btn-receipt" data-id="${rdv.id}">${actionIcon('download')}Reçu</button>`
+        : '';
       card.innerHTML = `
         <div class="rdv-card-icon ${cls}">${appointmentIcon()}</div>
         <div class="rdv-card-body">
@@ -216,6 +221,7 @@
         ${statusBadge(rdv.status)}
         <div class="rdv-card-actions">
           <button class="btn-detail" data-id="${rdv.id}">${actionIcon('detail')}Détails</button>
+          ${receiptButton}
         </div>
       `;
       container.appendChild(card);
@@ -224,6 +230,47 @@
     container.querySelectorAll('.btn-detail').forEach(btn => {
       btn.addEventListener('click', () => openUserModal(+btn.dataset.id));
     });
+    container.querySelectorAll('.btn-receipt').forEach(btn => {
+      btn.addEventListener('click', () => downloadAppointmentReceipt(+btn.dataset.id));
+    });
+  }
+
+  async function downloadAppointmentReceipt(id) {
+    const session = loadSession();
+    if (!session?.id) {
+      if (typeof showFeedback === 'function') {
+        showFeedback('Authentification requise pour télécharger le reçu.', true);
+      }
+      return;
+    }
+
+    try {
+      const receiptUrl = `${APPOINTMENTS_API}/${encodeURIComponent(id)}/receipt?user_id=${encodeURIComponent(session.id)}`;
+      const res = await apiFetch(receiptUrl);
+      if (!res.ok) {
+        await readApiResponse(res);
+      }
+
+      const blob = await res.blob();
+      const filename = `recu-rdv-${id}.pdf`;
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = filename;
+      anchor.style.display = 'none';
+      document.body.appendChild(anchor);
+      anchor.click();
+      window.setTimeout(() => {
+        URL.revokeObjectURL(url);
+        anchor.remove();
+      }, 1000);
+    } catch (error) {
+      if (typeof showFeedback === 'function') {
+        showFeedback(error.message || 'Impossible de télécharger le reçu.', true);
+      } else {
+        alert(error.message || 'Impossible de télécharger le reçu.');
+      }
+    }
   }
 
   /* ── ADMIN VIEW ── */

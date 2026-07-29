@@ -471,6 +471,24 @@ body.dark-mode .account-label { color: #f1f5f9; }
   display: flex; align-items: center; gap: 12px; flex-shrink: 0;
 }
 .msg-thread-header-info { flex: 1; min-width: 0; }
+.msg-delete-conversation-btn {
+  border: none;
+  background: #f87171;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 140ms;
+}
+.msg-delete-conversation-btn:hover {
+  background: #ef4444;
+}
+.msg-delete-conversation-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 .msg-thread-header-name { font-size: 14px; font-weight: 700; color: #0f172a; }
 .msg-thread-header-sub  { font-size: 11px; color: #64748b; margin-top: 1px; }
 .msg-thread-scroll {
@@ -483,6 +501,26 @@ body.dark-mode .account-label { color: #f1f5f9; }
 .msg-bubble {
   padding: 10px 14px; border-radius: 8px;
   font-size: 13px; line-height: 1.55; word-break: break-word;
+}
+.msg-delete-btn {
+  align-self: flex-end;
+  border: none;
+  background: transparent;
+  color: #dc2626;
+  font-size: 13px;
+  cursor: pointer;
+  margin: 6px 0 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  transition: background 140ms, color 140ms;
+}
+.msg-delete-btn:hover {
+  background: rgba(220, 38, 38, 0.08);
+  color: #b91c1c;
+}
+.msg-delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 .msg-bubble-wrap.sent .msg-bubble {
   background: #1f5fbf;
