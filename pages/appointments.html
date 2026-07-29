@@ -19,7 +19,7 @@
   <script>requireAuth();</script>
 </head>
 <body class="admin-bg">
-<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+<button class="hamburger" id="hamburger" type="button" aria-label="Menu"><span></span><span></span><span></span></button>
 <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 <div class="container">
 
@@ -36,7 +36,7 @@
       <a href="./appointments.html" class="active" data-i18n="nav.appointments">Rendez-vous</a>
       <a href="./messages.html" data-i18n="nav.messages">Messages</a>
       <a href="./parametres.html" data-i18n="nav.settings">Paramètres</a>
-      <a href="#" onclick="cognitoSignOut(); return false;" data-i18n="nav.logout">Déconnexion</a>
+      <a href="#" class="nav-logout" data-i18n="nav.logout">Déconnexion</a>
     </nav>
   </aside>
 

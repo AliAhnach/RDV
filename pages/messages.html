@@ -19,7 +19,7 @@
 </head>
 <body class="admin-bg">
 
-<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+<button class="hamburger" id="hamburger" type="button" aria-label="Menu"><span></span><span></span><span></span></button>
 <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
 <div class="container">
@@ -37,7 +37,7 @@
       <a href="./appointments.html" data-i18n="nav.appointments">Rendez-vous</a>
       <a href="./messages.html" class="active" data-i18n="nav.messages">Messages</a>
       <a href="./parametres.html" data-i18n="nav.settings">Paramètres</a>
-      <a href="#" onclick="cognitoSignOut(); return false;" data-i18n="nav.logout">Déconnexion</a>
+      <a href="#" class="nav-logout" data-i18n="nav.logout">Déconnexion</a>
     </nav>
   </aside>
 
@@ -294,7 +294,7 @@
       const url = isAdmin
         ? `${API_BASE}/messages/admin`
         : `${API_BASE}/messages/user/${encodeURIComponent(user.id)}`;
-      const res  = await fetch(url);
+      const res  = await apiFetch(url);
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || `Erreur HTTP ${res.status}`);
       const conversations = Array.isArray(data) ? data : (data.conversations || data.data || []);
@@ -317,7 +317,7 @@
     btnSend.disabled = true;
     setStatus('Envoi…');
     try {
-      const res = await fetch(`${API_BASE}/messages/${activeConversationId}/reply`, {
+      const res = await apiFetch(`${API_BASE}/messages/${activeConversationId}/reply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sender_id: user.id, content: text })
@@ -341,7 +341,7 @@
     if (!activeConversationId) return;
     btnMarkRead.disabled = true;
     try {
-      const res = await fetch(`${API_BASE}/messages/${activeConversationId}/read`, { method: 'PUT' });
+      const res = await apiFetch(`${API_BASE}/messages/${activeConversationId}/read`, { method: 'PUT' });
       if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
       btnMarkRead.style.display = 'none';
       setStatus('Marqué comme lu ✓');
@@ -376,7 +376,7 @@
     if (!text) return;
     btnSendNew.disabled = true;
     try {
-      const res = await fetch(`${API_BASE}/messages`, {
+      const res = await apiFetch(`${API_BASE}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sender_id: user.id, content: text })

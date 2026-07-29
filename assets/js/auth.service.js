@@ -5,11 +5,33 @@
    le navigateur envoie automatiquement le cookie de session.
    ============================================================= */
 
-const _IS_LOCAL = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-const API_BASE   = _IS_LOCAL
-  ? 'http://127.0.0.1:5000/api'
-  : 'https://aliahnach.pythonanywhere.com/api';
+// Unique production API origin. All application requests must use this base.
+const API_BASE = 'https://aliahnach.pythonanywhere.com/api';
+const API_ORIGIN = new URL(API_BASE).origin;
+
+async function healthCheck() {
+  try {
+    const response = await fetch(`${API_ORIGIN}/health`, { credentials: 'include' });
+    if (!response.ok) throw new Error('Health check failed');
+    return await response.json();
+  } catch (error) {
+    console.error('[health] Backend inaccessible:', error);
+    return null;
+  }
+}
 const SESSION_KEY = 'rdv_session';
+
+function apiErrorMessage(status, data = {}, fallback = 'La requête a échoué.') {
+  if (data.message || data.error) return data.message || data.error;
+  const messages = {
+    400: 'Les données envoyées sont invalides.',
+    401: 'Votre session a expiré. Veuillez vous reconnecter.',
+    403: 'Vous n’êtes pas autorisé à effectuer cette action.',
+    404: 'La ressource demandée est introuvable.',
+    500: 'Une erreur serveur est survenue. Réessayez plus tard.',
+  };
+  return messages[status] || fallback;
+}
 
 // ── Session ───────────────────────────────────────────────────
 
@@ -106,8 +128,15 @@ async function register(fullname, email, password) {
     headers:     { 'Content-Type': 'application/json' },
     body:        JSON.stringify({ fullname, email, password })
   });
-  const data = await res.json();
-  if (!data.success) throw data.message || 'Erreur lors de l\'inscription.';
+
+  let data = {};
+  try {
+    data = await res.json();
+  } catch (error) {
+    throw new Error('Réponse invalide du backend.');
+  }
+
+  if (!res.ok || !data.success) throw new Error(apiErrorMessage(res.status, data, 'Erreur lors de l’inscription.'));
   return data;
 }
 
@@ -124,8 +153,15 @@ async function login(email, password) {
     headers:     { 'Content-Type': 'application/json' },
     body:        JSON.stringify({ email, password })
   });
-  const data = await res.json();
-  if (!data.success) throw data.message || 'Email ou mot de passe incorrect.';
+
+  let data = {};
+  try {
+    data = await res.json();
+  } catch (error) {
+    throw new Error('Réponse invalide du backend.');
+  }
+
+  if (!res.ok || !data.success) throw new Error(apiErrorMessage(res.status, data, 'Email ou mot de passe incorrect.'));
   console.log('[login] cookie de session reçu, user:', data.user);
   saveSession(data.user);
   return data.user;

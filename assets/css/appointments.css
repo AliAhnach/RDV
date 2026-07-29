@@ -398,6 +398,38 @@
 }
 
 /* ── Responsive ── */
+@media (max-width: 768px) {
+  .rdv-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .rdv-card-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    flex: 1 0 100%;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .rdv-card-actions .btn-confirm,
+  .rdv-card-actions .btn-refuse,
+  .rdv-card-actions .btn-detail {
+    box-sizing: border-box;
+    justify-content: center;
+    min-width: 0;
+    min-height: 44px;
+    text-align: center;
+    white-space: normal;
+    line-height: 1.2;
+  }
+
+  .rdv-card-actions > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 520px) {
   .rdv-row { grid-template-columns: 1fr; }
   .rdv-form-footer { flex-direction: column-reverse; }

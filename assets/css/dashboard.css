@@ -1,5 +1,5 @@
 /* ── Background géré par background.css ── */
-.container { position: relative; z-index: 1; }
+.container { position: relative; z-index: auto; }
 .sidebar   { z-index: 300; }
 
 /* ── Palette harmonisée avec le fond global ── */

@@ -1,8 +1,6 @@
 /* ── Appointments page logic ── */
 (() => {
-  const API_ROOT = typeof API_BASE === 'string'
-    ? API_BASE
-    : 'https://aliahnach.pythonanywhere.com/api';
+  const API_ROOT = API_BASE;
   const APPOINTMENTS_API = `${API_ROOT}/appointments`;
   const STATUS_REFRESH_DELAY = 15000;
 

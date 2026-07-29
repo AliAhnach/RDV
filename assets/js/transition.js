@@ -136,6 +136,7 @@ window.navigateTo = null;
   document.addEventListener('click', e => {
     const a = e.target.closest('a[href]');
     if (!a) return;
+    if (a.closest('.sidebar nav')) return;
     const href = a.getAttribute('href');
     if (!href || href === '#' || href.startsWith('http') || href.startsWith('mailto')) return;
     if (a.getAttribute('onclick')) return;
@@ -143,6 +144,7 @@ window.navigateTo = null;
     const file = href.split('/').pop();
     const pageName = PAGE_NAMES[file] || '';
     e.preventDefault();
+    e.stopPropagation();
 
     // Sur mobile, fermer la sidebar puis lancer la transition comme sur desktop
     if (window.innerWidth <= 768) {

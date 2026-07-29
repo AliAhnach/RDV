@@ -42,9 +42,13 @@
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.45);
-  z-index: 499;
+  z-index: 550;
+  pointer-events: none;
 }
-.sidebar-backdrop.open { display: block; }
+.sidebar-backdrop.open {
+  display: block;
+  pointer-events: auto;
+}
 body.sidebar-open { overflow: hidden; }
 
 /* ── Desktop: offset main from fixed sidebar ── */
@@ -54,7 +58,17 @@ body.sidebar-open { overflow: hidden; }
 
 /* ── Tablet & Mobile (≤ 768px) ── */
 @media (max-width: 768px) {
-  .hamburger { display: flex; }
+  .hamburger {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: 1200 !important;
+  }
+
+  /* The backdrop is a body child.  Do not let the container create a lower
+     stacking context that traps the fixed sidebar beneath it. */
+  .container { z-index: auto !important; }
 
   .sidebar {
     position: fixed !important;
@@ -67,21 +81,41 @@ body.sidebar-open { overflow: hidden; }
     height: 100dvh !important;
     padding: 18px 16px 24px !important;
     border-radius: 0 24px 24px 0 !important;
-    z-index: 600 !important;
+    z-index: 1100 !important;
     transform: translateX(-105%) !important;
     opacity: 0 !important;
     visibility: hidden !important;
     transition: transform 260ms ease, opacity 260ms ease, visibility 260ms ease !important;
-    pointer-events: auto !important;
+    pointer-events: none !important;
     box-shadow: 0 20px 60px rgba(0,0,0,0.35) !important;
     overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    isolation: isolate;
+    -webkit-tap-highlight-color: transparent;
   }
   .sidebar.open {
     transform: translateX(0) !important;
     opacity: 1 !important;
     visibility: visible !important;
+    pointer-events: auto !important;
   }
+  .sidebar nav a {
+    min-height: 48px;
+    padding: 12px 14px;
+    width: 100%;
+    border-radius: 12px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
+    position: relative;
+    z-index: 10;
+  }
+
   .sidebar .sidebar-close {
+    position: relative;
+    z-index: 11;
     display: flex;
     align-items: center;
     justify-content: center;

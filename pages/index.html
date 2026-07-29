@@ -23,7 +23,7 @@
 </head>
 <body class="admin-bg">
 
-<button class="hamburger" id="hamburger" aria-label="Ouvrir le menu">
+<button class="hamburger" id="hamburger" type="button" aria-label="Ouvrir le menu">
   <span></span><span></span><span></span>
 </button>
 <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -67,7 +67,7 @@
         </svg>
         <span data-i18n="nav.settings">Paramètres</span>
       </a>
-      <a href="#" class="nav-logout" onclick="cognitoSignOut(); return false;">
+      <a href="#" class="nav-logout">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
           <polyline points="16 17 21 12 16 7"/>

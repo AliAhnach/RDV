@@ -131,7 +131,7 @@
   function renderStats(stats) {
     if (isAdmin) {
       setStatCard('stat-card-rdv',      'stat-rdv',      'calendar', 'Rendez-vous', firstNumber(stats, ['total_appointments', 'appointments', 'total_rdvs', 'total', 'totalAppointments']));
-      setStatCard('stat-card-messages', 'stat-messages', 'clock',    'Messages',     firstNumber(stats, ['pending_messages', 'unread_messages', 'messages', 'pending_appointments', 'pending']));
+      setStatCard('stat-card-messages', 'stat-messages', 'clock',    'En attente',   firstNumber(stats, ['waiting', 'pending_messages', 'unread_messages', 'messages', 'pending_appointments', 'pending']));
       return;
     }
     setStatCard('stat-card-rdv',       'stat-rdv',       'calendar', 'Rendez-vous',   firstNumber(stats, ['total_appointments', 'appointments', 'total_rdvs', 'total', 'totalAppointments']));
@@ -172,7 +172,7 @@
   // ── Dashboard statistics and recent activity from Flask ──
   setDashboardLoading();
   try {
-    const _dashApiBase = (typeof API_BASE === 'string') ? API_BASE : 'https://aliahnach.pythonanywhere.com/api';
+    const _dashApiBase = API_BASE;
     const _url = `${_dashApiBase}/dashboard/stats`;
     console.log('[dashboard] GET', _url);
     const res = await apiFetch(_url);

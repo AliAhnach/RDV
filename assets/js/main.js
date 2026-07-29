@@ -68,7 +68,7 @@ function highlightActiveNav() {
     a.classList.remove("active");
 
     const href = a.getAttribute("href") || "";
-    const isDashboard = href.includes("index.html");
+    const isDashboard = href.includes("index.html") || href.includes("user-dashboard.html");
     const isRdv = href.includes("appointments.html");
     const isMessages = href.includes("messages.html");
     const isParam = href.includes("parametres.html");
@@ -404,12 +404,70 @@ function initPillFromSession() {
   if (pillHandle) pillHandle.textContent = s.email    || '—';
 }
 
+function closeMobileSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  const hamburger = document.getElementById('hamburger');
+  const body = document.body;
+
+  if (sidebar) sidebar.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('open');
+  if (hamburger) {
+    hamburger.classList.remove('is-open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    hamburger.style.display = '';
+  }
+  if (body) {
+    body.classList.remove('sidebar-open');
+    body.style.overflow = '';
+  }
+}
+
+function initSidebarNavigation() {
+  const sidebar = document.getElementById('sidebar');
+  if (!sidebar) return;
+
+  const links = Array.from(sidebar.querySelectorAll('nav a[href]'));
+  if (!links.length) return;
+
+  links.forEach(link => {
+    const handleSidebarNav = (event) => {
+      const href = link.getAttribute('href') || '';
+      if (href === '#') {
+        event.preventDefault();
+        event.stopPropagation();
+        if (window.innerWidth <= 768) closeMobileSidebar();
+        if (typeof window.cognitoSignOut === 'function') window.cognitoSignOut();
+        else if (typeof window.logout === 'function') window.logout();
+        return;
+      }
+
+      if (!href || href.startsWith('http') || href.startsWith('mailto')) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (window.innerWidth <= 768) closeMobileSidebar();
+
+      if (window.navigateTo) {
+        window.navigateTo(href);
+      } else {
+        window.location.assign(href);
+      }
+    };
+
+    link.addEventListener('click', handleSidebarNav, { passive: false });
+  });
+}
+
 function initHamburger() {
   const btn      = document.getElementById('hamburger');
   const sidebar  = document.getElementById('sidebar');
   const backdrop = document.getElementById('sidebar-backdrop');
   const body     = document.body;
   if (!btn || !sidebar) return;
+  btn.setAttribute('aria-controls', 'sidebar');
+  btn.setAttribute('aria-expanded', 'false');
 
   // Créer le bouton close une seule fois
   let closeBtn = sidebar.querySelector('.sidebar-close');
@@ -426,16 +484,12 @@ function initHamburger() {
     sidebar.classList.add('open');
     if (backdrop) backdrop.classList.add('open');
     btn.classList.add('is-open');
-    body.style.overflow = 'hidden';
-    btn.style.display = 'none';
+    btn.setAttribute('aria-expanded', 'true');
+    body.classList.add('sidebar-open');
   }
 
   function closeSidebar() {
-    sidebar.classList.remove('open');
-    if (backdrop) backdrop.classList.remove('open');
-    btn.classList.remove('is-open');
-    body.style.overflow = '';
-    btn.style.display = '';
+    closeMobileSidebar();
   }
 
   closeBtn.addEventListener('click', closeSidebar);
@@ -446,7 +500,6 @@ function initHamburger() {
   });
   if (backdrop) {
     backdrop.addEventListener('click', closeSidebar);
-    backdrop.addEventListener('touchstart', closeSidebar);
   }
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && sidebar.classList.contains('open')) closeSidebar();
@@ -657,6 +710,7 @@ function boot() {
   initParametresPage();
   initUserDashboard();
   injectFooter();
+  initSidebarNavigation();
   initHamburger();
 }
 
