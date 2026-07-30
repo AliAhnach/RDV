@@ -6,8 +6,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>RDV — Tableau de bord</title>
 
+  <script src="../assets/js/api.config.js"></script>
   <script src="../assets/js/auth.service.js"></script>
   <script>requireAuth();</script>
+  <style>.mobile-logo {
+      display: none;
+    }
+    /* Styles pour l'avatar */
+    .account-avatar {
+      display: none; /* Caché par défaut sur desktop */
+      width: 28px; /* Taille de l'avatar */
+      height: 28px;
+      border-radius: 50%;
+      background-color: var(--color-primary); /* Couleur de fond par défaut */
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .account-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    @media (max-width: 768px) {
+      /* Style professionnel pour la barre de navigation mobile */
+      .dash-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #fff;
+        padding: 8px 16px;
+        border-bottom: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      /* S'assurer que le bouton hamburger est positionné correctement dans le header */
+      .dash-header .hamburger {
+        position: static;
+        display: block; /* S'assurer qu'il est visible */
+      }
+      .dash-header > .search-wrap,
+      .dash-header > label.search-wrap {
+        display: none;
+      }
+      .mobile-logo {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        /* Centrer le logo de manière absolue */
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .dash-header .hdr-icon-btn .account-label,
+      .dash-header .hdr-btn--account .account-label { display: none; } /* Masquer le texte sur mobile */
+      .dash-header .hdr-icon-btn .account-avatar, .dash-header .hdr-btn--account .account-avatar { display: flex; } /* Afficher l'avatar sur mobile */
+      .dash-header .hdr-icon-btn, .dash-header .hdr-btn--account { padding: 6px 8px; gap: 0; } /* Ajuster le bouton */
+    }
+  </style>
 
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -20,12 +82,10 @@
   <link rel="stylesheet" href="../assets/css/splash.css"/>
   <link rel="stylesheet" href="../assets/css/responsive.css"/>
   <link rel="stylesheet" href="../assets/css/animations.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 </head>
 <body class="admin-bg">
 
-<button class="hamburger" id="hamburger" type="button" aria-label="Ouvrir le menu">
-  <span></span><span></span><span></span>
-</button>
 <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
 <div class="container">
@@ -83,6 +143,9 @@
 
     <!-- Topbar -->
     <header class="dash-header" role="banner">
+      <button class="hamburger" id="hamburger" type="button" aria-label="Ouvrir le menu">
+        <span></span><span></span><span></span>
+      </button>
       <div class="search-wrap" role="search">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -93,7 +156,7 @@
 
       <div class="dash-header-actions" id="dash-header-actions">
         <button class="hdr-btn hdr-btn--account" id="btn-account" type="button" aria-label="Mon compte" title="Mon compte">
-          <span class="account-label" id="header-username">Compte</span>
+          <span class="account-avatar"></span><span class="account-label">Compte</span>
         </button>
       </div>
     </header>
@@ -164,7 +227,9 @@
             </a>
           </header>
           <div class="card-body" id="upcoming-rdvs" aria-live="polite">
-            <p class="card-empty">Chargement…</p>
+            <p class="card-empty" style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+              <i class="fa-solid fa-spinner fa-spin"></i> Chargement…
+            </p>
           </div>
         </div>
       </section>

@@ -200,8 +200,25 @@ function initProfileName() {
       label.className = 'account-label';
       accountBtn.appendChild(label);
     }
-    label.textContent = fullName.length > 10 ? firstName : fullName;
+    label.textContent = fullName; // Always set full name for desktop
     label.title = fullName;
+
+    // --- New: Handle avatar ---
+    let avatar = accountBtn.querySelector('.account-avatar');
+    if (!avatar) {
+      avatar = document.createElement('span');
+      avatar.className = 'account-avatar';
+      accountBtn.prepend(avatar); // Add before the label
+    }
+
+    const avatarUrl = user?.avatar; // Assuming user.avatar holds the URL
+    if (avatarUrl) {
+      avatar.innerHTML = `<img src="${avatarUrl}" alt="${fullName}" class="account-avatar-img">`;
+    } else {
+      const initials = String(fullName).trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'U';
+      avatar.textContent = initials;
+    }
+    // --- End new: Handle avatar ---
   }
 }
 
@@ -281,7 +298,13 @@ function initSettingsPage() {
       return;
     }
 
-    savedProfile = { ...savedProfile, name, email, phone, passwordUpdatedAt: password ? Date.now() : savedProfile.passwordUpdatedAt || null };
+    savedProfile = {
+      ...savedProfile,
+      name,
+      email,
+      phone,
+      passwordUpdatedAt: password ? Date.now() : savedProfile.passwordUpdatedAt || null
+    };
     localStorage.setItem(STORAGE.profile, JSON.stringify(savedProfile));
     if (session) saveSession({ ...session, fullname: name, name, email });
     passwordInput.value = '';

@@ -48,8 +48,9 @@
   "btn.confirm":    "Confirmer",
   "btn.refuse":     "Refuser",
   "btn.markread":   "Marquer comme lu",
-  "btn.newmsg":     "+ Nouveau message",
+  "btn.newmsg":     "Nouveau message",
   "btn.placeorder": "Place Order",
+  "btn.download.receipt": "Télécharger le reçu",
 
   "filter.all":       "Tous",
   "filter.confirmed": "Confirmés",

@@ -95,6 +95,7 @@ body.sidebar-open { overflow: hidden; }
     isolation: isolate;
     -webkit-tap-highlight-color: transparent;
   }
+
   .sidebar.open {
     transform: translateX(0) !important;
     opacity: 1 !important;
@@ -157,7 +158,7 @@ body.sidebar-open { overflow: hidden; }
     flex-wrap: wrap;
     gap: 10px;
   }
-  .search-wrap { max-width: 100% !important; flex: 1; }
+  .search-wrap { display: none !important; }
   .kbd { display: none; }
   .pill-name, .pill-handle { display: none; }
 

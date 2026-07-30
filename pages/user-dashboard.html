@@ -6,6 +6,7 @@
   <meta name="description" content="Tableau de bord personnel de la plateforme RDV.">
   <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
   <title>RDV — Mon espace</title>
+  <script src="../assets/js/api.config.js"></script>
   <script src="../assets/js/auth.service.js"></script>
   <script>
     requireAuth();
@@ -13,6 +14,67 @@
       window.location.replace('./index.html');
     }
   </script>
+  <style>.mobile-logo {
+      display: none;
+    }
+    /* Styles pour l'avatar */
+    .account-avatar {
+      display: none; /* Caché par défaut sur desktop */
+      width: 28px; /* Taille de l'avatar */
+      height: 28px;
+      border-radius: 50%;
+      background-color: var(--color-primary); /* Couleur de fond par défaut */
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .account-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    @media (max-width: 768px) {
+      /* Style professionnel pour la barre de navigation mobile */
+      .dash-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #fff;
+        padding: 8px 16px;
+        border-bottom: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      /* S'assurer que le bouton hamburger est positionné correctement dans le header */
+      .dash-header .hamburger {
+        position: static;
+        display: block; /* S'assurer qu'il est visible */
+      }
+      .dash-header > .search-wrap,
+      .dash-header > label.search-wrap {
+        display: none;
+      }
+      .mobile-logo {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        /* Centrer le logo de manière absolue */
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .dash-header .hdr-icon-btn .account-label,
+      .dash-header .hdr-btn--account .account-label { display: none; } /* Masquer le texte sur mobile */
+      .dash-header .hdr-icon-btn .account-avatar, .dash-header .hdr-btn--account .account-avatar { display: flex; } /* Afficher l'avatar sur mobile */
+      .dash-header .hdr-icon-btn, .dash-header .hdr-btn--account { padding: 6px 8px; gap: 0; } /* Ajuster le bouton */
+    }
+  </style>
   <link rel="stylesheet" href="../assets/css/variables.css">
   <link rel="stylesheet" href="../assets/css/background.css">
   <link rel="stylesheet" href="../assets/css/animations.css">
@@ -20,9 +82,9 @@
   <link rel="stylesheet" href="../assets/css/dashboard.css">
   <link rel="stylesheet" href="../assets/css/splash.css">
   <link rel="stylesheet" href="../assets/css/responsive.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 </head>
 <body class="admin-bg">
-  <button class="hamburger" id="hamburger" type="button" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
   <div class="container">
@@ -42,11 +104,12 @@
 
     <main class="main">
       <header class="dash-header">
+        <button class="hamburger" id="hamburger" type="button" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
         <label class="search-wrap" for="appointment-search">
           <input id="appointment-search" type="search" data-i18n-placeholder="search.appointments" placeholder="Rechercher un rendez-vous">
         </label>
         <div class="dash-header-right" id="dash-header-right">
-          <button class="hdr-icon-btn hdr-account-btn" id="btn-account" type="button"><span class="account-label">Compte</span></button>
+          <button class="hdr-icon-btn hdr-account-btn" id="btn-account" type="button"><span class="account-avatar"></span><span class="account-label">Compte</span></button>
         </div>
       </header>
 
@@ -82,10 +145,12 @@
           </header>
           <div class="appointment-list" id="upcoming-rdvs">
             <article class="appointment-item">
-              <div class="appointment-info"><h3>Consultation médicale</h3><p>Aujourd'hui · 10:00</p></div><span class="status-badge status-badge--confirmed">Confirmé</span>
+              <div class="appointment-info"><h3>Consultation médicale</h3><p>Aujourd'hui · 10:00</p></div>
+              <span class="status-badge status-badge--confirmed"><i class="fa-solid fa-check" style="margin-right: 4px;"></i> Confirmé</span>
             </article>
             <article class="appointment-item">
-              <div class="appointment-info"><h3>Suivi traitement</h3><p>Demain · 14:30</p></div><span class="status-badge status-badge--pending">En attente</span>
+              <div class="appointment-info"><h3>Suivi traitement</h3><p>Demain · 14:30</p></div>
+              <span class="status-badge status-badge--pending"><i class="fa-solid fa-clock" style="margin-right: 4px;"></i> En attente</span>
             </article>
           </div>
         </section>

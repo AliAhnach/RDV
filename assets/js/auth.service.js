@@ -5,8 +5,24 @@
    le navigateur envoie automatiquement le cookie de session.
    ============================================================= */
 
-// Base URL de l'API de production PythonAnywhere.
-const API_BASE = 'https://AliAhnach.pythonanywhere.com/api';
+// API_BASE dynamique : utilise l'URL locale en développement et la prod sur PythonAnywhere.
+const API_BASE = (() => {
+  const prodUrl = 'https://AliAhnach.pythonanywhere.com/api';
+  const localUrl = 'http://localhost:5000/api';
+
+  if (typeof window !== 'undefined' && window.RDV_API_BASE) {
+    return window.RDV_API_BASE;
+  }
+
+  if (typeof location !== 'undefined') {
+    const hostname = location.hostname.toLowerCase();
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return localUrl;
+    }
+  }
+
+  return prodUrl;
+})();
 
 // Affiche l'URL de l'API utilisée dans la console pour le débogage.
 console.log(`[AuthService] L'API de base est : ${API_BASE}`);
@@ -51,7 +67,8 @@ function normalizeSessionUser(user) {
     role,
     isAdmin: role === 'admin',
     fullname: user.fullname || user.name || user.fullName || '',
-    name: user.name || user.fullname || user.fullName || ''
+    name: user.name || user.fullname || user.fullName || '',
+    avatar: user.avatar || ''
   };
 }
 
@@ -64,6 +81,7 @@ function saveSession(user) {
     name:      normalizedUser?.name || normalizedUser?.fullname || '',
     email:     normalizedUser?.email || '',
     role:      normalizedUser?.role || 'user',
+    avatar:    normalizedUser?.avatar || '',
     isAdmin:   normalizedUser?.isAdmin || false,
     expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000
   };

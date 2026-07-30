@@ -549,7 +549,9 @@
       startUserRefresh();
 
       // Request modal events
-      document.getElementById('btn-open-request').addEventListener('click', openRequestModal);
+      const btn1 = document.getElementById('btn-open-request');
+      if (btn1) btn1.addEventListener('click', openRequestModal);
+
       const btn2 = document.getElementById('btn-open-request2');
       if (btn2) btn2.addEventListener('click', openRequestModal);
 

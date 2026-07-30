@@ -14,12 +14,90 @@
   <link rel="stylesheet" href="../assets/css/dashboard.css">
   <link rel="stylesheet" href="../assets/css/splash.css">
   <link rel="stylesheet" href="../assets/css/responsive.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+  <script src="../assets/js/api.config.js"></script>
   <script src="../assets/js/auth.service.js"></script>
   <script>requireAuth();</script>
+  <style>.mobile-logo {
+      display: none;
+    }
+    /* Styles pour l'avatar */
+    .account-avatar {
+      display: none; /* Caché par défaut sur desktop */
+      width: 28px; /* Taille de l'avatar */
+      height: 28px;
+      border-radius: 50%;
+      background-color: var(--color-primary); /* Couleur de fond par défaut */
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .account-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    @media (max-width: 768px) {
+      /* Style professionnel pour la barre de navigation mobile */
+      .dash-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #fff;
+        padding: 8px 16px;
+        border-bottom: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      /* S'assurer que le bouton hamburger est positionné correctement dans le header */
+      .dash-header .hamburger {
+        position: static;
+        display: block; /* S'assurer qu'il est visible */
+      }
+      .dash-header > .search-wrap,
+      .dash-header > label.search-wrap {
+        display: none;
+      }
+      .mobile-logo {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        /* Centrer le logo de manière absolue */
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .dash-header .hdr-icon-btn .account-label,
+      .dash-header .hdr-btn--account .account-label { display: none; } /* Masquer le texte sur mobile */
+      .dash-header .hdr-icon-btn .account-avatar, .dash-header .hdr-btn--account .account-avatar { display: flex; } /* Afficher l'avatar sur mobile */
+      .dash-header .hdr-icon-btn, .dash-header .hdr-btn--account { padding: 6px 8px; gap: 0; } /* Ajuster le bouton */
+    }
+    .msg-back-btn { background:none; border:none; cursor:pointer; font-size:16px; padding:0 8px 0 0; color:#a0aec0; }
+    .msg-back-btn:hover { color: #fff; }
+    .msg-delete-btn {
+      background: none; border: none; color: #9ab; cursor: pointer;
+      opacity: 0; transition: opacity 150ms ease;
+      padding: 2px 6px; font-size: 12px;
+      position: absolute; top: 4px; right: 4px;
+    }
+    .msg-bubble-wrap.sent .msg-delete-btn { right: auto; left: 4px; }
+    .msg-bubble:hover .msg-delete-btn { opacity: 0.6; }
+    .msg-bubble:hover .msg-delete-btn:hover { opacity: 1; color: #e53e3e; }
+    .msg-bubble { position: relative; padding-right: 28px; }
+    .msg-bubble-wrap.sent .msg-bubble { padding-left: 28px; padding-right: 14px; }
+    .msg-item-avatar { display: flex; align-items: center; justify-content: center; }
+    .msg-item-avatar .fa-solid { font-size: 18px; }
+    #thread-avatar .fa-solid { font-size: 22px; }
+  </style>
 </head>
 <body class="admin-bg">
 
-<button class="hamburger" id="hamburger" type="button" aria-label="Menu"><span></span><span></span><span></span></button>
 <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
 <div class="container">
@@ -43,6 +121,7 @@
 
   <main class="main">
     <header class="dash-header">
+      <button class="hamburger" id="hamburger" type="button" aria-label="Menu"><span></span><span></span><span></span></button>
       <div class="search-wrap">
         <svg width="14" height="14" fill="none" stroke="#7a7a9a" stroke-width="2" viewBox="0 0 24 24">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -52,7 +131,7 @@
       </div>
       <div class="dash-header-right" id="dash-header-right">
         <button class="hdr-icon-btn" id="btn-account" title="Compte" type="button" aria-label="Compte">
-          <span class="account-label" data-i18n="account.label">Compte</span><span class="hdr-badge" style="display:none;"></span>
+          <span class="account-avatar"></span><span class="account-label">Compte</span><span class="hdr-badge" style="display:none;"></span>
         </button>
       </div>
     </header>
@@ -69,11 +148,13 @@
           </h2>
           <p id="msg-list-subtitle">Chargement…</p>
           <!-- Bouton nouveau message (utilisateur uniquement) -->
-          <button class="msg-new-btn" id="btn-new-msg" style="display:none;" data-i18n="btn.newmsg">+ Nouveau message</button>
+          <button class="msg-new-btn" id="btn-new-msg" style="display:none;">
+            <i class="fa-solid fa-plus"></i> <span data-i18n="btn.newmsg">Nouveau message</span>
+          </button>
         </div>
         <div class="msg-list-scroll" id="msg-list-scroll">
           <div class="msg-empty-state" id="msg-list-loading">
-            <div class="msg-empty-icon">⏳</div>
+            <div class="msg-empty-icon"><i class="fa-solid fa-spinner fa-spin"></i></div>
             Chargement des messages…
           </div>
         </div>
@@ -84,14 +165,16 @@
 
         <!-- État vide par défaut -->
         <div class="msg-empty-state" id="msg-thread-empty">
-          <div class="msg-empty-icon">💬</div>
+          <div class="msg-empty-icon"><i class="fa-solid fa-comments"></i></div>
           <span data-i18n="msg.select">Sélectionnez une conversation</span>
         </div>
 
         <!-- Conversation ouverte (masquée par défaut) -->
         <div id="msg-thread-content" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
           <div class="msg-thread-header">
-            <button id="btn-back" style="display:none; background:none; border:none; cursor:pointer; font-size:18px; padding:0 8px 0 0; color:#7a7a9a;">&#8592;</button>
+            <button id="btn-back" class="msg-back-btn" style="display:none;" aria-label="Retour à la liste">
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
             <div class="msg-item-avatar" id="thread-avatar">?</div>
             <div class="msg-thread-header-info">
               <div class="msg-thread-header-name" id="thread-name">—</div>
@@ -108,7 +191,9 @@
           <!-- Zone de réponse (admin) / nouveau message (user dans thread) -->
           <div class="msg-compose" id="msg-compose">
             <textarea id="compose-text" rows="1" data-i18n-placeholder="msg.write" placeholder="Écrire un message…"></textarea>
-            <button class="msg-send-btn" id="btn-send" title="Envoyer">➤</button>
+            <button class="msg-send-btn" id="btn-send" title="Envoyer" aria-label="Envoyer le message">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
           </div>
         </div>
 
@@ -180,8 +265,15 @@
     return `il y a ${Math.floor(diff/86400)}j`;
   }
 
-  function initials(name) {
-    return String(name || '?').trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+  function getAvatarContent(name) {
+    const nameStr = String(name || '').trim();
+    if (!nameStr) {
+      return '<i class="fa-solid fa-user"></i>';
+    } else if (nameStr === 'Administrateur') {
+      return '<i class="fa-solid fa-user-shield"></i>';
+    }
+    const inits = nameStr.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    return escHtml(inits || '?');
   }
 
   function setStatus(msg, isError = false) {
@@ -207,7 +299,9 @@
       : `${conversations.length} conversation(s)`;
 
     if (conversations.length === 0) {
-      listScroll.innerHTML = `<div class="msg-empty-state"><div class="msg-empty-icon">📭</div>Aucun message pour le moment.</div>`;
+      listScroll.innerHTML = `<div class="msg-empty-state">
+        <div class="msg-empty-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+        Aucun message pour le moment.</div>`;
       return;
     }
 
@@ -224,7 +318,7 @@
       item.className = 'msg-item' + (isUnread ? ' unread' : '') + (activeConversationId === conversation.id ? ' active' : '');
       item.dataset.id = conversation.id;
       item.innerHTML = `
-        <div class="msg-item-avatar">${initials(senderName)}</div>
+        <div class="msg-item-avatar">${getAvatarContent(senderName)}</div>
         <div class="msg-item-body">
           <div class="msg-item-name">${escHtml(senderName)}</div>
           <div class="msg-item-preview">${escHtml(preview)}</div>
@@ -249,7 +343,7 @@
     });
 
     const senderName = isAdmin ? (conversation.sender?.fullname || 'Utilisateur') : 'Administrateur';
-    threadAvatar.textContent = initials(senderName);
+    threadAvatar.innerHTML   = getAvatarContent(senderName);
     threadName.textContent   = senderName;
     threadSub.textContent    = formatDateTime(conversation.created_at);
 
@@ -279,9 +373,9 @@
       wrap.className = 'msg-bubble-wrap ' + (sentByMe ? 'sent' : 'received');
       wrap.dataset.messageId = message.id;
 
-      const deleteBtnHtml = isAdmin ? `
-        <button class="msg-delete-btn" type="button" data-message-id="${message.id}" aria-label="Supprimer ce message">✕</button>
-      ` : '';
+      const deleteBtnHtml = isAdmin
+        ? `<button class="msg-delete-btn" type="button" data-message-id="${message.id}" aria-label="Supprimer ce message"><i class="fa-solid fa-times"></i></button>`
+        : '';
 
       wrap.innerHTML = `
         <div class="msg-bubble" data-message-id="${message.id}">${escHtml(message.content)}</div>
@@ -328,7 +422,9 @@
       setStatus('Message supprimé avec succès.');
 
       if (conversation && conversation.messages.length === 0) {
-        threadScroll.innerHTML = `<div class="msg-empty-state"><div class="msg-empty-icon">🗑️</div>Aucun message dans cette conversation.</div>`;
+        threadScroll.innerHTML = `<div class="msg-empty-state">
+          <div class="msg-empty-icon"><i class="fa-solid fa-trash-can"></i></div>
+          Aucun message dans cette conversation.</div>`;
       }
     } catch (err) {
       console.error('Delete message failed:', err);
@@ -340,7 +436,9 @@
 
   // ── Charger conversations ─────────────────────────────────
   async function loadMessages() {
-    listScroll.innerHTML = `<div class="msg-empty-state"><div class="msg-empty-icon">⏳</div>Chargement…</div>`;
+    listScroll.innerHTML = `<div class="msg-empty-state">
+      <div class="msg-empty-icon"><i class="fa-solid fa-spinner fa-spin"></i></div>
+      Chargement…</div>`;
     try {
       const url = isAdmin
         ? `${API_BASE}/messages/admin`
@@ -352,7 +450,9 @@
       conversations.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       renderList(conversations);
     } catch (err) {
-      listScroll.innerHTML = `<div class="msg-empty-state"><div class="msg-empty-icon">⚠️</div>${escHtml(err.message || 'Erreur réseau.')}</div>`;
+      listScroll.innerHTML = `<div class="msg-empty-state">
+        <div class="msg-empty-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        ${escHtml(err.message || 'Erreur réseau.')}</div>`;
     }
   }
 
@@ -367,6 +467,7 @@
     if (!text || !activeConversationId) return;
     btnSend.disabled = true;
     setStatus('Envoi…');
+    console.log('[sendReply] envoyer sur', `${API_BASE}/messages/${activeConversationId}/reply`, 'text=', text);
     try {
       const res = await apiFetch(`${API_BASE}/messages/${activeConversationId}/reply`, {
         method: 'POST',
@@ -374,6 +475,7 @@
         body: JSON.stringify({ sender_id: user.id, content: text })
       });
       const data = await res.json();
+      console.log('[sendReply] réponse', res.status, data);
       if (!res.ok) throw new Error(data.message || `Erreur HTTP ${res.status}`);
       composeText.value = '';
       setStatus('Message envoyé ✓');
@@ -381,9 +483,38 @@
       const updated = allConversations.find(c => c.id === activeConversationId);
       if (updated) openThread(updated);
     } catch (err) {
+      console.error('[sendReply] erreur', err);
       setStatus(err.message || 'Erreur réseau.', true);
     } finally {
       btnSend.disabled = false;
+    }
+  }
+
+  async function sendNewMessage() {
+    const text = newMsgText.value.trim();
+    if (!text) return;
+    btnSendNew.disabled = true;
+    setStatus('Envoi du nouveau message…');
+    console.log('[sendNewMessage] envoyer sur', `${API_BASE}/messages`, 'text=', text);
+    try {
+      const res = await apiFetch(`${API_BASE}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sender_id: user.id, content: text })
+      });
+      const data = await res.json();
+      console.log('[sendNewMessage] réponse', res.status, data);
+      if (!res.ok) throw new Error(data.message || `Erreur HTTP ${res.status}`);
+      newMsgText.value = '';
+      newMsgForm.style.display = 'none';
+      btnNewMsg.style.display = '';
+      setStatus('Message envoyé ✓');
+      await loadMessages();
+    } catch (err) {
+      console.error('[sendNewMessage] erreur', err);
+      setStatus(err.message || 'Erreur réseau.', true);
+    } finally {
+      btnSendNew.disabled = false;
     }
   }
 
