@@ -79,7 +79,6 @@ body > * {
 .sidebar nav a.active {
   background: rgba(59,130,246,0.18) !important;
   color: #fff !important;
-  border-left: 3px solid rgba(6,182,212,0.85);
 }
 
 /* ══════════════════════════════════════════════════════════════
