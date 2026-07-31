@@ -1,282 +1,387 @@
-/* =============================================================
-   RDV — Messages Page Logic
-   Gère la récupération et l'affichage des conversations et des
-   messages pour les utilisateurs et les administrateurs.
-   ============================================================= */
-
 (() => {
-  'use strict';
+  const user = getCurrentUser();
+  if (!user) return;
+  const isAdmin = user.role === 'admin';
 
-  // Vérifie si on est sur la page des messages
-  if (!document.querySelector('.msg-layout')) {
-    return;
+  // ── DOM refs ──────────────────────────────────────────────
+  const listScroll    = document.getElementById('msg-list-scroll');
+  const listSubtitle  = document.getElementById('msg-list-subtitle');
+  const unreadBadge   = document.getElementById('unread-count');
+  const threadEmpty   = document.getElementById('msg-thread-empty');
+  const threadContent = document.getElementById('msg-thread-content');
+  const threadScroll  = document.getElementById('msg-thread-scroll');
+  const threadName    = document.getElementById('thread-name');
+  const threadSub     = document.getElementById('thread-sub');
+  const threadAvatar  = document.getElementById('thread-avatar');
+  const statusBar     = document.getElementById('msg-status-bar');
+  const composeText   = document.getElementById('compose-text');
+  const btnSend       = document.getElementById('btn-send');
+  const btnDeleteConversation = document.getElementById('btn-delete-conversation');
+  const btnNewMsg     = document.getElementById('btn-new-msg');
+  const newMsgForm    = document.getElementById('msg-new-form');
+  const newMsgText    = document.getElementById('new-msg-text');
+  const btnSendNew    = document.getElementById('btn-send-new');
+  const btnCancelNew  = document.getElementById('btn-cancel-new');
+  const btnBack       = document.getElementById('btn-back');
+  const layout        = document.getElementById('msg-layout');
+
+  let activeConversationId = null;
+  let allConversations     = [];
+
+  // ── Helpers ───────────────────────────────────────────────
+  function formatDateTime(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' })
+      + ' ' + d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
   }
 
-  const API_ROOT = API_BASE;
-  const MESSAGES_API = `${API_ROOT}/messages`;
+  function timeAgo(iso) {
+    if (!iso) return '';
+    const diff = Math.floor((Date.now() - new Date(iso)) / 1000);
+    if (diff < 60)    return 'il y a quelques secondes';
+    if (diff < 3600)  return `il y a ${Math.floor(diff/60)} min`;
+    if (diff < 86400) return `il y a ${Math.floor(diff/3600)}h`;
+    return `il y a ${Math.floor(diff/86400)}j`;
+  }
 
-  // --- État local ---
-  let state = {
-    conversations: [],
-    activeConversationId: null,
-    currentUser: getCurrentUser(),
-    isAdmin: getCurrentUser()?.role === 'admin',
-  };
-
-  // --- Éléments du DOM ---
-  const layout = document.querySelector('.msg-layout');
-  const listPanel = document.querySelector('.msg-list-panel');
-  const threadPanel = document.querySelector('.msg-thread-panel');
-  const convListContainer = document.querySelector('.msg-list-scroll');
-  const threadHeaderName = document.getElementById('thread-header-name');
-  const messageContainer = document.querySelector('.msg-thread-scroll');
-  const composeForm = document.getElementById('msg-compose-form');
-  const composeTextarea = document.getElementById('msg-compose-textarea');
-  const emptyState = document.querySelector('.msg-empty-state');
-  const backToListBtn = document.getElementById('btn-back-to-list');
-
-  // --- Helpers ---
-
-  async function readApiResponse(res) {
-    const body = await res.text();
-    let data = {};
-    if (body) {
-      try {
-        data = JSON.parse(body);
-      } catch {
-        throw new Error(res.ok ? 'Réponse invalide du serveur.' : `Erreur HTTP ${res.status}`);
-      }
+  function getAvatarContent(name) {
+    const nameStr = String(name || '').trim();
+    if (!nameStr) {
+      return '<i class="fa-solid fa-user"></i>';
+    } else if (nameStr === 'Administrateur') {
+      return '<i class="fa-solid fa-user-shield"></i>';
     }
-    if (!res.ok) throw new Error(data.message || data.error || `Erreur HTTP ${res.status}`);
-    if (data.success === false) throw new Error(data.message || data.error || 'La requête a échoué.');
-    return data;
+    const inits = nameStr.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    return escHtml(inits || '?');
   }
 
-  function showFeedback(message, isError = false) {
-    const statusBar = document.querySelector('.msg-status-bar');
-    if (!statusBar) return;
-    statusBar.textContent = message;
-    statusBar.className = `msg-status-bar ${isError ? 'error' : ''}`;
-    setTimeout(() => { statusBar.textContent = ''; }, 4000);
+  function setStatus(msg, isError = false) {
+    statusBar.textContent = msg;
+    statusBar.className = 'msg-status-bar' + (isError ? ' error' : '');
   }
 
-  function deleteIcon() {
-    return '<svg class="inline-icon" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6m4-6v6M9 7l1-3h4l1 3M6 7l1 14h10l1-14"/></svg>';
+  function escHtml(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  // --- Rendu ---
+  // ── Render liste ──────────────────────────────────────────
+  function renderList(conversations) {
+    allConversations = conversations;
+    listScroll.innerHTML = '';
 
-  function renderConversations() {
-    if (!convListContainer) return;
-    convListContainer.innerHTML = '';
-    if (state.conversations.length === 0) {
-      convListContainer.innerHTML = '<p class="card-empty" style="padding: 20px;">Aucune conversation.</p>';
+    const unread = conversations.filter(c => !c.is_read).length;
+    unreadBadge.textContent = unread;
+    unreadBadge.style.display = unread > 0 ? '' : 'none';
+
+    listSubtitle.textContent = isAdmin
+      ? `${conversations.length} conversation(s) reçue(s)`
+      : `${conversations.length} conversation(s)`;
+
+    if (conversations.length === 0) {
+      listScroll.innerHTML = `<div class="msg-empty-state">
+        <div class="msg-empty-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+        Aucun message pour le moment.</div>`;
       return;
     }
 
-    state.conversations.forEach(conv => {
-      const lastMessage = conv.messages[conv.messages.length - 1];
-      const item = document.createElement('div');
-      item.className = `msg-item ${conv.id === state.activeConversationId ? 'active' : ''} ${!conv.is_read && state.isAdmin ? 'unread' : ''}`;
-      item.dataset.conversationId = conv.id;
-      const initials = (conv.sender?.fullname || 'U').charAt(0).toUpperCase();
+    conversations.forEach(conversation => {
+      const lastMessage = conversation.messages && conversation.messages.length
+        ? conversation.messages[conversation.messages.length - 1]
+        : null;
+      const preview    = lastMessage ? lastMessage.content.slice(0, 55) + (lastMessage.content.length > 55 ? '…' : '') : '—';
+      const senderName = isAdmin ? (conversation.sender?.fullname || 'Utilisateur') : 'Administrateur';
+      const isUnread   = !conversation.is_read;
+      const timeStr    = lastMessage ? timeAgo(lastMessage.created_at) : timeAgo(conversation.created_at);
 
+      const item = document.createElement('div');
+      item.className = 'msg-item' + (isUnread ? ' unread' : '') + (activeConversationId === conversation.id ? ' active' : '');
+      item.dataset.id = conversation.id;
       item.innerHTML = `
-        <div class="msg-item-avatar">${initials}</div>
+        <div class="msg-item-avatar">${getAvatarContent(senderName)}</div>
         <div class="msg-item-body">
-          <div class="msg-item-name">${conv.sender?.fullname || 'Utilisateur inconnu'}</div>
-          <div class="msg-item-preview">${lastMessage?.content || '...'}</div>
+          <div class="msg-item-name">${escHtml(senderName)}</div>
+          <div class="msg-item-preview">${escHtml(preview)}</div>
         </div>
         <div class="msg-item-meta">
-          <span class="msg-item-time">${new Date(lastMessage?.created_at || conv.created_at).toLocaleDateString('fr-FR')}</span>
-          ${!conv.is_read && state.isAdmin ? '<div class="msg-badge-unread"></div>' : ''}
-        </div>
-      `;
-      convListContainer.appendChild(item);
-    });
-
-    // Attacher les écouteurs d'événements
-    convListContainer.querySelectorAll('.msg-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const convId = parseInt(item.dataset.conversationId, 10);
-        setActiveConversation(convId);
-      });
+          <span class="msg-item-time">${timeStr}</span>
+          ${isUnread
+            ? '<span class="msg-badge-unread">Non lu</span>'
+            : '<span class="msg-badge-read">✓ Lu</span>'}
+        </div>`;
+      item.addEventListener('click', () => openThread(conversation));
+      listScroll.appendChild(item);
     });
   }
 
-  function renderActiveConversation() {
-    const conv = state.conversations.find(c => c.id === state.activeConversationId);
-    if (!conv || !messageContainer || !threadHeaderName) {
-      if (emptyState) emptyState.hidden = false;
-      if (composeForm) composeForm.hidden = true;
-      return;
+  // ── Ouvrir conversation ───────────────────────────────────
+  function openThread(conversation) {
+    // Marquer automatiquement comme lu si l'admin ouvre une conversation non lue
+    if (isAdmin && !conversation.is_read) {
+      // Appel API en arrière-plan, sans attendre la réponse pour afficher le thread
+      apiFetch(`${API_BASE}/messages/${conversation.id}/read`, { method: 'PUT' })
+        .then(res => {
+          if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
+          
+          // En cas de succès, mettre à jour les données locales et l'interface
+          const conv = allConversations.find(c => c.id === conversation.id);
+          if (conv) {
+            conv.is_read = true;
+          }
+          renderList(allConversations); // Met à jour la liste et le compteur de non-lus
+          setStatus('Conversation marquée comme lue.');
+        })
+        .catch(err => {
+          console.error('Échec du marquage comme lu:', err);
+          // Ne pas afficher d'erreur à l'utilisateur, c'est une tâche de fond.
+        });
     }
+    activeConversationId = conversation.id;
 
-    if (emptyState) emptyState.hidden = true;
-    if (composeForm) composeForm.hidden = false;
-
-    threadHeaderName.textContent = conv.sender?.fullname || 'Conversation';
-    messageContainer.innerHTML = '';
-
-    conv.messages.forEach(msg => {
-      const isSentByCurrentUser = msg.sender_id === state.currentUser.id;
-      const bubbleWrap = document.createElement('div');
-      bubbleWrap.className = `msg-bubble-wrap ${isSentByCurrentUser ? 'sent' : 'received'}`;
-
-      const bubble = document.createElement('div');
-      bubble.className = 'msg-bubble';
-      bubble.dataset.messageId = msg.id;
-
-      let deleteBtnHtml = '';
-      // C'EST ICI QU'ON AJOUTE LE BOUTON SUPPRIMER
-      if (state.isAdmin) {
-        deleteBtnHtml = `
-          <button class="btn-icon btn-delete-msg" data-message-id="${msg.id}" title="Supprimer ce message">
-            ${deleteIcon()}
-          </button>`;
-      }
-
-      bubble.innerHTML = `
-        <div class="msg-content"><p>${msg.content.replace(/\n/g, '<br>')}</p></div>
-        ${deleteBtnHtml}
-      `;
-
-      const meta = document.createElement('div');
-      meta.className = 'msg-bubble-meta';
-      meta.innerHTML = `
-        <span class="msg-sender">${msg.sender_name}</span>
-        <span class="msg-time">${new Date(msg.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
-      `;
-
-      bubbleWrap.appendChild(bubble);
-      bubbleWrap.appendChild(meta);
-      messageContainer.appendChild(bubbleWrap);
+    listScroll.querySelectorAll('.msg-item').forEach(el => {
+      el.classList.toggle('active', Number(el.dataset.id) === conversation.id);
     });
 
-    // Attacher les écouteurs pour les nouveaux boutons de suppression
-    messageContainer.querySelectorAll('.btn-delete-msg').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        handleDeleteMessage(btn.dataset.messageId);
+    const senderName = isAdmin ? (conversation.sender?.fullname || 'Utilisateur') : 'Administrateur';
+    threadAvatar.innerHTML   = getAvatarContent(senderName);
+    threadName.textContent   = senderName;
+    threadSub.textContent    = formatDateTime(conversation.created_at);
+
+    btnDeleteConversation.style.display = isAdmin ? '' : 'none';
+
+    threadEmpty.style.display   = 'none';
+    threadContent.style.display = 'flex';
+    layout.classList.add('thread-open');
+    btnBack.style.display = window.innerWidth <= 768 ? '' : 'none';
+
+    renderThread(conversation);
+    setStatus('');
+  }
+
+  function renderThread(conversation) {
+    threadScroll.innerHTML = '';
+    const messages = conversation.messages || [];
+
+    messages.forEach(message => {
+      const sentByMe = isAdmin
+        ? message.sender_role === 'admin'
+        : message.sender_role === 'user';
+      const label = sentByMe ? 'Vous' : (isAdmin ? (conversation.sender?.fullname || 'Utilisateur') : 'Administrateur');
+
+      const wrap = document.createElement('div');
+      wrap.className = 'msg-bubble-wrap ' + (sentByMe ? 'sent' : 'received');
+      wrap.dataset.messageId = message.id;
+
+      const deleteBtnHtml = isAdmin
+        ? `<button class="msg-delete-btn" type="button" data-message-id="${message.id}" aria-label="Supprimer ce message"><i class="fa-solid fa-times"></i></button>`
+        : '';
+
+      wrap.innerHTML = `
+        <div class="msg-bubble" data-message-id="${message.id}">${escHtml(message.content)}</div>
+        ${deleteBtnHtml}
+        <div class="msg-bubble-meta">
+          <span>${escHtml(label)}</span>
+          <span>·</span>
+          <span>${formatDateTime(message.created_at)}</span>
+        </div>`;
+      threadScroll.appendChild(wrap);
+    });
+
+    threadScroll.querySelectorAll('.msg-delete-btn').forEach(btn => {
+      btn.addEventListener('click', async (event) => {
+        event.stopPropagation();
+        await handleDeleteMessage(btn.dataset.messageId);
       });
     });
 
-    messageContainer.scrollTop = messageContainer.scrollHeight;
+    threadScroll.scrollTop = threadScroll.scrollHeight;
   }
-
-  // --- Actions ---
 
   async function handleDeleteMessage(messageId) {
     if (!window.confirm("Voulez-vous vraiment supprimer ce message ?\nCette action est irréversible.")) {
       return;
     }
 
-    try {
-      const res = await apiFetch(`${MESSAGES_API}/${messageId}`, { method: 'DELETE' });
-      await readApiResponse(res);
-
-      // Mettre à jour l'état local
-      const conv = state.conversations.find(c => c.id === state.activeConversationId);
-      if (conv) {
-        conv.messages = conv.messages.filter(m => m.id !== parseInt(messageId, 10));
-      }
-
-      // Mettre à jour l'UI
-      const bubbleWrap = document.querySelector(`.msg-bubble[data-message-id="${messageId}"]`)?.closest('.msg-bubble-wrap');
-      if (bubbleWrap) {
-        bubbleWrap.remove();
-      }
-      showFeedback('Message supprimé avec succès.');
-
-    } catch (error) {
-      console.error('Failed to delete message:', error);
-      showFeedback(error.message || 'Une erreur est survenue lors de la suppression.', true);
-    }
-  }
-
-  async function setActiveConversation(convId) {
-    state.activeConversationId = convId;
-    if (layout) layout.classList.add('thread-open');
-
-    // Marquer comme lu si admin
-    const conv = state.conversations.find(c => c.id === convId);
-    if (state.isAdmin && conv && !conv.is_read) {
-      try {
-        await apiFetch(`${MESSAGES_API}/${convId}/read`, { method: 'PUT' });
-        conv.is_read = true;
-      } catch (error) {
-        console.error("Failed to mark as read:", error);
-      }
-    }
-
-    renderConversations(); // Pour mettre à jour la classe 'active'
-    renderActiveConversation();
-  }
-
-  async function handleReply(event) {
-    event.preventDefault();
-    const content = composeTextarea.value.trim();
-    if (!content || !state.activeConversationId) return;
-
-    const originalButtonText = composeForm.querySelector('button span')?.textContent || 'Envoyer';
-    composeForm.querySelector('button').disabled = true;
-    composeForm.querySelector('button span').textContent = 'Envoi...';
+    const button = threadScroll.querySelector(`.msg-delete-btn[data-message-id=\"${messageId}\"]`);
+    if (button) button.disabled = true;
 
     try {
-      const res = await apiFetch(`${MESSAGES_API}/${state.activeConversationId}/reply`, {
-        method: 'POST',
-        body: JSON.stringify({
-          content: content,
-          sender_id: state.currentUser.id
-        })
-      });
-      const data = await readApiResponse(res);
+      const res = await apiFetch(`${API_BASE}/messages/${messageId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || `Erreur HTTP ${res.status}`);
 
-      // Mettre à jour l'état et ré-afficher
-      const convIndex = state.conversations.findIndex(c => c.id === state.activeConversationId);
-      if (convIndex > -1) {
-        state.conversations[convIndex] = data.data;
+      const conversation = allConversations.find(c => c.id === activeConversationId);
+      if (conversation) {
+        conversation.messages = (conversation.messages || []).filter(msg => msg.id !== parseInt(messageId, 10));
       }
-      composeTextarea.value = '';
-      renderActiveConversation();
 
-    } catch (error) {
-      showFeedback(error.message || "Erreur lors de l'envoi.", true);
+      const bubbleWrap = threadScroll.querySelector(`.msg-bubble-wrap[data-message-id=\"${messageId}\"]`);
+      if (bubbleWrap) bubbleWrap.remove();
+
+      setStatus('Message supprimé avec succès.');
+
+      if (conversation && conversation.messages.length === 0) {
+        threadScroll.innerHTML = `<div class="msg-empty-state">
+          <div class="msg-empty-icon"><i class="fa-solid fa-trash-can"></i></div>
+          Aucun message dans cette conversation.</div>`;
+      }
+    } catch (err) {
+      console.error('Delete message failed:', err);
+      setStatus(err.message || 'Erreur lors de la suppression du message.', true);
     } finally {
-      composeForm.querySelector('button').disabled = false;
-      composeForm.querySelector('button span').textContent = originalButtonText;
+      if (button) button.disabled = false;
     }
   }
 
-  // --- Initialisation ---
-
-  async function init() {
-    if (!state.currentUser) return;
-
-    const url = state.isAdmin ? `${MESSAGES_API}/admin` : `${MESSAGES_API}/user/${state.currentUser.id}`;
-
+  // ── Charger conversations ─────────────────────────────────
+  async function loadMessages() {
+    listScroll.innerHTML = `<div class="msg-empty-state">
+      <div class="msg-empty-icon"><i class="fa-solid fa-spinner fa-spin"></i></div>
+      Chargement…</div>`;
     try {
-      const res = await apiFetch(url);
-      const data = await readApiResponse(res);
-      state.conversations = data.data || [];
-      renderConversations();
-    } catch (error) {
-      console.error("Failed to load conversations:", error);
-      if (convListContainer) convListContainer.innerHTML = `<p class="card-empty" style="padding: 20px;">${error.message}</p>`;
-    }
-
-    if (composeForm) {
-      composeForm.addEventListener('submit', handleReply);
-    }
-
-    if (backToListBtn) {
-      backToListBtn.addEventListener('click', () => {
-        if (layout) layout.classList.remove('thread-open');
-        state.activeConversationId = null;
-        renderConversations();
-      });
+      const url = isAdmin
+        ? `${API_BASE}/messages/admin`
+        : `${API_BASE}/messages/user/${encodeURIComponent(user.id)}`;
+      const res  = await apiFetch(url);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || `Erreur HTTP ${res.status}`);
+      const conversations = Array.isArray(data) ? data : (data.conversations || data.data || []);
+      conversations.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      renderList(conversations);
+    } catch (err) {
+      listScroll.innerHTML = `<div class="msg-empty-state">
+        <div class="msg-empty-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        ${escHtml(err.message || 'Erreur réseau.')}</div>`;
     }
   }
 
-  init();
+  // ── Envoyer réponse ───────────────────────────────────────
+  btnSend.addEventListener('click', sendReply);
+  composeText.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply(); }
+  });
+
+  async function sendReply() {
+    const text = composeText.value.trim();
+    if (!text || !activeConversationId) return;
+    btnSend.disabled = true;
+    setStatus('Envoi…');
+    try {
+      const res = await apiFetch(`${API_BASE}/messages/${activeConversationId}/reply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sender_id: user.id, content: text })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || `Erreur HTTP ${res.status}`);
+      composeText.value = '';
+      setStatus('Message envoyé ✓');
+      await loadMessages();
+      const updated = allConversations.find(c => c.id === activeConversationId);
+      if (updated) openThread(updated);
+    } catch (err) {
+      console.error('[sendReply] erreur', err);
+      setStatus(err.message || 'Erreur réseau.', true);
+    } finally {
+      btnSend.disabled = false;
+    }
+  }
+
+  async function sendNewMessage() {
+    const text = newMsgText.value.trim();
+    if (!text) return;
+    btnSendNew.disabled = true;
+    setStatus('Envoi du nouveau message…');
+    try {
+      const res = await apiFetch(`${API_BASE}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sender_id: user.id, content: text })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || `Erreur HTTP ${res.status}`);
+      newMsgText.value = '';
+      newMsgForm.style.display = 'none';
+      btnNewMsg.style.display = '';
+      setStatus('Message envoyé ✓');
+      await loadMessages();
+    } catch (err) {
+      console.error('[sendNewMessage] erreur', err);
+      setStatus(err.message || 'Erreur réseau.', true);
+    } finally {
+      btnSendNew.disabled = false;
+    }
+  }
+
+  // ── Nouveau message (utilisateur) ─────────────────────────
+  if (!isAdmin) {
+    btnNewMsg.style.display = '';
+    btnNewMsg.addEventListener('click', () => {
+      newMsgForm.style.display = '';
+      newMsgText.focus();
+      btnNewMsg.style.display = 'none';
+    });
+    btnCancelNew.addEventListener('click', () => {
+      newMsgForm.style.display = 'none';
+      newMsgText.value = '';
+      btnNewMsg.style.display = '';
+    });
+    btnSendNew.addEventListener('click', sendNewMessage);
+  }
+
+  if (btnDeleteConversation) {
+    btnDeleteConversation.addEventListener('click', async () => {
+      if (!activeConversationId) return;
+      await deleteConversation(activeConversationId);
+    });
+  }
+
+  async function deleteConversation(conversationId) {
+    if (!window.confirm('Voulez-vous vraiment supprimer cette conversation et tous ses messages ?')) {
+      return;
+    }
+
+    btnDeleteConversation.disabled = true;
+    try {
+      const res = await apiFetch(`${API_BASE}/messages/conversation/${conversationId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || `Erreur HTTP ${res.status}`);
+
+      allConversations = allConversations.filter(c => c.id !== conversationId);
+      activeConversationId = null;
+      threadContent.style.display = 'none';
+      threadEmpty.style.display = '';
+      layout.classList.remove('thread-open');
+      renderList(allConversations);
+      setStatus('Conversation supprimée avec succès.');
+    } catch (err) {
+      console.error('Delete conversation failed:', err);
+      setStatus(err.message || 'Erreur lors de la suppression de la conversation.', true);
+    } finally {
+      btnDeleteConversation.disabled = false;
+    }
+  }
+
+  // ── Retour mobile ─────────────────────────────────────────
+  btnBack.addEventListener('click', () => {
+    layout.classList.remove('thread-open');
+    threadContent.style.display = 'none';
+    threadEmpty.style.display = '';
+    activeConversationId = null;
+  });
+
+  // ── Recherche ─────────────────────────────────────────────
+  document.getElementById('search').addEventListener('input', e => {
+    const q = e.target.value.trim().toLowerCase();
+    if (!q) { renderList(allConversations); return; }
+    const filtered = allConversations.filter(c => {
+      const inMessages = (c.messages || []).some(m => m.content.toLowerCase().includes(q));
+      const inSender   = (c.sender?.fullname || '').toLowerCase().includes(q);
+      return inMessages || inSender;
+    });
+    renderList(filtered);
+  });
+
+  // ── Init ──────────────────────────────────────────────────
+  loadMessages();
 })();

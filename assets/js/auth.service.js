@@ -6,22 +6,14 @@
    ============================================================= */
 
 // API_BASE dynamique : utilise l'URL locale en développement et la prod sur PythonAnywhere.
+// La variable globale window.RDV_API_BASE est définie par api.config.js, qui doit être chargé avant ce script.
 const API_BASE = (() => {
-  const prodUrl = 'https://AliAhnach.pythonanywhere.com/api';
-  const localUrl = 'http://localhost:5000/api';
-
   if (typeof window !== 'undefined' && window.RDV_API_BASE) {
     return window.RDV_API_BASE;
   }
-
-  if (typeof location !== 'undefined') {
-    const hostname = location.hostname.toLowerCase();
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return localUrl;
-    }
-  }
-
-  return prodUrl;
+  // Fallback de sécurité si api.config.js n'est pas chargé.
+  console.error("[AuthService] Erreur critique : window.RDV_API_BASE n'est pas défini. Assurez-vous que api.config.js est chargé avant auth.service.js.");
+  return 'https://AliAhnach.pythonanywhere.com/api';
 })();
 
 // Affiche l'URL de l'API utilisée dans la console pour le débogage.

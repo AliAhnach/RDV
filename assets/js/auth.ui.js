@@ -106,10 +106,10 @@
 
     try {
       console.log('[signup] inscription →', API_BASE + '/register');
-      await register(fullname, email, password);
-      showMessage(msg, 'Compte créé ! Connexion en cours…', false);
-      const user = await login(email, password);
-      console.log('[signup] connecté :', user);
+      const data = await register(fullname, email, password);
+      const user = data.user;
+      saveSession(user); // Sauvegarde la session reçue du backend
+      console.log('[signup] compte créé et connecté :', user);
       const role = resolveUserRole(user);
       window.location.href = role === 'admin' ? './index.html' : './user-dashboard.html';
     } catch (err) {

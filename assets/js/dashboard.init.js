@@ -135,7 +135,7 @@
       return;
     }
     setStatCard('stat-card-rdv',       'stat-rdv',       'calendar', 'Rendez-vous',   firstNumber(stats, ['total_appointments', 'appointments', 'total_rdvs', 'total', 'totalAppointments']));
-    setStatCard('stat-card-messages',  'stat-messages',  'clock',    'En attente',    firstNumber(stats, ['pending_appointments', 'pending', 'waiting_appointments', 'pending_count', 'pendingAppointments']));
+    setStatCard('stat-card-messages',  'stat-messages',  'clock',    'En attente',    firstNumber(stats, ['waiting', 'pending_appointments', 'pending', 'waiting_appointments', 'pending_count', 'pendingAppointments']));
     setStatCard('stat-card-confirmed', 'stat-confirmed', 'check',    'Confirmés',     firstNumber(stats, ['confirmed_appointments', 'confirmed', 'confirmed_count', 'confirmedAppointments']));
     setStatCard('stat-card-refused',   'stat-refused',   'x',        'Refusés',       firstNumber(stats, ['refused_appointments', 'rejected_appointments', 'refused', 'rejected', 'refused_count', 'rejected_count']));
     setStatCard('stat-card-today',     'stat-today',     'pin',      "Aujourd'hui",   firstNumber(stats, ['appointments_today', 'today_appointments', 'today', 'today_count', 'appointmentsToday']));
@@ -172,10 +172,12 @@
   // ── Dashboard statistics and recent activity from Flask ──
   setDashboardLoading();
   try {
-    const _dashApiBase = API_BASE;
-    const _url = `${_dashApiBase}/dashboard/stats`;
-    console.log('[dashboard] GET', _url);
-    const res = await apiFetch(_url);
+    const url = isAdmin
+      ? `${API_BASE}/dashboard/stats`
+      : `${API_BASE}/dashboard/user/${s.id}`;
+
+    console.log('[dashboard] GET', url);
+    const res = await apiFetch(url);
     const data = await readApiResponse(res);
     console.log('[dashboard] réponse reçue :', JSON.stringify(data).slice(0, 300));
     const stats = data.stats ?? data.dashboard ?? data.data ?? data;
